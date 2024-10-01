@@ -1,5 +1,13 @@
+import ProductCard from "@/components/reuseable/ProductCard";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -8,12 +16,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
+import { getRandomProducts } from "@/lib/getproduct";
+import { ProductType } from "@/types/product";
+import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
+import { title } from "process";
 import { useState } from "react";
 
 const Product = () => {
   const [selectedSort, setSelectedSort] = useState("popular");
+  const [initialValue, setInitialValue] = useState(2);
+  const [finalValue, setFinalValue] = useState(10);
+
+  const { status, data, error } = useQuery({
+    queryKey: ["products"],
+    queryFn: getRandomProducts,
+  });
+
+  if (status === "pending") {
+    return <div>Loading...</div>;
+  }
+  if (status === "error") {
+    return <span>Error: {error.message}</span>;
+  }
+
   return (
     <>
       <section className="w-full py-12 md:py-24 lg:py-32">
@@ -25,7 +51,7 @@ const Product = () => {
           <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
             <div className="w-full md:w-1/3">
               <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   className="pl-8"
                   placeholder="Search products..."
@@ -35,9 +61,12 @@ const Product = () => {
             </div>
             <div className="w-full md:w-1/3 flex items-center gap-3">
               <h3 className="text-sm font-semibold">Sort By:</h3>
-              <Select defaultValue={selectedSort} onValueChange={setSelectedSort}>
+              <Select
+                defaultValue={selectedSort}
+                onValueChange={setSelectedSort}
+              >
                 <SelectTrigger className="w-[180px]">
-                  <SelectValue>{selectedSort}</SelectValue> 
+                  <SelectValue>{selectedSort}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="popular">Popular</SelectItem>
@@ -52,34 +81,34 @@ const Product = () => {
               </Select>
             </div>
           </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((product) => (
-              <Card key={product}>
-                <img
-                  src={`https://via.placeholder.com/200x200?text=Product ${product}`}
-                  alt={`Product ${product}`}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-4">
-                  <h3 className="font-semibold">Product {product}</h3>
-                  <p className="text-gray-500">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  </p>
-                  <div className="mt-4 flex justify-between items-center">
-                    <span className="text-2xl font-bold">
-                      ${(Math.random() * 100).toFixed(2)}
-                    </span>
-                    <Button size="sm">Add to Cart</Button>
-                  </div>
-                </div>
-              </Card>
-            ))}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 place-items-center">
+            {data &&
+              data
+                .slice(initialValue, finalValue)
+                .map((product: ProductType, index: number) => (
+                <ProductCard number={index} message={product} />
+                ))}
           </div>
-
           <div className="flex justify-center mt-8">
-            <Button className="mr-2">Previous</Button>
-            <Button className="ml-2">Next</Button>
+            {initialValue > 4 && (
+              <Button
+                className="mr-2"
+                onClick={() => (
+                  setFinalValue(initialValue),
+                  setInitialValue(initialValue - (finalValue - initialValue))
+                )}
+              >
+                Previous
+              </Button>
+            )}
+            <Button
+              className="ml-2"
+              onClick={() => (
+                setInitialValue(finalValue), setFinalValue(finalValue + 8)
+              )}
+            >
+              Next
+            </Button>
           </div>
         </div>
       </section>
