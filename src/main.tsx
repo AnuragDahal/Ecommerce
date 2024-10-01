@@ -9,7 +9,7 @@ import Layout from "./Layout.tsx";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
-      <Layout children={<App />} />
+      <App/>
     </BrowserRouter>
   </StrictMode>
 );

@@ -13,9 +13,19 @@ const Layout = ({ children }) => (
               <span className="hidden font-bold sm:inline-block">ShopNow</span>
             </Link>
             <nav className="flex items-center space-x-6 text-sm font-medium">
-              <Link to="/products">Products</Link>
-              <Link to="/categories">Categories</Link>
-              <Link to="/contact">Contact</Link>
+            <Link to="/products">
+            Products
+            </Link>
+            <Link to="/categories">
+            Categories
+            </Link>
+            <Link to="/about">
+            About
+            </Link>
+            <Link to="/contact">
+            Contact
+            </Link>
+
             </nav>
           </div>
           <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
