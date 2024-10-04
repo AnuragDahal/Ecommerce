@@ -1,11 +1,12 @@
+import { API_ROUTES } from '@/constants/apiRoutes';
 import axios from 'axios';
 
 
 export const getFeaturedProducts = async()=>{
 
-    const response = await axios.get(`https://api.escuelajs.co/api/v1/products`,{
+    const response = await axios.get(API_ROUTES.PRODUCTS,{
         params:{
-            offset:3,
+            offset:73,
             limit:6
         }
     });
@@ -15,7 +16,8 @@ export const getFeaturedProducts = async()=>{
 
 export const getRandomProducts = async()=>{
 
-    const response = await axios.get(`https://api.escuelajs.co/api/v1/products`)
+    const response = await axios.get(API_ROUTES.PRODUCTS)
 
     return response.data;
 }
+
