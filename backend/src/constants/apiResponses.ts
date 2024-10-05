@@ -4,6 +4,7 @@ export const API_RESPONSES = {
     USER_LOGGED_IN: "User successfully logged in",
     EMAIL_SENT: "Email successfully sent",
     PASSWORD_CHANGED: "Password successfully changed",
+    USER_LOGGED_OUT: "User successfully logged out",
 
     // Error Responses
     USER_NOT_FOUND: "User not found",
@@ -20,6 +21,8 @@ export const API_RESPONSES = {
     PASSWORD_DIGIT: "Password must contain at least one digit",
     PASSWORD_SPECIAL_CHAR:
         "Password must contain at least one special character",
+    MISSING_REQUIRED_FIELDS: "Please fill in all required fields",
+    
 
     // General Responses
     BAD_REQUEST: "Bad request",

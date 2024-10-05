@@ -32,6 +32,16 @@ export const sendForbidden = (
     });
 };
 
+export const sendAlreadyExists= (
+    res: Response,
+    message = API_RESPONSES.USER_ALREADY_EXISTS
+) => {
+    return res.status(HTTP_STATUS_CODES.CONFLICT).json({
+        statusCode: HTTP_STATUS_CODES.CONFLICT,
+        message: message,
+    });
+};
+
 export const sendNotFound = (
     res: Response,
     message = API_RESPONSES.NOT_FOUND
@@ -53,8 +63,8 @@ export const sendInternalServerError = (
 };
 export const sendSuccess = (
     res: Response,
-    statusCode = HTTP_STATUS_CODES.OK,
     message = "Success",
+    statusCode = HTTP_STATUS_CODES.OK,
     data = {}
 ) => {
     // Ensure the status code is a valid success code
