@@ -1,4 +1,6 @@
-export const passwordChangeTemplate = (userName:string) => `
+import { IEmailTemplate } from "../../types/email";
+
+export const passwordChangeTemplate = ({userName}:IEmailTemplate) => `
 <!DOCTYPE html>
 <html lang="en">
 <head>
