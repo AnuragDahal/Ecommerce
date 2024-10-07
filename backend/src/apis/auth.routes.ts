@@ -10,9 +10,6 @@ const router = Router();
 
 router.post("/signup", handleSignUp);
 router.post("/login", handleLogin);
-
-// router.post("/logout", handleLogout);
-
 router.post("/logout", handleLogout);
 // router.post("/change-password");
 // router.post("/forgot-password" /* handler */);

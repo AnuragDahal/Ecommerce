@@ -77,14 +77,20 @@ export const handleLogin = async (
 
         if (!accessToken && !refreshToken) {
             console.log("Failed to generate access and refresh token");
-            sendInternalServerError(res, API_RESPONSES.FAILED_TO_GENERATE_TOKEN);
+            sendInternalServerError(
+                res,
+                API_RESPONSES.FAILED_TO_GENERATE_TOKEN
+            );
             return;
         }
         if (refreshToken) {
             user.refreshToken = refreshToken;
         } else {
             console.log("Refresh token is undefined");
-            sendInternalServerError(res, API_RESPONSES.FAILED_TO_GENERATE_TOKEN);
+            sendInternalServerError(
+                res,
+                API_RESPONSES.FAILED_TO_GENERATE_TOKEN
+            );
             return;
         }
         await user.save({ validateBeforeSave: false });
@@ -116,6 +122,33 @@ export const handleLogin = async (
     }
 };
 
-export const handleLogout = async (req: Request, res: Response) => {};
+export const handleLogout = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+    try {
+        const authHeader = req.headers["authorization"];
+        if (!authHeader) {
+            sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
+            return;
+        }
+        const token = authHeader.split(" ")[1];
+        const loggedInUser = await User.findOneAndUpdate(
+            { refreshToken: token },
+            { $set: { refreshToken: "" } },
+            { new: true }
+        );
+        if (!loggedInUser) {
+            sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
+            return;
+        }
+        // Perform logout logic here, e.g., invalidate the token
+        sendSuccess(res, API_RESPONSES.USER_LOGGED_OUT);
+        return;
+    } catch (error) {
+        sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
+        return;
+    }
+};
 
 export const handleRefreshToken = async (req: Request, res: Response) => {};
