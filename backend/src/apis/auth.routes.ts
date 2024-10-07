@@ -3,6 +3,7 @@ import {
     handleSignUp,
     handleLogin,
     handleLogout,
+    handleRefreshToken,
     // handleSignUp,
 } from "../controllers/user.controller";
 
@@ -11,6 +12,7 @@ const router = Router();
 router.post("/signup", handleSignUp);
 router.post("/login", handleLogin);
 router.post("/logout", handleLogout);
+router.post("/refresh-token",handleRefreshToken);
 // router.post("/change-password");
 // router.post("/forgot-password" /* handler */);
 // router.post("/reset-password" /* handler */);

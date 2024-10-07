@@ -11,6 +11,7 @@ import { API_RESPONSES } from "../constants/apiResponses";
 import User from "../models/user.model";
 import { HTTP_STATUS_CODES } from "../constants/statusCodes";
 import { generateAccessAndRefreshToken } from "../utils/tokenUtils";
+import jwt from "jsonwebtoken";
 
 export const handleSignUp = async (
     req: Request,
@@ -129,12 +130,34 @@ export const handleLogout = async (
     try {
         const authHeader = req.headers["authorization"];
         if (!authHeader) {
-            sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
+            sendUnauthorized(res, API_RESPONSES.MISSING_HEADERS);
             return;
         }
         const token = authHeader.split(" ")[1];
-        const loggedInUser = await User.findOneAndUpdate(
-            { refreshToken: token },
+        if (!token) {
+            sendUnauthorized(res, API_RESPONSES.INVALID_TOKEN);
+            return;
+        }
+        if (!process.env.ACCESS_TOKEN_SECRET) {
+            sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
+            return;
+        }
+        let decodedToken;
+        try {
+            decodedToken = jwt.verify(
+                token,
+                process.env.ACCESS_TOKEN_SECRET
+            ) as { _id: string };
+        } catch (error) {
+            sendUnauthorized(res, API_RESPONSES.INVALID_TOKEN);
+            return;
+        }
+        if (!decodedToken || !decodedToken._id) {
+            sendUnauthorized(res, API_RESPONSES.INVALID_TOKEN);
+            return;
+        }
+        const loggedInUser = await User.findByIdAndUpdate(
+            decodedToken._id,
             { $set: { refreshToken: "" } },
             { new: true }
         );
@@ -142,13 +165,53 @@ export const handleLogout = async (
             sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
             return;
         }
-        // Perform logout logic here, e.g., invalidate the token
+
+        res.clearCookie("accessToken");
         sendSuccess(res, API_RESPONSES.USER_LOGGED_OUT);
+    } catch (error) {
+        if (error instanceof jwt.JsonWebTokenError) {
+            sendUnauthorized(res, API_RESPONSES.INVALID_TOKEN);
+        } else {
+            sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
+        }
+    }
+};
+
+export const handleRefreshToken = async (req: Request, res: Response) => {
+    try {
+        const authHeader = req.headers["authorization"];
+        if (!authHeader) {
+            sendUnauthorized(res, API_RESPONSES.MISSING_HEADERS);
+            return;
+        }
+        const headerToken = authHeader.split("Bearer ")[1];
+        const user = await User.findOne({ refreshToken: headerToken });
+        if (!user) {
+            sendUnauthorized(res, API_RESPONSES.NOT_FOUND);
+            return;
+        }
+        const { accessToken, refreshToken } =
+            await generateAccessAndRefreshToken(user._id);
+        if (!accessToken && !refreshToken) {
+            sendInternalServerError(
+                res,
+                API_RESPONSES.FAILED_TO_GENERATE_TOKEN
+            );
+            return;
+        }
+        user.refreshToken = refreshToken;
+        await user.save({ validateBeforeSave: false });
+        res.cookie("accessToken", accessToken).cookie(
+            "refreshToken",
+            refreshToken
+        );
+        sendSuccess(res, API_RESPONSES.TOKEN_REFRESHED, HTTP_STATUS_CODES.OK, {
+            accessToken: accessToken,
+            refreshToken: refreshToken,
+        });
         return;
     } catch (error) {
         sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
         return;
     }
 };
-
-export const handleRefreshToken = async (req: Request, res: Response) => {};
