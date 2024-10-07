@@ -5,11 +5,11 @@ export const API_RESPONSES = {
     EMAIL_SENT: "Email successfully sent",
     PASSWORD_CHANGED: "Password successfully changed",
     USER_LOGGED_OUT: "User successfully logged out",
+    TOKEN_REFRESHED: "Access token and refresh token successfully refreshed",
 
     // Error Responses
     USER_NOT_FOUND: "User not found",
     USER_ALREADY_EXISTS: "User already exists",
-    INVALID_CREDENTIALS: "Invalid credentials",
     FAILED_TO_GENERATE_TOKEN: "Failed to generate token",
     FAILED_TO_SEND_EMAIL: "Failed to send email",
     FAILED_TO_LOGIN: "Failed to login",
@@ -23,7 +23,9 @@ export const API_RESPONSES = {
     PASSWORD_SPECIAL_CHAR:
         "Password must contain at least one special character",
     MISSING_REQUIRED_FIELDS: "Please fill in all required fields",
-    
+    MISSING_HEADERS: "Please providerequired headers",
+    INVALID_CREDENTIALS: "Invalid credentials",
+    INVALID_TOKEN: "The token has been expired or is invalid",
 
     // General Responses
     BAD_REQUEST: "Bad request",
