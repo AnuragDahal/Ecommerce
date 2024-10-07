@@ -12,6 +12,7 @@ export const API_RESPONSES = {
     INVALID_CREDENTIALS: "Invalid credentials",
     FAILED_TO_GENERATE_TOKEN: "Failed to generate token",
     FAILED_TO_SEND_EMAIL: "Failed to send email",
+    FAILED_TO_LOGIN: "Failed to login",
 
     // VALIDATION ERRORS
     INVALID_EMAIL: "Invalid email",

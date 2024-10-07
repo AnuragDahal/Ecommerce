@@ -1,5 +1,7 @@
+import { send } from "process";
 import User from "../models/user.model";
 import { Types } from "mongoose";
+import { sendInternalServerError } from "./statusUtils";
 export const generateAccessAndRefreshToken = async (userId: Types.ObjectId) => {
     try {
         const user = await User.findById(userId);
@@ -13,6 +15,6 @@ export const generateAccessAndRefreshToken = async (userId: Types.ObjectId) => {
         await user.save({ validateBeforeSave: false });
         return { accessToken, refreshToken };
     } catch (error) {
-        return { error: "Failed to generate access and refresh token" };
+        return { error: "Error generating access and refresh token" };
     }
 };

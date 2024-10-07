@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { IUser } from "../types/user";
-import { cachedDataVersionTag } from "v8";
+
 dotenv.config();
 
 const userSchema = new Schema({
@@ -49,7 +49,7 @@ userSchema.methods.isPasswordCorrect = async function (
     return await bcrypt.compare(candidatePassword, this.password);
 };
 
-userSchema.methods.generateAceessToken = function () {
+userSchema.methods.generateAccessToken = function () {
     if (!process.env.ACCESS_TOKEN_SECRET) {
         throw new Error("ACCESS_TOKEN_SECRET is not defined");
     }
@@ -67,7 +67,7 @@ userSchema.methods.generateAceessToken = function () {
         }
     );
 };
-userSchema.methods.generateRefreshToken = async function () {
+userSchema.methods.generateRefreshToken =  function () {
     if (!process.env.REFRESH_TOKEN_SECRET) {
         throw new Error("REFRESH_TOKEN_SECRET is not defined");
     }

@@ -9,7 +9,6 @@ export interface IUser extends Document {
     generateAccessToken(): String;
     generateRefreshToken(): String;
 }
-
 export interface IResponse {
     success?: Boolean;
     message: String;
