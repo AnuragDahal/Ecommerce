@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { IUser } from "../types/user";
+import exp from "constants";
 
 dotenv.config();
 
@@ -44,11 +45,28 @@ const userSchema = new Schema({
     isEmailVerified: {
         type: Boolean,
     },
+    otp: {
+        type: String,
+    },
+    otpExpires: {
+        type: Date,
+        expires: 600,
+        default: Date.now,
+        index: { expires: "10m" },
+        required: false,
+    },
     refreshToken: {
         type: String,
     },
 });
 
+userSchema.pre("save", function (next) {
+    if (this.otpExpires && this.otpExpires < new Date()) {
+        this.otp = "";
+        this.otpExpires = null;
+    }
+    next();
+});
 // Pre-hook to hash the password before saving the user
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) next();

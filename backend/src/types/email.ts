@@ -6,8 +6,7 @@ export interface IEmail {
     html: string;
 }
 
-export interface IEmailTemplate{
-    userName:string;
-    otp?:string | number;
-}   
-
+export interface IEmailTemplate {
+    userName: string;
+    otp?: string | number;
+}

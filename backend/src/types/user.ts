@@ -22,6 +22,8 @@ export interface IUser extends Document {
     role: EnumRole;
     password: String;
     avatar: String;
+    otp?: Number;
+    otpExpires?: Date;
     refreshToken: String;
     isPasswordCorrect(candidatePassword: String): Promise<Boolean>;
     generateAccessToken(): String;

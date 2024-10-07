@@ -7,11 +7,14 @@ import {
     sendSuccess,
     sendUnauthorized,
 } from "../utils/statusUtils";
+import { emailVerificationTemplate } from "../constants/emailTemplates/emailVerification";
 import { API_RESPONSES } from "../constants/apiResponses";
 import User from "../models/user.model";
 import { HTTP_STATUS_CODES } from "../constants/statusCodes";
 import { generateAccessAndRefreshToken } from "../utils/tokenUtils";
 import jwt from "jsonwebtoken";
+import { IEmailTemplate } from "../types/email";
+import { sendEmail } from "../utils/emailUtils";
 
 export const handleSignUp = async (
     req: Request,
@@ -36,11 +39,30 @@ export const handleSignUp = async (
             userName,
             password,
         });
-        await user.save();
 
-        sendSuccess(res, API_RESPONSES.USER_CREATED, HTTP_STATUS_CODES.CREATED);
-        console.log("User created successfully");
+        // Send email verification link
+        const Otp = Math.floor(100000 + Math.random() * 900000);
+        const emailData = {
+            to: email,
+            subject: "Email Verification",
+            html: emailVerificationTemplate({ userName, otp: Otp }),
+        };
+        user.otp = Otp;
+        user.otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+        await user.save({ validateBeforeSave: false });
+
+        const isEmailSent = await sendEmail(
+            emailData.to,
+            emailData.subject,
+            emailData.html
+        );
+        if (!isEmailSent) {
+            sendInternalServerError(res, API_RESPONSES.FAILED_TO_SEND_EMAIL);
+            return;
+        }
+        sendSuccess(res, API_RESPONSES.EMAIL_SENT, HTTP_STATUS_CODES.OK);
         return;
+        
     } catch (error) {
         sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
         console.log("Signup error:");
