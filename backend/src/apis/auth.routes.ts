@@ -1,19 +1,15 @@
 import { Router } from "express";
 import {
+    handleSignUp,
     handleLogin,
     handleLogout,
-    handleSignUp,
+    // handleSignUp,
 } from "../controllers/user.controller";
 
 const router = Router();
 
-router.post("/sign-up", handleSignUp);
+router.post("/signup", handleSignUp);
 router.post("/login", handleLogin);
-router.post("/logout", handleLogout);
-// router.post("/change-password");
-// router.post("/forgot-password" /* handler */);
-// router.post("/reset-password" /* handler */);
-// router.post("/verify-email" /* handler */);
-// router.post("/resend-verification-email" /* handler */);
+// router.post("/logout", handleLogout);
 
 export default router;
