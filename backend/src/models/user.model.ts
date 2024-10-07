@@ -21,6 +21,17 @@ const userSchema = new Schema({
         required: true,
         unique: true,
     },
+    address: {
+        type: String,
+    },
+    role: {
+        type: String,
+        enum: ["user", "seller", "admin"],
+        default: "user",
+    },
+    avatar: {
+        type: String,
+    },
     email: {
         type: String,
         required: true,
@@ -29,6 +40,9 @@ const userSchema = new Schema({
     password: {
         type: String,
         required: true,
+    },
+    isEmailVerified: {
+        type: Boolean,
     },
     refreshToken: {
         type: String,
@@ -67,7 +81,7 @@ userSchema.methods.generateAccessToken = function () {
         }
     );
 };
-userSchema.methods.generateRefreshToken =  function () {
+userSchema.methods.generateRefreshToken = function () {
     if (!process.env.REFRESH_TOKEN_SECRET) {
         throw new Error("REFRESH_TOKEN_SECRET is not defined");
     }
