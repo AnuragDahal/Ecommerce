@@ -11,6 +11,8 @@
 // createdAt Date
 // updateAt Date
 
+import { Types } from "mongoose";
+
 type EnumRole = "user" | "seller" | "admin";
 export interface IUser extends Document {
     firstName: String;
@@ -22,10 +24,16 @@ export interface IUser extends Document {
     role: EnumRole;
     password: String;
     avatar: String;
-    otp?: Number;
+    otp?: String;
     otpExpires?: Date;
     refreshToken: String;
     isPasswordCorrect(candidatePassword: String): Promise<Boolean>;
     generateAccessToken(): String;
     generateRefreshToken(): String;
+}
+
+export interface IJWTPayload {
+    _id: Types.ObjectId;
+    email: String;
+    userName: String;
 }

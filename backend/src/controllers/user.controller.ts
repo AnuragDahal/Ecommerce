@@ -11,10 +11,14 @@ import { emailVerificationTemplate } from "../constants/emailTemplates/emailVeri
 import { API_RESPONSES } from "../constants/apiResponses";
 import User from "../models/user.model";
 import { HTTP_STATUS_CODES } from "../constants/statusCodes";
-import { generateAccessAndRefreshToken } from "../utils/tokenUtils";
+import {
+    generateAccessAndRefreshToken,
+    getPayloadDataFromHeader,
+} from "../utils/tokenUtils";
 import jwt from "jsonwebtoken";
 import { IEmailTemplate } from "../types/email";
 import { sendEmail } from "../utils/emailUtils";
+import { IJWTPayload } from "../types/user";
 
 export const handleSignUp = async (
     req: Request,
@@ -47,7 +51,7 @@ export const handleSignUp = async (
             subject: "Email Verification",
             html: emailVerificationTemplate({ userName, otp: Otp }),
         };
-        user.otp = Otp;
+        user.otp = Otp.toString();
         user.otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
         await user.save({ validateBeforeSave: false });
 
@@ -62,7 +66,6 @@ export const handleSignUp = async (
         }
         sendSuccess(res, API_RESPONSES.EMAIL_SENT, HTTP_STATUS_CODES.OK);
         return;
-        
     } catch (error) {
         sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
         console.log("Signup error:");
@@ -231,6 +234,48 @@ export const handleRefreshToken = async (req: Request, res: Response) => {
             accessToken: accessToken,
             refreshToken: refreshToken,
         });
+        return;
+    } catch (error) {
+        sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
+        return;
+    }
+};
+
+export const handleOtpVerification = async (req: Request, res: Response) => {
+    // const authHeader = req.headers["authorization"];
+    // if (!authHeader) {
+    //     sendUnauthorized(res, API_RESPONSES.MISSING_HEADERS);
+    //     return;
+    // }
+    // const token = authHeader.split(" ")[1];
+    // if (!process.env.ACCESS_TOKEN_SECRET) {
+    //     sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
+    //     return;
+    // }
+    try {
+        const { email, otp } = req.body;
+        if (!email || !otp) {
+            sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
+            return;
+        }
+        const user = await User.findOne({ email });
+        if (!user) {
+            sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
+            return;
+        }
+        if (user.otp !== otp) {
+            sendBadRequest(res, API_RESPONSES.INVALID_CREDENTIALS);
+            return;
+        }
+        if (user.otpExpires && user.otpExpires < new Date()) {
+            sendBadRequest(res, API_RESPONSES.INVALID_CREDENTIALS);
+            return;
+        }
+        user.isEmailVerified = true;
+        user.otp = "";
+        user.otpExpires = undefined;
+        await user.save({ validateBeforeSave: false });
+        sendSuccess(res, API_RESPONSES.USER_LOGGED_IN);
         return;
     } catch (error) {
         sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);

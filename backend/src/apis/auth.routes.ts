@@ -4,6 +4,7 @@ import {
     handleLogin,
     handleLogout,
     handleRefreshToken,
+    handleOtpVerification,
     // handleSignUp,
 } from "../controllers/user.controller";
 
@@ -13,6 +14,7 @@ router.post("/signup", handleSignUp);
 router.post("/login", handleLogin);
 router.post("/logout", handleLogout);
 router.post("/refresh-token",handleRefreshToken);
+router.post('/verify',handleOtpVerification);
 // router.post("/change-password");
 // router.post("/forgot-password" /* handler */);
 // router.post("/reset-password" /* handler */);
