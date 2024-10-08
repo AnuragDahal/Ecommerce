@@ -23,7 +23,7 @@ export const API_RESPONSES = {
     PASSWORD_SPECIAL_CHAR:
         "Password must contain at least one special character",
     MISSING_REQUIRED_FIELDS: "Please fill in all required fields",
-    MISSING_HEADERS: "Please providerequired headers",
+    MISSING_HEADERS: "Please provide required headers",
     INVALID_CREDENTIALS: "Invalid credentials",
     INVALID_TOKEN: "The token has been expired or is invalid",
     OTP_EXPIRED: "The otp has been expired. Please request a new one",

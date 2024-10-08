@@ -7,6 +7,7 @@ import {
     handleOtpVerification,
     handlePasswordReset,
     handleForgetPassword,
+    handlePasswordChange,
 } from "../controllers/user.controller";
 
 const router = Router();
@@ -18,12 +19,8 @@ router.post("/refresh-token", handleRefreshToken);
 router.post("/verify", handleOtpVerification);
 router.post("/forgot-password", handleForgetPassword);
 router.post("/reset-password", handlePasswordReset);
-// router.post()
+router.post("/change-password", handlePasswordChange);
 
-// router.post("/change-password");
-// router.post("/forgot-password" /* handler */);
-// router.post("/reset-password" /* handler */);
-// router.post("/verify-email" /* handler */);
 // router.post("/resend-verification-email" /* handler */);
 
 export default router;

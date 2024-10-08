@@ -381,3 +381,51 @@ export const handlePasswordReset = async (req: Request, res: Response) => {
         return;
     }
 };
+
+export const handlePasswordChange = async (req: Request, res: Response) => {
+    const payload = getPayloadDataFromHeader(req, res);
+    if (!payload) {
+        sendUnauthorized(res, API_RESPONSES.INVALID_TOKEN);
+        return;
+    }
+    const userId = payload._id;
+    try {
+        const { oldPassword, newPassword } = req.body;
+        if (!oldPassword || !newPassword) {
+            sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
+            return;
+        }
+        const user = await User.findOne({ _id: userId });
+        if (!user) {
+            sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
+            return;
+        }
+        const isPasswordMatched = await user.isPasswordCorrect(oldPassword);
+        if (!isPasswordMatched) {
+            sendBadRequest(res, API_RESPONSES.INVALID_PASSWORD);
+            return;
+        }
+        user.password = newPassword;
+        await user.save({ validateBeforeSave: false });
+        const emailData = {
+            to: user.email,
+            subject: "Password Changed",
+            html: passwordChangeTemplate({
+                userName: user.userName.toString(),
+            }),
+        };
+        const isEmailSent = await sendEmail(
+            emailData.to.toString(),
+            emailData.subject,
+            emailData.html
+        );
+        if (!isEmailSent) {
+            sendInternalServerError(res, API_RESPONSES.FAILED_TO_SEND_EMAIL);
+            return;
+        }
+        sendSuccess(res, API_RESPONSES.PASSWORD_CHANGED);
+    } catch (error) {
+        sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
+        return;
+    }
+};
