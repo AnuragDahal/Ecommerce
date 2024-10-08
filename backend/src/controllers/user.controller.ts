@@ -16,9 +16,10 @@ import {
     getPayloadDataFromHeader,
 } from "../utils/tokenUtils";
 import jwt from "jsonwebtoken";
-import { IEmailTemplate } from "../types/email";
 import { sendEmail } from "../utils/emailUtils";
+import { forgotPasswordTemplate } from "../constants/emailTemplates/forgetPassword";
 import { IJWTPayload } from "../types/user";
+import { passwordChangeTemplate } from "../constants/emailTemplates/passwordChange";
 
 export const handleSignUp = async (
     req: Request,
@@ -276,6 +277,104 @@ export const handleOtpVerification = async (req: Request, res: Response) => {
         user.otpExpires = undefined;
         await user.save({ validateBeforeSave: false });
         sendSuccess(res, API_RESPONSES.USER_LOGGED_IN);
+        return;
+    } catch (error) {
+        sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
+        return;
+    }
+};
+
+export const handleForgetPassword = async (req: Request, res: Response) => {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
+            return;
+        }
+        const user = await User.findOne({ email });
+        if (!user) {
+            sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
+            return;
+        }
+        const Otp = Math.floor(100000 + Math.random() * 900000);
+        const emailData = {
+            to: email,
+            subject: "Reset Password",
+            // to do change the template to password reset template
+            html: forgotPasswordTemplate({
+                userName: user.userName.toString(),
+                otp: Otp,
+            }),
+        };
+        user.otp = Otp.toString();
+        user.otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+        await user.save({ validateBeforeSave: false });
+
+        const isEmailSent = await sendEmail(
+            emailData.to,
+            emailData.subject,
+            emailData.html
+        );
+        if (!isEmailSent) {
+            sendInternalServerError(res, API_RESPONSES.FAILED_TO_SEND_EMAIL);
+            return;
+        }
+        sendSuccess(res, API_RESPONSES.EMAIL_SENT, HTTP_STATUS_CODES.OK);
+        return;
+    } catch (error) {
+        sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
+        return;
+    }
+};
+
+export const handlePasswordReset = async (req: Request, res: Response) => {
+    // const payload = getPayloadDataFromHeader(req, res);
+    // if (!payload) {
+    //     sendUnauthorized(res, API_RESPONSES.INVALID_TOKEN);
+    //     return;
+    // }
+    // const userId = payload._id;
+    try {
+        const { email, otp, newPassword } = req.body;
+        if (!newPassword || !otp) {
+            sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
+            return;
+        }
+        const user = await User.findOne({ email: email });
+        if (!user) {
+            sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
+            return;
+        }
+        if (user.otp !== otp) {
+            sendBadRequest(res, API_RESPONSES.INVALID_CREDENTIALS);
+            return;
+        }
+        if (user.otpExpires && user.otpExpires < new Date()) {
+            sendBadRequest(res, API_RESPONSES.OTP_EXPIRED);
+            return;
+        }
+        user.password = newPassword;
+        user.otp = "";
+        user.otpExpires = undefined;
+        await user.save({ validateBeforeSave: false });
+
+        const emailData = {
+            to: email,
+            subject: "Password Changed",
+            html: passwordChangeTemplate({
+                userName: user.userName.toString(),
+            }),
+        };
+        const isEmailSent = await sendEmail(
+            emailData.to,
+            emailData.subject,
+            emailData.html
+        );
+        if (!isEmailSent) {
+            sendInternalServerError(res, API_RESPONSES.FAILED_TO_SEND_EMAIL);
+            return;
+        }
+        sendSuccess(res, API_RESPONSES.PASSWORD_CHANGED);
         return;
     } catch (error) {
         sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);

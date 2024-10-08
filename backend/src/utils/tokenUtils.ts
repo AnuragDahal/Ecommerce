@@ -6,6 +6,7 @@ import { API_RESPONSES } from "../constants/apiResponses";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { IJWTPayload2 } from "../types/user";
 dotenv.config();
 
 export const generateAccessAndRefreshToken = async (userId: Types.ObjectId) => {
@@ -36,6 +37,13 @@ export const getPayloadDataFromHeader = (req: Request, res: Response) => {
         sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
         return;
     }
-    const payload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    return payload;
+    const payload = jwt.verify(
+        token,
+        process.env.ACCESS_TOKEN_SECRET
+    ) as IJWTPayload2;
+    return {
+        _id: payload._id,
+        email: payload.email,
+        userName: payload.userName,
+    };
 };

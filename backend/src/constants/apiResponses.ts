@@ -26,6 +26,7 @@ export const API_RESPONSES = {
     MISSING_HEADERS: "Please providerequired headers",
     INVALID_CREDENTIALS: "Invalid credentials",
     INVALID_TOKEN: "The token has been expired or is invalid",
+    OTP_EXPIRED: "The otp has been expired. Please request a new one",
 
     // General Responses
     BAD_REQUEST: "Bad request",

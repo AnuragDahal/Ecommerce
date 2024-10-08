@@ -1,6 +1,6 @@
 import { IEmailTemplate } from "../../types/email";
 
-export const passwordChangeTemplate = ({ userName }: IEmailTemplate) => `
+export const forgotPasswordTemplate = ({ userName, otp }: IEmailTemplate) => `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -39,14 +39,16 @@ export const passwordChangeTemplate = ({ userName }: IEmailTemplate) => `
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Password Changed</h1>
-        <p>Hi ${userName},</p>
-        <p>This is to inform you that your password has been successfully changed.</p>
-        <p>If you did not request this change or if you suspect unauthorized activity, please contact our support team immediately.</p>
-        <p>Thank you for using our service!</p>
-        <p class="footer">Best regards,<br>shop now</p>
-    </div>
+     <div class="container">
+            <h1>Reset Your Password</h1>
+            <p>Hi ${userName},</p>
+            <p>We received a request to reset your password. Please use the following OTP (One-Time Password) to reset your password:</p>
+            <h2>${otp}</h2>
+            <p>This OTP is valid for the next 10 minutes.</p>
+            <p>If you did not request a password reset, please ignore this email or contact our support team immediately.</p>
+            <p>Thank you for using our service!</p>
+            <p class="footer">Best regards,<br>Shop Now</p>
+        </div>
 </body>
 </html>
 `;

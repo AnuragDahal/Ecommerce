@@ -37,3 +37,9 @@ export interface IJWTPayload {
     email: String;
     userName: String;
 }
+
+export interface IJWTPayload2 {
+    _id: string;
+    email: string;
+    userName: string;
+}
