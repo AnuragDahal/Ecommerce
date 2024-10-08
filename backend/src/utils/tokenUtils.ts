@@ -9,7 +9,9 @@ import dotenv from "dotenv";
 import { IJWTPayload2 } from "../types/user";
 dotenv.config();
 
-export const generateAccessAndRefreshToken = async (userId: Types.ObjectId) => {
+export const generateAccessAndRefreshToken = async (
+    userId: Types.ObjectId | string
+) => {
     try {
         const user = await User.findById(userId);
         if (!user) {

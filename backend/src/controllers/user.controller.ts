@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import {
     sendAlreadyExists,
     sendBadRequest,
@@ -15,10 +15,8 @@ import {
     generateAccessAndRefreshToken,
     getPayloadDataFromHeader,
 } from "../utils/tokenUtils";
-import jwt from "jsonwebtoken";
 import { sendEmail } from "../utils/emailUtils";
 import { forgotPasswordTemplate } from "../constants/emailTemplates/forgetPassword";
-import { IJWTPayload } from "../types/user";
 import { passwordChangeTemplate } from "../constants/emailTemplates/passwordChange";
 
 export const handleSignUp = async (
@@ -76,8 +74,7 @@ export const handleSignUp = async (
 
 export const handleLogin = async (
     req: Request,
-    res: Response,
-    next: NextFunction
+    res: Response
 ): Promise<void> => {
     try {
         const { userName, email, password } = req.body;
@@ -113,7 +110,6 @@ export const handleLogin = async (
         if (refreshToken) {
             user.refreshToken = refreshToken;
         } else {
-            console.log("Refresh token is undefined");
             sendInternalServerError(
                 res,
                 API_RESPONSES.FAILED_TO_GENERATE_TOKEN
@@ -125,7 +121,6 @@ export const handleLogin = async (
         const loggedInUser = await User.findById(user._id).select(
             "-password -refreshToken"
         );
-
         const options = {
             httpOnly: true,
             secure: true,
@@ -153,37 +148,15 @@ export const handleLogout = async (
     req: Request,
     res: Response
 ): Promise<void> => {
+    const payload = getPayloadDataFromHeader(req, res);
+    if (!payload) {
+        sendUnauthorized(res, API_RESPONSES.INVALID_TOKEN);
+        return;
+    }
+    const userId = payload._id;
     try {
-        const authHeader = req.headers["authorization"];
-        if (!authHeader) {
-            sendUnauthorized(res, API_RESPONSES.MISSING_HEADERS);
-            return;
-        }
-        const token = authHeader.split(" ")[1];
-        if (!token) {
-            sendUnauthorized(res, API_RESPONSES.INVALID_TOKEN);
-            return;
-        }
-        if (!process.env.ACCESS_TOKEN_SECRET) {
-            sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
-            return;
-        }
-        let decodedToken;
-        try {
-            decodedToken = jwt.verify(
-                token,
-                process.env.ACCESS_TOKEN_SECRET
-            ) as { _id: string };
-        } catch (error) {
-            sendUnauthorized(res, API_RESPONSES.INVALID_TOKEN);
-            return;
-        }
-        if (!decodedToken || !decodedToken._id) {
-            sendUnauthorized(res, API_RESPONSES.INVALID_TOKEN);
-            return;
-        }
         const loggedInUser = await User.findByIdAndUpdate(
-            decodedToken._id,
+            userId,
             { $set: { refreshToken: "" } },
             { new: true }
         );
@@ -191,38 +164,33 @@ export const handleLogout = async (
             sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
             return;
         }
-
         res.clearCookie("accessToken");
         sendSuccess(res, API_RESPONSES.USER_LOGGED_OUT);
     } catch (error) {
-        if (error instanceof jwt.JsonWebTokenError) {
-            sendUnauthorized(res, API_RESPONSES.INVALID_TOKEN);
-        } else {
-            sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
-        }
+        sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
     }
 };
 
 export const handleRefreshToken = async (req: Request, res: Response) => {
+    const payload = getPayloadDataFromHeader(req, res);
+    if (!payload) {
+        sendUnauthorized(res, API_RESPONSES.INVALID_TOKEN);
+        return;
+    }
+    const userId = payload._id;
     try {
-        const authHeader = req.headers["authorization"];
-        if (!authHeader) {
-            sendUnauthorized(res, API_RESPONSES.MISSING_HEADERS);
-            return;
-        }
-        const headerToken = authHeader.split("Bearer ")[1];
-        const user = await User.findOne({ refreshToken: headerToken });
-        if (!user) {
-            sendUnauthorized(res, API_RESPONSES.NOT_FOUND);
-            return;
-        }
         const { accessToken, refreshToken } =
-            await generateAccessAndRefreshToken(user._id);
+            await generateAccessAndRefreshToken(userId);
         if (!accessToken && !refreshToken) {
             sendInternalServerError(
                 res,
                 API_RESPONSES.FAILED_TO_GENERATE_TOKEN
             );
+            return;
+        }
+        const user = await User.findOne({ _id: userId });
+        if (!user) {
+            sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
             return;
         }
         user.refreshToken = refreshToken;
@@ -243,16 +211,6 @@ export const handleRefreshToken = async (req: Request, res: Response) => {
 };
 
 export const handleOtpVerification = async (req: Request, res: Response) => {
-    // const authHeader = req.headers["authorization"];
-    // if (!authHeader) {
-    //     sendUnauthorized(res, API_RESPONSES.MISSING_HEADERS);
-    //     return;
-    // }
-    // const token = authHeader.split(" ")[1];
-    // if (!process.env.ACCESS_TOKEN_SECRET) {
-    //     sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
-    //     return;
-    // }
     try {
         const { email, otp } = req.body;
         if (!email || !otp) {
