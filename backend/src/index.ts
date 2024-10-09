@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import { connect } from "./db/db.connect";
 import authRouter from "./apis/auth.routes";
+import productRouter from "./apis/product.routes";
 import cookieParser from "cookie-parser";
 
 dotenv.config();
@@ -9,16 +10,12 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-
 app.use(express.json());
 app.use(cookieParser());
 
+app.use("/api/auth", authRouter);
+app.use("/api/products", productRouter);
 
-
-
-app.use("/api/auth",authRouter );
-
-// Connect to MongoDB and start the server
 connect()
     .then(() => {
         app.listen(PORT, () => {

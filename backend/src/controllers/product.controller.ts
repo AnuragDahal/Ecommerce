@@ -25,7 +25,7 @@ export const handleCreateProduct = async (
             return;
         }
 
-        const { name, price, description, totalQuantity } = multerReq.body;
+        const { name, price, description, totalQuantity,category } = multerReq.body;
         if (!name || !price || !description || !totalQuantity) {
             sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
             return;
@@ -36,6 +36,7 @@ export const handleCreateProduct = async (
             price,
             description,
             totalQuantity,
+            category,
             imageUrl: [], // Initialize the imageUrl array
         });
 
@@ -47,7 +48,7 @@ export const handleCreateProduct = async (
             product.imageUrl.push(result.url);
         }
 
-        await product.save();
+        await product.save({ validateBeforeSave: false });
         sendSuccess(
             res,
             API_RESPONSES.PRODUCT_CREATED,

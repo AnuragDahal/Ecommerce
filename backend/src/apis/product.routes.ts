@@ -12,3 +12,5 @@ router.post("/create", upload.array("images", 5), handleCreateProduct);
 // router.post("/update", handleUpdateProduct);
 // router.post("/delete", handleDeleteProduct);
 // router.get("/list", handleListProduct);
+
+export default router;
