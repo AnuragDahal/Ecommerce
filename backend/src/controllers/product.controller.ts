@@ -13,6 +13,7 @@ import {
     uploadMultipleFiles,
 } from "../utils/imageKit";
 import { HTTP_STATUS_CODES } from "../constants/statusCodes";
+import upload from "../utils/multer";
 
 interface MulterRequest extends Request {
     files?: Express.Multer.File[];
@@ -47,13 +48,8 @@ export const handleCreateProduct = async (
             imageUrl: [], // Initialize the imageUrl array
         });
 
-        for (const file of multerReq.files) {
-            const result = await imagekit.upload({
-                file: file.buffer,
-                fileName: file.originalname,
-            });
-            product.imageUrl.push(result.url);
-        }
+        const result = await uploadMultipleFiles(multerReq.files);
+        product.imageUrl = result;
 
         await product.save({ validateBeforeSave: false });
         sendSuccess(
