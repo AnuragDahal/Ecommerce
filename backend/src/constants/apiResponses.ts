@@ -8,7 +8,8 @@ export const API_RESPONSES = {
     TOKEN_REFRESHED: "Access token and refresh token successfully refreshed",
     PRODUCT_CREATED: "Product successfully created",
     PRODUCT_UPDATED: "Product successfully updated",
-
+    PRODUCT_DELETED: "Product successfully deleted",
+    IMAGE_UPLOAD_SUCCESS: "Image uploaded successfully",
     // Error Responses
     USER_NOT_FOUND: "User not found",
     USER_ALREADY_EXISTS: "User already exists",

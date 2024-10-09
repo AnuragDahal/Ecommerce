@@ -56,14 +56,14 @@ export const deletePreviousImages = async (images: string[]) => {
 
         const deleteResults = [];
         for (const fileId of imageFields) {
-            const deleteResult = await imagekit.deleteFile(fileId);
+            const deleteResult = await imagekit.deleteFile(fileId, function () {
+                console.log("File deleted successfully");
+            });
             deleteResults.push(deleteResult);
         }
-
-        console.log("Delete results:", deleteResults);
-        return deleteResults;
+        return true;
     } catch (error) {
         console.error("Error deleting images:", error);
-        throw new Error("Unable to delete images");
+        return false;
     }
 };

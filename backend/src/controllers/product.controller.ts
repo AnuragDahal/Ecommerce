@@ -133,3 +133,34 @@ export const handleUpdateProduct = async (req: Request, res: Response) => {
         sendInternalServerError(res, "Internal Server Error");
     }
 };
+
+export const handleDeleteProduct = async (req: Request, res: Response) => {
+    try {
+        const productId = req.params.id;
+        if (!productId) {
+            sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
+            return;
+        }
+        const product = await Product.findById(productId);
+        if (!product) {
+            sendNotFound(res, API_RESPONSES.NOT_FOUND);
+            return;
+        }
+        const images = product.imageUrl;
+        // delete the images
+        const isImageDeleted = await deletePreviousImages(images);
+        if (!isImageDeleted) {
+            sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
+            return;
+        }
+        // implement the logic to delete the images from the imagekit
+        sendSuccess(
+            res,
+            API_RESPONSES.PRODUCT_DELETED,
+            HTTP_STATUS_CODES.DELETED
+        );
+    } catch (error) {
+        console.error("Error deleting product:", error);
+        sendInternalServerError(res, "Internal Server Error");
+    }
+};
