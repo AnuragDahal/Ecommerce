@@ -11,6 +11,9 @@ export const imagekit = new ImageKit({
 export const uploadMultipleFiles = async (
     files: Express.Multer.File[]
 ): Promise<string[]> => {
+    if (files.length === 0) {
+        return [];
+    }
     try {
         const uploadPromises = files.map((file) =>
             imagekit.upload({
@@ -40,13 +43,13 @@ export const uploadSingleFile = async (
     }
 };
 async function getFileIdFromUrl(url: string): Promise<string | null> {
-    const fileName = url.split('/').pop();
+    const fileName = url.split("/").pop();
     if (!fileName) return null;
 
     try {
         const searchResults = await imagekit.listFiles({
             name: fileName,
-            limit: 1
+            limit: 1,
         });
 
         if (searchResults && searchResults.length > 0) {
@@ -60,11 +63,13 @@ async function getFileIdFromUrl(url: string): Promise<string | null> {
 }
 
 async function getFileIdsFromUrls(urls: string[]): Promise<string[]> {
-    const fileIds = await Promise.all(urls.map(url => getFileIdFromUrl(url)));
+    const fileIds = await Promise.all(urls.map((url) => getFileIdFromUrl(url)));
     return fileIds.filter((id): id is string => id !== null);
 }
 
-export const deletePreviousImages = async (images: string[]): Promise<boolean> => {
+export const deletePreviousImages = async (
+    images: string[]
+): Promise<boolean> => {
     try {
         const fileIds = await getFileIdsFromUrls(images);
         console.log("File IDs to delete:", fileIds);
@@ -79,7 +84,10 @@ export const deletePreviousImages = async (images: string[]): Promise<boolean> =
                 await imagekit.deleteFile(fileId);
                 console.log(`Successfully deleted file with ID: ${fileId}`);
             } catch (deleteError) {
-                console.error(`Error deleting file with ID ${fileId}:`, deleteError);
+                console.error(
+                    `Error deleting file with ID ${fileId}:`,
+                    deleteError
+                );
             }
         }
 

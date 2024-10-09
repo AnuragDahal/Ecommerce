@@ -18,6 +18,8 @@ export const API_RESPONSES = {
     FAILED_TO_LOGIN: "Failed to login",
     UNABLE_TO_CREATE_PRODUCT: "Unable to create product",
     UNABLE_TO_UPDATE_PRODUCT: "Unable to update product",
+    IMAGE_UPLOAD_FAILED: "Image upload failed",
+    PRODUCT_NOT_FOUND: "Product not found",
 
     // VALIDATION ERRORS
     INVALID_EMAIL: "Invalid email",

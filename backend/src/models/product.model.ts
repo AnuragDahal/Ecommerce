@@ -14,7 +14,7 @@ import mongoose, { Types } from "mongoose";
 // reviews Array
 // sellerId Objectid['seller']
 
-interface IProduct extends mongoose.Document {
+export interface IProduct extends mongoose.Document {
     name: string;
     description: string;
     price: number;
