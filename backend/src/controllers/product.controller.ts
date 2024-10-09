@@ -134,33 +134,52 @@ export const handleUpdateProduct = async (req: Request, res: Response) => {
     }
 };
 
-export const handleDeleteProduct = async (req: Request, res: Response) => {
+export const handleDeleteProduct = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
     try {
         const productId = req.params.id;
         if (!productId) {
             sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
             return;
         }
+
         const product = await Product.findById(productId);
         if (!product) {
             sendNotFound(res, API_RESPONSES.NOT_FOUND);
             return;
         }
+
         const images = product.imageUrl;
-        // delete the images
-        const isImageDeleted = await deletePreviousImages(images);
-        if (!isImageDeleted) {
-            sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
-            return;
+
+        // Delete the images
+        try {
+            const isImageDeleted = await deletePreviousImages(images);
+            if (!isImageDeleted) {
+                console.log(
+                    "Failed to delete some or all images for product:",
+                    productId
+                );
+                // Optionally, you might want to proceed with product deletion even if image deletion fails
+            }
+        } catch (imageDeleteError) {
+            console.error("Error during image deletion:", imageDeleteError);
+            // Optionally, you might want to proceed with product deletion even if image deletion fails
         }
-        // implement the logic to delete the images from the imagekit
+
+        // Delete the product from the database
+        await Product.findByIdAndDelete(productId);
+
         sendSuccess(
             res,
             API_RESPONSES.PRODUCT_DELETED,
-            HTTP_STATUS_CODES.DELETED
+            HTTP_STATUS_CODES.OK // Using 200 OK instead of 204 No Content to allow for a response body
         );
+        return;
     } catch (error) {
         console.error("Error deleting product:", error);
-        sendInternalServerError(res, "Internal Server Error");
+        sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
+        return;
     }
 };

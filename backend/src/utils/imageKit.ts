@@ -39,31 +39,54 @@ export const uploadSingleFile = async (
         throw new Error("Unable to upload file");
     }
 };
+async function getFileIdFromUrl(url: string): Promise<string | null> {
+    const fileName = url.split('/').pop();
+    if (!fileName) return null;
 
-async function getFileIdsFromUrls(urls: string[]): Promise<string[]> {
-    const fileIds = [];
-    for (const url of urls) {
-        const fileDetails = await imagekit.getFileDetails(url);
-        fileIds.push(fileDetails.fileId);
+    try {
+        const searchResults = await imagekit.listFiles({
+            name: fileName,
+            limit: 1
+        });
+
+        if (searchResults && searchResults.length > 0) {
+            return searchResults[0].fileId;
+        }
+    } catch (error) {
+        console.error(`Error searching for file: ${fileName}`, error);
     }
-    return fileIds;
+
+    return null;
 }
 
-export const deletePreviousImages = async (images: string[]) => {
-    try {
-        const imageFields = await getFileIdsFromUrls(images);
-        console.log("Image fields (file IDs):", imageFields);
+async function getFileIdsFromUrls(urls: string[]): Promise<string[]> {
+    const fileIds = await Promise.all(urls.map(url => getFileIdFromUrl(url)));
+    return fileIds.filter((id): id is string => id !== null);
+}
 
-        const deleteResults = [];
-        for (const fileId of imageFields) {
-            const deleteResult = await imagekit.deleteFile(fileId, function () {
-                console.log("File deleted successfully");
-            });
-            deleteResults.push(deleteResult);
+export const deletePreviousImages = async (images: string[]): Promise<boolean> => {
+    try {
+        const fileIds = await getFileIdsFromUrls(images);
+        console.log("File IDs to delete:", fileIds);
+
+        if (fileIds.length === 0) {
+            console.log("No valid file IDs found to delete.");
+            return true;
         }
+
+        for (const fileId of fileIds) {
+            try {
+                await imagekit.deleteFile(fileId);
+                console.log(`Successfully deleted file with ID: ${fileId}`);
+            } catch (deleteError) {
+                console.error(`Error deleting file with ID ${fileId}:`, deleteError);
+            }
+        }
+
+        console.log("Finished processing all files");
         return true;
     } catch (error) {
-        console.error("Error deleting images:", error);
+        console.error("Error in deletePreviousImages:", error);
         return false;
     }
 };
