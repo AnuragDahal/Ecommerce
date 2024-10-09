@@ -6,6 +6,7 @@ export const API_RESPONSES = {
     PASSWORD_CHANGED: "Password successfully changed",
     USER_LOGGED_OUT: "User successfully logged out",
     TOKEN_REFRESHED: "Access token and refresh token successfully refreshed",
+    PRODUCT_CREATED: "Product successfully created",
 
     // Error Responses
     USER_NOT_FOUND: "User not found",
@@ -13,6 +14,7 @@ export const API_RESPONSES = {
     FAILED_TO_GENERATE_TOKEN: "Failed to generate token",
     FAILED_TO_SEND_EMAIL: "Failed to send email",
     FAILED_TO_LOGIN: "Failed to login",
+    UNABLE_TO_CREATE_PRODUCT: "Unable to create product",
 
     // VALIDATION ERRORS
     INVALID_EMAIL: "Invalid email",

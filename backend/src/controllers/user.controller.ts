@@ -19,10 +19,7 @@ import { sendEmail } from "../utils/emailUtils";
 import { forgotPasswordTemplate } from "../constants/emailTemplates/forgetPassword";
 import { passwordChangeTemplate } from "../constants/emailTemplates/passwordChange";
 
-export const handleSignUp = async (
-    req: Request,
-    res: Response
-): Promise<void> => {
+export const handleSignUp = async (req: Request, res: Response) => {
     try {
         const { firstName, lastName, email, userName, password } = req.body;
 
@@ -72,10 +69,7 @@ export const handleSignUp = async (
     }
 };
 
-export const handleLogin = async (
-    req: Request,
-    res: Response
-): Promise<void> => {
+export const handleLogin = async (req: Request, res: Response) => {
     try {
         const { userName, email, password } = req.body;
 
@@ -144,10 +138,7 @@ export const handleLogin = async (
     }
 };
 
-export const handleLogout = async (
-    req: Request,
-    res: Response
-): Promise<void> => {
+export const handleLogout = async (req: Request, res: Response) => {
     const payload = getPayloadDataFromHeader(req, res);
     if (!payload) {
         sendUnauthorized(res, API_RESPONSES.INVALID_TOKEN);
