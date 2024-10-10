@@ -124,15 +124,18 @@ export const handleLogin = async (req: Request, res: Response) => {
 
         res.status(HTTP_STATUS_CODES.OK)
             .cookie("accessToken", accessToken, options)
-            .cookie("refreshToken", refreshToken, options)
-            .json({
-                message: API_RESPONSES.USER_LOGGED_IN,
-                user: loggedInUser,
-                accessToken,
-                refreshToken,
-            });
+            .cookie("refreshToken", refreshToken, options);
+        sendSuccess(
+            res,
+            API_RESPONSES.USER_LOGGED_IN,
+            HTTP_STATUS_CODES.CREATED,
+            {
+                accessToken: accessToken,
+                refreshToken: refreshToken,
+            }
+        );
+        return;
     } catch (error) {
-        console.error("Login error:", error);
         sendInternalServerError(res, API_RESPONSES.FAILED_TO_LOGIN);
         return;
     }

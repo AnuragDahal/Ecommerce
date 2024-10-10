@@ -9,10 +9,12 @@ import Contact from "@/pages/static/Contact";
 import Home from "@/pages/Home";
 import Layout from "@/components/layout/Layout";
 import { Toaster } from "./components/ui/toaster";
+import ProtectedRoute from "./components/reuseable/ProtectedRoute";
 
 const App = () => {
     const location = useLocation();
     const hideLayout = ["/login", "/sign-up"].includes(location.pathname);
+
     return (
         <>
             <Toaster />
@@ -20,12 +22,39 @@ const App = () => {
                 <Layout>
                     <Routes>
                         <Route path="/" element={<Home />} />
-                        <Route path="/products" element={<Product />} />
-                        <Route path="/about" element={<About />} />
-                        <Route path="/categories" element={<Categories />} />
-                        <Route path="/contact" element={<Contact />} />
+                        <Route
+                            path="/products"
+                            element={
+                                <ProtectedRoute>
+                                    <Product />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/about"
+                            element={
+                                <ProtectedRoute>
+                                    <About />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/categories"
+                            element={
+                                <ProtectedRoute>
+                                    <Categories />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/contact"
+                            element={
+                                <ProtectedRoute>
+                                    <Contact />
+                                </ProtectedRoute>
+                            }
+                        />
                         <Route path="/sign-up" element={<SignUp />} />
-                        // <Route path="/login" element={<Login />} />
                         <Route path="*" element={<NotFound />} />
                     </Routes>
                 </Layout>

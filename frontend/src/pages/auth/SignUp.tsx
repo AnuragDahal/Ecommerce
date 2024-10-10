@@ -45,7 +45,10 @@ export default function SignUp() {
             },
             onError: (error: any) => {
                 setIsLoading(false);
-                console.log(error.response?.data?.message || "Sign up failed!");
+                toast({
+                    title: "Sign up failed!",
+                    description: error.response.data.message,
+                });
             },
         });
     };
