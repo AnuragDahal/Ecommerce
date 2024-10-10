@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,39 +11,30 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useMutation } from "@tanstack/react-query";
-import { useSignUpService } from "@/services/useAuthService";
-import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function SignUp() {
-    const navigate = useNavigate();
+    const { signUpMutation } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const [firstName, setFirstName] = useState<string>("");
     const [lastName, setLastName] = useState<string>("");
     const [userName, setUserName] = useState<string>("");
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
-    const data = {
+    const signUpData = {
         firstName,
         lastName,
         userName,
         email,
         password,
     };
-    const signUpMutation = useMutation({
-        mutationFn: useSignUpService,
-        onSuccess: () => {
-            navigate("/login");
-        },
-        onError: (error) => {
-            console.error(error);
-        },
-    });
     const handleSignUp = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setIsLoading(true);
-        signUpMutation.mutate(data);
+        signUpMutation.mutate(signUpData);
     };
+    const { data } = signUpMutation;
+    console.log(data);
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 p-4">
             <div className="absolute inset-0 overflow-hidden">

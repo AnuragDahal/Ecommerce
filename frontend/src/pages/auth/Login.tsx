@@ -11,25 +11,13 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useLoginService } from "@/services/useAuthService";
-import { useNavigate } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/useAuth";
 
 const Login = () => {
-    const navigate = useNavigate();
+    const { loginMutation } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const [input, setInput] = useState<string>("");
     const [password, setPassword] = useState<string>("");
-
-    const loginMutation = useMutation({
-        mutationFn: useLoginService,
-        onSuccess: () => {
-            navigate("/");
-        },
-        onError: (error) => {
-            console.error(error);
-        },
-    });
 
     const handleSignIn = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
