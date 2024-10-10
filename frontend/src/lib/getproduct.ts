@@ -6,7 +6,7 @@ export const getFeaturedProducts = async()=>{
 
     const response = await axios.get(API_ROUTES.PRODUCTS,{
         params:{
-            offset:73,
+            offset:16,
             limit:6
         }
     });

@@ -4,6 +4,7 @@ import { connect } from "./db/db.connect";
 import authRouter from "./apis/auth.routes";
 import productRouter from "./apis/product.routes";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 
 dotenv.config();
 
@@ -12,6 +13,12 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(
+    cors({
+        origin: ["http://localhost:5173"], // This is the frontend URL
+        credentials: true,
+    })
+);
 
 app.use("/api/auth", authRouter);
 app.use("/api/products", productRouter);
