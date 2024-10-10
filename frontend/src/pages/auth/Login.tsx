@@ -12,8 +12,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import { useAuthContext } from "@/context/authcontext";
 
 const Login = () => {
+    const { login } = useAuthContext();
+    const navigate = useNavigate();
     const { loginMutation } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const [input, setInput] = useState<string>("");
@@ -24,11 +28,20 @@ const Login = () => {
         setIsLoading(true);
 
         const isEmail = /\S+@\S+\.\S+/.test(input);
-        const data = isEmail
+        const loginDetails = isEmail
             ? { email: input, password }
             : { userName: input, password };
 
-        loginMutation.mutate(data);
+        loginMutation.mutate(loginDetails, {
+            onSuccess: (data) => {
+                setIsLoading(false);
+                login(data?.data?.accessToken, data?.data?.refreshToken);
+                navigate("/");
+            },
+            onError: () => {
+                setIsLoading(false);
+            },
+        });
     };
 
     return (

@@ -28,8 +28,7 @@ export const useLoginService = async (data: Partial<ISignUpData>) => {
     try {
         const response = await axios.post(
             "http://localhost:3000/api/auth/login",
-            data,
-            { withCredentials: true }
+            data
         );
         return response.data;
     } catch (error) {

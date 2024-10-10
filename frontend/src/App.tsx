@@ -10,6 +10,7 @@ import Home from "@/pages/Home";
 import Layout from "@/components/layout/Layout";
 import { Toaster } from "./components/ui/toaster";
 import ProtectedRoute from "./components/reuseable/ProtectedRoute";
+import { AuthProvider } from "./context/authcontext";
 
 const App = () => {
     const location = useLocation();
@@ -17,54 +18,57 @@ const App = () => {
 
     return (
         <>
-            <Toaster />
-            {!hideLayout && (
-                <Layout>
+            <AuthProvider>
+                <Toaster />
+                {!hideLayout && (
+                    <Layout>
+                        <Routes>
+                            <Route path="/" element={<Home />} />
+                            <Route
+                                path="/products"
+                                element={
+                                    <ProtectedRoute>
+                                        <Product />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/about"
+                                element={
+                                    <ProtectedRoute>
+                                        <About />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/categories"
+                                element={
+                                    <ProtectedRoute>
+                                        <Categories />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/contact"
+                                element={
+                                    <ProtectedRoute>
+                                        <Contact />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route path="/sign-up" element={<SignUp />} />
+                            <Route path="/login" element={<Login />} />
+                            <Route path="*" element={<NotFound />} />
+                        </Routes>
+                    </Layout>
+                )}
+                {hideLayout && (
                     <Routes>
-                        <Route path="/" element={<Home />} />
-                        <Route
-                            path="/products"
-                            element={
-                                <ProtectedRoute>
-                                    <Product />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/about"
-                            element={
-                                <ProtectedRoute>
-                                    <About />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/categories"
-                            element={
-                                <ProtectedRoute>
-                                    <Categories />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/contact"
-                            element={
-                                <ProtectedRoute>
-                                    <Contact />
-                                </ProtectedRoute>
-                            }
-                        />
+                        <Route path="/login" element={<Login />} />
                         <Route path="/sign-up" element={<SignUp />} />
-                        <Route path="*" element={<NotFound />} />
                     </Routes>
-                </Layout>
-            )}
-            {hideLayout && (
-                <Routes>
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/sign-up" element={<SignUp />} />
-                </Routes>
-            )}
+                )}
+            </AuthProvider>
         </>
     );
 };
