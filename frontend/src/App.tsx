@@ -8,12 +8,14 @@ import Categories from "@/pages/product/Categories";
 import Contact from "@/pages/static/Contact";
 import Home from "@/pages/Home";
 import Layout from "@/components/layout/Layout";
+import { Toaster } from "./components/ui/toaster";
 
 const App = () => {
     const location = useLocation();
     const hideLayout = ["/login", "/sign-up"].includes(location.pathname);
     return (
         <>
+            <Toaster />
             {!hideLayout && (
                 <Layout>
                     <Routes>

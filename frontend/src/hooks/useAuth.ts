@@ -7,13 +7,6 @@ const useAuth = () => {
 
     const signUpMutation = useMutation({
         mutationFn: useSignUpService,
-        onSuccess: (data) => {
-            navigate("/login");
-            return data;
-        },
-        onError: (error) => {
-            return error;
-        },
     });
     const loginMutation = useMutation({
         mutationFn: useLoginService,

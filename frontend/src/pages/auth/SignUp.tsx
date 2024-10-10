@@ -12,15 +12,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 export default function SignUp() {
-    const { signUpMutation } = useAuth();
+    const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(false);
     const [firstName, setFirstName] = useState<string>("");
     const [lastName, setLastName] = useState<string>("");
     const [userName, setUserName] = useState<string>("");
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
+    const { signUpMutation } = useAuth();
     const signUpData = {
         firstName,
         lastName,
@@ -31,10 +33,22 @@ export default function SignUp() {
     const handleSignUp = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setIsLoading(true);
-        signUpMutation.mutate(signUpData);
+        signUpMutation.mutate(signUpData, {
+            onSuccess: (data) => {
+                setIsLoading(false);
+                toast({
+                    title: "Sign up successful!",
+                    description:
+                        "A verification email has been sent to your email address.",
+                });
+                console.log(data);
+            },
+            onError: (error: any) => {
+                setIsLoading(false);
+                console.log(error.response?.data?.message || "Sign up failed!");
+            },
+        });
     };
-    const { data } = signUpMutation;
-    console.log(data);
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 p-4">
             <div className="absolute inset-0 overflow-hidden">
