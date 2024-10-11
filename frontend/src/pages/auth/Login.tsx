@@ -12,8 +12,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuthContext } from "@/context/authcontext";
+import { toast } from "@/hooks/use-toast";
 
 const Login = () => {
     const { login } = useAuthContext();
@@ -36,10 +37,19 @@ const Login = () => {
             onSuccess: (data) => {
                 setIsLoading(false);
                 login(data?.data?.accessToken, data?.data?.refreshToken);
+                toast({
+                    variant: "default",
+                    title: `${data?.message}`,
+                });
                 navigate("/");
             },
-            onError: () => {
+            onError: (data) => {
                 setIsLoading(false);
+                toast({
+                    variant: "destructive",
+                    title: "Sign in failed!",
+                    description: `${data?.message}`,
+                });
             },
         });
     };
@@ -120,7 +130,7 @@ const Login = () => {
                                 href="#"
                                 className="text-purple-400 hover:text-purple-300 underline underline-offset-4"
                             >
-                                Sign Up
+                                <Link to="/sign-up">Sign Up</Link>
                             </a>
                         </p>
                     </CardFooter>

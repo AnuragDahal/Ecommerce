@@ -6,7 +6,7 @@ import { API_RESPONSES } from "../constants/apiResponses";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import { IJWTPayload2 } from "../types/user";
+import { IJWTPayload, IJWTPayload2 } from "../types/user";
 dotenv.config();
 
 export const generateAccessAndRefreshToken = async (
@@ -48,4 +48,16 @@ export const getPayloadDataFromHeader = (req: Request, res: Response) => {
         email: payload.email,
         userName: payload.userName,
     };
+};
+
+export const verifyToken = (
+    token: string,
+    secret: string = process.env.ACCESS_TOKEN_SECRET || ""
+) => {
+    try {
+        const payload = jwt.verify(token, secret) as IJWTPayload2;
+        return payload;
+    } catch (error) {
+        return null;
+    }
 };

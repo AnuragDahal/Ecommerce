@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 
 export default function SignUp() {
     const { toast } = useToast();
@@ -185,7 +186,7 @@ export default function SignUp() {
                                 href="#"
                                 className="text-purple-400 hover:text-purple-300 underline underline-offset-4"
                             >
-                                Sign In
+                                <Link to="/login">Sign In</Link>
                             </a>
                         </p>
                     </CardFooter>

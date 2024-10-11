@@ -40,16 +40,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
                 const response = await axios.post(
                     "http://localhost:3000/api/auth/refresh-token",
                     {
-                        headers: {
-                            Authorizatioin: `Bearer ${refreshToken}`,
-                        },
+                        refreshToken,
                     }
                 );
 
-                const { accessToken } = response.data;
+                const { accessToken } = response.data.data;
 
                 // Set accessToken in cookies (if needed) and state
-                Cookies.set("accessToken", accessToken);
+                Cookies.set("accessToken", accessToken, { expires: 10 / 1440 });
                 setToken(accessToken);
                 setIsAuthenticated(true);
             }
@@ -63,29 +61,32 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
     // Check if the token exists in cookies
     useEffect(() => {
-        const tokenFromCookie = Cookies.get("accessToken");
+        const checkTokens = async () => {
+            const tokenFromCookie = Cookies.get("accessToken");
 
-        if (tokenFromCookie) {
-            setToken(tokenFromCookie);
-            setIsAuthenticated(true);
-            setLoading(false); // Set loading to false after token check
-        } else {
-            const refreshToken = Cookies.get("refreshToken");
-
-            if (refreshToken) {
-                // Try refreshing the tokens
-                refreshTokens();
+            if (tokenFromCookie) {
+                setToken(tokenFromCookie);
+                setIsAuthenticated(true);
+                setLoading(false); // Set loading to false after token check
             } else {
-                // No tokens available, force user to log in
-                logout();
-                setLoading(false); // Set loading to false if no tokens are available
+                const refreshToken = Cookies.get("refreshToken");
+
+                if (refreshToken) {
+                    // Try refreshing the tokens
+                    await refreshTokens();
+                } else {
+                    // No tokens available, force user to log in
+                    logout();
+                    setLoading(false); // Set loading to false if no tokens are available
+                }
             }
-        }
+        };
+        checkTokens();
     }, []);
     //login function to set tokens in cookies and state
     const login = (accessToken: string, refreshToken: string) => {
-        Cookies.set("accessToken", accessToken, { expires: 1 / 24 });
-        Cookies.set("refreshToken", refreshToken, { expires: 7 });
+        Cookies.set("accessToken", accessToken, { expires: 10 / 1440 });
+        Cookies.set("refreshToken", refreshToken, { expires: 1 });
 
         setToken(accessToken);
         setIsAuthenticated(true);
@@ -98,7 +99,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         Cookies.remove("refreshToken");
         setToken(null);
         setIsAuthenticated(false);
-        navigate("/login"); // Redirect to login page after logout
+        navigate("/sign-up"); // Redirect to login page after logout
     };
 
     if (loading) {

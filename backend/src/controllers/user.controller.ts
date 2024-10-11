@@ -14,6 +14,7 @@ import { HTTP_STATUS_CODES } from "../constants/statusCodes";
 import {
     generateAccessAndRefreshToken,
     getPayloadDataFromHeader,
+    verifyToken,
 } from "../utils/tokenUtils";
 import { sendEmail } from "../utils/emailUtils";
 import { forgotPasswordTemplate } from "../constants/emailTemplates/forgetPassword";
@@ -80,7 +81,7 @@ export const handleLogin = async (req: Request, res: Response) => {
 
         const user = await User.findOne({ $or: [{ email }, { userName }] });
         if (!user) {
-            sendBadRequest(res, API_RESPONSES.INVALID_CREDENTIALS);
+            sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
             return;
         }
 
@@ -166,38 +167,26 @@ export const handleLogout = async (req: Request, res: Response) => {
 };
 
 export const handleRefreshToken = async (req: Request, res: Response) => {
-    const payload = getPayloadDataFromHeader(req, res);
+    const { refreshToken } = req.body;
+    const payload = verifyToken(refreshToken, process.env.REFRESH_TOKEN_SECRET);
     if (!payload) {
         sendUnauthorized(res, API_RESPONSES.INVALID_TOKEN);
         return;
     }
-    const userId = payload._id;
     try {
-        const { accessToken, refreshToken } =
-            await generateAccessAndRefreshToken(userId);
-        if (!accessToken && !refreshToken) {
-            sendInternalServerError(
-                res,
-                API_RESPONSES.FAILED_TO_GENERATE_TOKEN
-            );
-            return;
-        }
-        const user = await User.findOne({ _id: userId });
+        const user = await User.findOne({ _id: payload._id });
         if (!user) {
             sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
             return;
         }
-        user.refreshToken = refreshToken;
-        await user.save({ validateBeforeSave: false });
-        res.cookie("accessToken", accessToken).cookie(
-            "refreshToken",
-            refreshToken
-        );
+        if (user.refreshToken !== refreshToken) {
+            sendUnauthorized(res, API_RESPONSES.INVALID_TOKEN);
+            return;
+        }
+        const accessToken = user.generateAccessToken();
         sendSuccess(res, API_RESPONSES.TOKEN_REFRESHED, HTTP_STATUS_CODES.OK, {
             accessToken: accessToken,
-            refreshToken: refreshToken,
         });
-        return;
     } catch (error) {
         sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
         return;
