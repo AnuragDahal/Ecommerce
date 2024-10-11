@@ -1,39 +1,25 @@
 "use client";
-
-import React, { useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Menu } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ModeToggle } from "@/components/themes/mode-toggle";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { navList } from "@/config/constants";
 
 const Header = () => {
     const [isOpen, setIsOpen] = useState(false);
-
     const toggleMenu = () => setIsOpen(!isOpen);
-    const NavList = [
-        {
-            name: "Products",
-            link: "/products",
-        },
-        {
-            name: "Categories",
-            link: "/categories",
-        },
-        {
-            name: "About",
-            link: "/about",
-        },
-        {
-            name: "Contact",
-            link: "/contact",
-        },
-    ];
 
-    const NavItems = () => (
+    const NavItems = ({ closeMenu }: { closeMenu: () => void }) => (
         <>
-            {NavList.map((item, index) => (
-                <Link to={item.link} key={index} className="block py-2 md:p-0">
+            {navList.map((item, index) => (
+                <Link
+                    to={item.link}
+                    key={index}
+                    className="block py-2 md:p-0"
+                    onClick={closeMenu}
+                >
                     {item.name}
                 </Link>
             ))}
@@ -52,7 +38,7 @@ const Header = () => {
                     </Link>
                 </div>
                 <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-                    <NavItems />
+                    <NavItems closeMenu={() => {}} />
                 </nav>
                 <div className="flex items-center space-x-4">
                     <Button variant="ghost" size="icon">
@@ -60,20 +46,21 @@ const Header = () => {
                         <span className="sr-only">Cart</span>
                     </Button>
                     <ModeToggle />
-                    <Sheet>
+                    <Sheet open={isOpen} onOpenChange={setIsOpen}>
                         <SheetTrigger asChild>
                             <Button
                                 variant="ghost"
                                 size="icon"
                                 className="md:hidden"
+                                onClick={toggleMenu}
                             >
                                 <Menu className="h-5 w-5" />
                                 <span className="sr-only">Menu</span>
                             </Button>
                         </SheetTrigger>
                         <SheetContent side="right" className="bg-white">
-                            <nav className="flex flex-col space-y-4 mt-4 ">
-                                <NavItems />
+                            <nav className="flex flex-col space-y-4 mt-4">
+                                <NavItems closeMenu={() => setIsOpen(false)} />
                             </nav>
                         </SheetContent>
                     </Sheet>
