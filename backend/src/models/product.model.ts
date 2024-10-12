@@ -1,19 +1,4 @@
 import mongoose, { Types } from "mongoose";
-// _id ObjectId pk
-// name string
-// description string
-// price number
-// image string //imagekit or cloudinary url
-// category Enum
-// totalitemsSold number
-// totalStocksLeft number
-// isoutOfStocks true
-// createdAt Date
-// updatedAt Date
-// discount number
-// reviews Array
-// sellerId Objectid['seller']
-
 export interface IProduct extends mongoose.Document {
     name: string;
     description: string;
