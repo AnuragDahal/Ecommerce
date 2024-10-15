@@ -143,3 +143,21 @@ export const useLogoutService = async () => {
         }
     }
 };
+
+export const useRefreshTokenService = async () => {
+    try {
+        const response = await axios.post(
+            "http://localhost:3000/api/auth/refresh-token",
+            {
+                withCredentials: true,
+            }
+        );
+        return response.data;
+    } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+            throw error.response.data;
+        } else {
+            throw new Error("Network Error");
+        }
+    }
+};

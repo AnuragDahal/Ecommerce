@@ -12,6 +12,7 @@ import { Toaster } from "@/components/ui/toaster";
 import ProtectedRoute from "@/components/reuseable/ProtectedRoute";
 import { AuthProvider } from "@/context/authcontext";
 import { ThemeProvider } from "@/components/themes/theme-provider";
+import VerifyOtp from "./pages/auth/Verify";
 
 const App = () => {
     return (
@@ -22,6 +23,7 @@ const App = () => {
                     <Routes>
                         <Route path="/login" element={<Login />} />
                         <Route path="/sign-up" element={<SignUp />} />
+                        <Route path="/verify" element={<VerifyOtp />} />
                         <Route
                             path="/*"
                             element={
