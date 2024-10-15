@@ -14,7 +14,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
     useEffect(() => {
         if (!isAuthenticated) {
-            // Redirect to login page if the user is not authenticated
             navigate("/login");
         }
     }, [isAuthenticated, navigate]);

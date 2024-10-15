@@ -99,7 +99,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         Cookies.remove("refreshToken");
         setToken(null);
         setIsAuthenticated(false);
-        navigate("/sign-up"); // Redirect to login page after logout
+        navigate("/login"); // Redirect to login page after logout
     };
 
     if (loading) {

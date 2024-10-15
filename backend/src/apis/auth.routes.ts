@@ -10,17 +10,18 @@ import {
     handlePasswordChange,
 } from "../controllers/user.controller";
 
+import { responseHandler } from "../middleware/responseHandler";
+
 const router = Router();
 
-router.post("/signup", handleSignUp);
-router.post("/login", handleLogin);
-router.post("/logout", handleLogout);
-router.post("/refresh-token", handleRefreshToken);
-router.post("/verify", handleOtpVerification);
-router.post("/forgot-password", handleForgetPassword);
-router.post("/reset-password", handlePasswordReset);
-router.post("/change-password", handlePasswordChange);
-
-// router.post("/resend-verification-email" /* handler */);
+router.post("/signup", responseHandler(handleSignUp));
+router.post("/login", responseHandler(handleLogin));
+router.post("/logout", responseHandler(handleLogout));
+router.post("/refresh-token", responseHandler(handleRefreshToken));
+router.post("/verify", responseHandler(handleOtpVerification));
+router.post("/forgot-password", responseHandler(handleForgetPassword));
+router.post("/reset-password", responseHandler(handlePasswordReset));
+router.post("/change-password", responseHandler(handlePasswordChange));
+// Other routes...
 
 export default router;

@@ -24,8 +24,7 @@ export const sendEmail = async (to: string, subject: string, html?: string) => {
         if (info.response.includes("250")) {
             return true;
         }
-    } catch (error) {
-        console.log("Error sending email:", error); // Improved error logging
+    } catch (error) { // Improved error logging
         return false;
     }
 };

@@ -7,7 +7,6 @@ import {
     sendSuccess,
     sendUnauthorized,
 } from "../utils/statusUtils";
-import { emailVerificationTemplate } from "../constants/emailTemplates/emailVerification";
 import { API_RESPONSES } from "../constants/apiResponses";
 import User from "../models/user.model";
 import { HTTP_STATUS_CODES } from "../constants/statusCodes";
@@ -17,22 +16,31 @@ import {
     verifyToken,
 } from "../utils/tokenUtils";
 import { sendEmail } from "../utils/emailUtils";
-import { forgotPasswordTemplate } from "../constants/emailTemplates/forgetPassword";
-import { passwordChangeTemplate } from "../constants/emailTemplates/passwordChange";
+import {
+    emailVerificationTemplate,
+    forgotPasswordTemplate,
+    passwordChangeTemplate,
+} from "../constants/emailTemplates";
 
-export const handleSignUp = async (req: Request, res: Response) => {
+// Assuming your statusUtils functions return Response
+export type ControllerFunction = (
+    req: Request,
+    res: Response
+) => Promise<Response>;
+
+export const handleSignUp: ControllerFunction = async (req, res) => {
+    const { firstName, lastName, email, userName, password } = req.body;
+
+    if (!firstName || !lastName || !email || !userName || !password) {
+        return sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
+    }
+
+    const isUser = await User.findOne({ $or: [{ email }, { userName }] });
+    if (isUser) {
+        return sendAlreadyExists(res, API_RESPONSES.USER_ALREADY_EXISTS);
+    }
+
     try {
-        const { firstName, lastName, email, userName, password } = req.body;
-
-        if (!firstName || !lastName || !email || !userName || !password) {
-            sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
-            return;
-        }
-        const isUser = await User.findOne({ $or: [{ email }, { userName }] });
-        if (isUser) {
-            sendAlreadyExists(res, API_RESPONSES.USER_ALREADY_EXISTS);
-            return;
-        }
         const user = new User({
             firstName,
             lastName,
@@ -41,7 +49,6 @@ export const handleSignUp = async (req: Request, res: Response) => {
             password,
         });
 
-        // Send email verification link
         const Otp = Math.floor(100000 + Math.random() * 900000);
         const emailData = {
             to: email,
@@ -58,59 +65,52 @@ export const handleSignUp = async (req: Request, res: Response) => {
             emailData.html
         );
         if (!isEmailSent) {
-            sendInternalServerError(res, API_RESPONSES.FAILED_TO_SEND_EMAIL);
-            return;
+            return sendInternalServerError(
+                res,
+                API_RESPONSES.FAILED_TO_SEND_EMAIL
+            );
         }
-        sendSuccess(res, API_RESPONSES.EMAIL_SENT, HTTP_STATUS_CODES.OK);
-        return;
+
+        return sendSuccess(res, API_RESPONSES.EMAIL_SENT, HTTP_STATUS_CODES.OK);
     } catch (error) {
-        sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
-        console.log("Signup error:");
-        return;
+        console.log("Signup error:", error);
+        return sendInternalServerError(
+            res,
+            API_RESPONSES.INTERNAL_SERVER_ERROR
+        );
     }
 };
 
-export const handleLogin = async (req: Request, res: Response) => {
+export const handleLogin: ControllerFunction = async (req, res) => {
+    const { userName, email, password } = req.body;
+
+    if ((!userName && !email) || (userName && email) || !password) {
+        return sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
+    }
+
     try {
-        const { userName, email, password } = req.body;
-
-        if ((!userName && !email) || (userName && email) || !password) {
-            sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
-            return;
-        }
-
         const user = await User.findOne({ $or: [{ email }, { userName }] });
         if (!user) {
-            sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
-            return;
+            return sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
         }
 
         const isPasswordMatched = await user.isPasswordCorrect(password);
         if (!isPasswordMatched) {
-            sendUnauthorized(res, API_RESPONSES.INVALID_PASSWORD);
-            return;
+            return sendUnauthorized(res, API_RESPONSES.INVALID_PASSWORD);
         }
 
         const { accessToken, refreshToken } =
             await generateAccessAndRefreshToken(user._id);
 
-        if (!accessToken && !refreshToken) {
+        if (!accessToken || !refreshToken) {
             console.log("Failed to generate access and refresh token");
-            sendInternalServerError(
+            return sendInternalServerError(
                 res,
                 API_RESPONSES.FAILED_TO_GENERATE_TOKEN
             );
-            return;
         }
-        if (refreshToken) {
-            user.refreshToken = refreshToken;
-        } else {
-            sendInternalServerError(
-                res,
-                API_RESPONSES.FAILED_TO_GENERATE_TOKEN
-            );
-            return;
-        }
+
+        user.refreshToken = refreshToken;
         await user.save({ validateBeforeSave: false });
 
         const loggedInUser = await User.findById(user._id).select(
@@ -126,116 +126,128 @@ export const handleLogin = async (req: Request, res: Response) => {
         res.status(HTTP_STATUS_CODES.OK)
             .cookie("accessToken", accessToken, options)
             .cookie("refreshToken", refreshToken, options);
-        sendSuccess(
+
+        return sendSuccess(
             res,
             API_RESPONSES.USER_LOGGED_IN,
             HTTP_STATUS_CODES.CREATED,
             {
-                accessToken: accessToken,
-                refreshToken: refreshToken,
+                accessToken,
+                refreshToken,
             }
         );
-        return;
     } catch (error) {
-        sendInternalServerError(res, API_RESPONSES.FAILED_TO_LOGIN);
-        return;
+        return sendInternalServerError(res, API_RESPONSES.FAILED_TO_LOGIN);
     }
 };
 
-export const handleLogout = async (req: Request, res: Response) => {
+// Similarly update other controller functions...
+
+export const handleLogout: ControllerFunction = async (req, res) => {
     const payload = getPayloadDataFromHeader(req, res);
     if (!payload) {
-        sendUnauthorized(res, API_RESPONSES.INVALID_TOKEN);
-        return;
+        return sendUnauthorized(res, API_RESPONSES.INVALID_TOKEN);
     }
-    const userId = payload._id;
+
     try {
         const loggedInUser = await User.findByIdAndUpdate(
-            userId,
+            payload._id,
             { $set: { refreshToken: "" } },
             { new: true }
         );
         if (!loggedInUser) {
-            sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
-            return;
+            return sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
         }
         res.clearCookie("accessToken");
-        sendSuccess(res, API_RESPONSES.USER_LOGGED_OUT);
+        return sendSuccess(res, API_RESPONSES.USER_LOGGED_OUT);
     } catch (error) {
-        sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
+        return sendInternalServerError(
+            res,
+            API_RESPONSES.INTERNAL_SERVER_ERROR
+        );
     }
 };
 
-export const handleRefreshToken = async (req: Request, res: Response) => {
+// // Update the remaining functions (handleRefreshToken, handleOtpVerification, etc.) similarly...
+
+export const handleRefreshToken: ControllerFunction = async (
+    req: Request,
+    res: Response
+) => {
     const { refreshToken } = req.body;
     const payload = verifyToken(refreshToken, process.env.REFRESH_TOKEN_SECRET);
     if (!payload) {
-        sendUnauthorized(res, API_RESPONSES.INVALID_TOKEN);
-        return;
+        return sendUnauthorized(res, API_RESPONSES.INVALID_TOKEN);
     }
     try {
         const user = await User.findOne({ _id: payload._id });
         if (!user) {
-            sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
-            return;
+            return sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
         }
         if (user.refreshToken !== refreshToken) {
-            sendUnauthorized(res, API_RESPONSES.INVALID_TOKEN);
-            return;
+            return sendUnauthorized(res, API_RESPONSES.INVALID_TOKEN);
         }
         const accessToken = user.generateAccessToken();
-        sendSuccess(res, API_RESPONSES.TOKEN_REFRESHED, HTTP_STATUS_CODES.OK, {
-            accessToken: accessToken,
-        });
+        return sendSuccess(
+            res,
+            API_RESPONSES.TOKEN_REFRESHED,
+            HTTP_STATUS_CODES.OK,
+            {
+                accessToken: accessToken,
+            }
+        );
     } catch (error) {
-        sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
-        return;
+        return sendInternalServerError(
+            res,
+            API_RESPONSES.INTERNAL_SERVER_ERROR
+        );
     }
 };
 
-export const handleOtpVerification = async (req: Request, res: Response) => {
+export const handleOtpVerification: ControllerFunction = async (
+    req: Request,
+    res: Response
+) => {
     try {
         const { email, otp } = req.body;
         if (!email || !otp) {
-            sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
-            return;
+            return sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
         }
         const user = await User.findOne({ email });
         if (!user) {
-            sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
-            return;
+            return sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
         }
         if (user.otp !== otp) {
-            sendBadRequest(res, API_RESPONSES.INVALID_CREDENTIALS);
-            return;
+            return sendBadRequest(res, API_RESPONSES.INVALID_CREDENTIALS);
         }
         if (user.otpExpires && user.otpExpires < new Date()) {
-            sendBadRequest(res, API_RESPONSES.INVALID_CREDENTIALS);
-            return;
+            return sendBadRequest(res, API_RESPONSES.INVALID_CREDENTIALS);
         }
         user.isEmailVerified = true;
         user.otp = "";
         user.otpExpires = undefined;
         await user.save({ validateBeforeSave: false });
-        sendSuccess(res, API_RESPONSES.USER_LOGGED_IN);
-        return;
+        return sendSuccess(res, API_RESPONSES.USER_LOGGED_IN);
     } catch (error) {
-        sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
-        return;
+        return sendInternalServerError(
+            res,
+            API_RESPONSES.INTERNAL_SERVER_ERROR
+        );
     }
 };
 
-export const handleForgetPassword = async (req: Request, res: Response) => {
+export const handleForgetPassword: ControllerFunction = async (
+    req: Request,
+    res: Response
+) => {
     try {
         const { email } = req.body;
         if (!email) {
-            sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
-            return;
+            return sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
         }
         const user = await User.findOne({ email });
         if (!user) {
-            sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
-            return;
+            return sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
         }
         const Otp = Math.floor(100000 + Math.random() * 900000);
         const emailData = {
@@ -257,42 +269,44 @@ export const handleForgetPassword = async (req: Request, res: Response) => {
             emailData.html
         );
         if (!isEmailSent) {
-            sendInternalServerError(res, API_RESPONSES.FAILED_TO_SEND_EMAIL);
-            return;
+            return sendInternalServerError(
+                res,
+                API_RESPONSES.FAILED_TO_SEND_EMAIL
+            );
         }
-        sendSuccess(res, API_RESPONSES.EMAIL_SENT, HTTP_STATUS_CODES.OK);
-        return;
+        return sendSuccess(res, API_RESPONSES.EMAIL_SENT, HTTP_STATUS_CODES.OK);
     } catch (error) {
-        sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
-        return;
+        return sendInternalServerError(
+            res,
+            API_RESPONSES.INTERNAL_SERVER_ERROR
+        );
     }
 };
 
-export const handlePasswordReset = async (req: Request, res: Response) => {
+export const handlePasswordReset: ControllerFunction = async (
+    req: Request,
+    res: Response
+) => {
     // const payload = getPayloadDataFromHeader(req, res);
     // if (!payload) {
-    //     sendUnauthorized(res, API_RESPONSES.INVALID_TOKEN);
-    //     return;
+    //    return sendUnauthorized(res, API_RESPONSES.INVALID_TOKEN);
+    //
     // }
     // const userId = payload._id;
     try {
         const { email, otp, newPassword } = req.body;
         if (!newPassword || !otp) {
-            sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
-            return;
+            return sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
         }
         const user = await User.findOne({ email: email });
         if (!user) {
-            sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
-            return;
+            return sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
         }
         if (user.otp !== otp) {
-            sendBadRequest(res, API_RESPONSES.INVALID_CREDENTIALS);
-            return;
+            return sendBadRequest(res, API_RESPONSES.INVALID_CREDENTIALS);
         }
         if (user.otpExpires && user.otpExpires < new Date()) {
-            sendBadRequest(res, API_RESPONSES.OTP_EXPIRED);
-            return;
+            return sendBadRequest(res, API_RESPONSES.OTP_EXPIRED);
         }
         user.password = newPassword;
         user.otp = "";
@@ -312,39 +326,41 @@ export const handlePasswordReset = async (req: Request, res: Response) => {
             emailData.html
         );
         if (!isEmailSent) {
-            sendInternalServerError(res, API_RESPONSES.FAILED_TO_SEND_EMAIL);
-            return;
+            return sendInternalServerError(
+                res,
+                API_RESPONSES.FAILED_TO_SEND_EMAIL
+            );
         }
-        sendSuccess(res, API_RESPONSES.PASSWORD_CHANGED);
-        return;
+        return sendSuccess(res, API_RESPONSES.PASSWORD_CHANGED);
     } catch (error) {
-        sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
-        return;
+        return sendInternalServerError(
+            res,
+            API_RESPONSES.INTERNAL_SERVER_ERROR
+        );
     }
 };
 
-export const handlePasswordChange = async (req: Request, res: Response) => {
+export const handlePasswordChange: ControllerFunction = async (
+    req: Request,
+    res: Response
+) => {
     const payload = getPayloadDataFromHeader(req, res);
     if (!payload) {
-        sendUnauthorized(res, API_RESPONSES.INVALID_TOKEN);
-        return;
+        return sendUnauthorized(res, API_RESPONSES.INVALID_TOKEN);
     }
     const userId = payload._id;
     try {
         const { oldPassword, newPassword } = req.body;
         if (!oldPassword || !newPassword) {
-            sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
-            return;
+            return sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
         }
         const user = await User.findOne({ _id: userId });
         if (!user) {
-            sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
-            return;
+            return sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
         }
         const isPasswordMatched = await user.isPasswordCorrect(oldPassword);
         if (!isPasswordMatched) {
-            sendBadRequest(res, API_RESPONSES.INVALID_PASSWORD);
-            return;
+            return sendBadRequest(res, API_RESPONSES.INVALID_PASSWORD);
         }
         user.password = newPassword;
         await user.save({ validateBeforeSave: false });
@@ -361,12 +377,16 @@ export const handlePasswordChange = async (req: Request, res: Response) => {
             emailData.html
         );
         if (!isEmailSent) {
-            sendInternalServerError(res, API_RESPONSES.FAILED_TO_SEND_EMAIL);
-            return;
+            return sendInternalServerError(
+                res,
+                API_RESPONSES.FAILED_TO_SEND_EMAIL
+            );
         }
-        sendSuccess(res, API_RESPONSES.PASSWORD_CHANGED);
+        return sendSuccess(res, API_RESPONSES.PASSWORD_CHANGED);
     } catch (error) {
-        sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
-        return;
+        return sendInternalServerError(
+            res,
+            API_RESPONSES.INTERNAL_SERVER_ERROR
+        );
     }
 };
