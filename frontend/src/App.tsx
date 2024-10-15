@@ -1,4 +1,4 @@
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import Product from "@/pages/product/Product";
 import NotFound from "@/pages/NotFound";
 import SignUp from "@/pages/auth/SignUp";
@@ -14,9 +14,6 @@ import { AuthProvider } from "@/context/authcontext";
 import { ThemeProvider } from "@/components/themes/theme-provider";
 
 const App = () => {
-    // const location = useLocation();
-    // const hideLayout = ["/login", "/sign-up"].includes(location.pathname);
-
     return (
         <>
             <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">

@@ -200,22 +200,31 @@ export const handleOtpVerification = async (req: Request, res: Response) => {
             sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
             return;
         }
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email: email });
         if (!user) {
             sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
             return;
         }
-        if (user.otp !== otp) {
-            sendBadRequest(res, API_RESPONSES.INVALID_CREDENTIALS);
+        if (user.otpExpires && user.otpExpires < new Date()) {
+            sendBadRequest(res, API_RESPONSES.OTP_EXPIRED);
             return;
         }
-        if (user.otpExpires && user.otpExpires < new Date()) {
+        if (user.otp != otp) {
             sendBadRequest(res, API_RESPONSES.INVALID_CREDENTIALS);
             return;
         }
         user.isEmailVerified = true;
-        user.otp = "";
-        user.otpExpires = undefined;
+        await User.findByIdAndUpdate(
+            {
+                _id: user._id,
+            },
+            {
+                $unset: {
+                    otp: "",
+                    otpExpires: "",
+                },
+            }
+        );
         await user.save({ validateBeforeSave: false });
         sendSuccess(res, API_RESPONSES.USER_LOGGED_IN);
         return;
@@ -269,12 +278,6 @@ export const handleForgetPassword = async (req: Request, res: Response) => {
 };
 
 export const handlePasswordReset = async (req: Request, res: Response) => {
-    // const payload = getPayloadDataFromHeader(req, res);
-    // if (!payload) {
-    //     sendUnauthorized(res, API_RESPONSES.INVALID_TOKEN);
-    //     return;
-    // }
-    // const userId = payload._id;
     try {
         const { email, otp, newPassword } = req.body;
         if (!newPassword || !otp) {
@@ -286,17 +289,26 @@ export const handlePasswordReset = async (req: Request, res: Response) => {
             sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
             return;
         }
-        if (user.otp !== otp) {
-            sendBadRequest(res, API_RESPONSES.INVALID_CREDENTIALS);
-            return;
-        }
         if (user.otpExpires && user.otpExpires < new Date()) {
             sendBadRequest(res, API_RESPONSES.OTP_EXPIRED);
             return;
         }
+        if (user.otp !== otp) {
+            sendBadRequest(res, API_RESPONSES.INVALID_CREDENTIALS);
+            return;
+        }
         user.password = newPassword;
-        user.otp = "";
-        user.otpExpires = undefined;
+        await User.findByIdAndUpdate(
+            {
+                _id: user._id,
+            },
+            {
+                $unset: {
+                    otp: "",
+                    otpExpires: "",
+                },
+            }
+        );
         await user.save({ validateBeforeSave: false });
 
         const emailData = {
