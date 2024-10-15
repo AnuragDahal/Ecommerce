@@ -50,7 +50,6 @@ const userSchema = new Schema({
     },
     otpExpires: {
         type: Date,
-        default: Date.now,
         required: false,
     },
     refreshToken: {
