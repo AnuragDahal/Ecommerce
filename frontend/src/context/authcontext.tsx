@@ -1,4 +1,3 @@
-// src/context/AuthContext.tsx
 import React, {
     createContext,
     useContext,
@@ -10,33 +9,48 @@ import Cookies from "js-cookie";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-// Define the structure of AuthContext
 interface AuthContextProps {
     isAuthenticated: boolean;
     token: string | null;
-    login: (accessToken: string, refreshToken: string) => void; // Add login to context
+    login: (accessToken: string, refreshToken: string) => void;
     logout: () => void;
 }
 
-// Initialize the AuthContext
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
-// Create the AuthProvider component
+const isTokenExpired = (token: string): boolean => {
+    try {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        const expiryTime = payload.exp * 1000;
+        return Date.now() >= expiryTime;
+    } catch (error) {
+        console.error("Error parsing token:", error);
+        return true;
+    }
+};
+
+const removeExpiredTokens = () => {
+    const accessToken = Cookies.get("accessToken");
+    if (accessToken && isTokenExpired(accessToken)) {
+        Cookies.remove("accessToken");
+        return true;
+    }
+    return false;
+};
+
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     children,
 }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [token, setToken] = useState<string | null>(null);
-    const [loading, setLoading] = useState(true); // Add loading state
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
-    // Function to refresh tokens using the refresh token
     const refreshTokens = async () => {
         try {
             const refreshToken = Cookies.get("refreshToken");
 
             if (refreshToken) {
-                // Call your API to refresh tokens
                 const response = await axios.post(
                     "http://localhost:3000/api/auth/refresh-token",
                     {
@@ -46,64 +60,91 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
                 const { accessToken } = response.data.data;
 
-                // Set accessToken in cookies (if needed) and state
                 Cookies.set("accessToken", accessToken, { expires: 5 / 86400 });
                 setToken(accessToken);
                 setIsAuthenticated(true);
+                return true;
             }
+            return false;
         } catch (error) {
             console.error("Failed to refresh token:", error);
             logout();
+            return false;
         } finally {
-            setLoading(false); // Set loading to false after token refresh attempt
+            setLoading(false);
         }
     };
 
-    // Check if the token exists in cookies
     useEffect(() => {
-        const checkTokens = async () => {
+        let tokenCheckInterval: ReturnType<typeof setInterval>;
+
+        (async () => {
             const tokenFromCookie = Cookies.get("accessToken");
 
             if (tokenFromCookie) {
-                setToken(tokenFromCookie);
-                setIsAuthenticated(true);
-                setLoading(false); // Set loading to false after token check
+                if (isTokenExpired(tokenFromCookie)) {
+                    Cookies.remove("accessToken");
+
+                    const refreshToken = Cookies.get("refreshToken");
+                    if (refreshToken) {
+                        await refreshTokens();
+                    } else {
+                        logout();
+                    }
+                } else {
+                    setToken(tokenFromCookie);
+                    setIsAuthenticated(true);
+                }
             } else {
                 const refreshToken = Cookies.get("refreshToken");
-
                 if (refreshToken) {
-                    // Try refreshing the tokens
                     await refreshTokens();
                 } else {
-                    // No tokens available, force user to log in
                     logout();
-                    setLoading(false); // Set loading to false if no tokens are available
                 }
             }
-        };
-        checkTokens();
-    }, []);
-    //login function to set tokens in cookies and state
-    const login = (accessToken: string, refreshToken: string) => {
-        Cookies.set("accessToken", accessToken, { expires: 10 / 1440 });
-        Cookies.set("refreshToken", refreshToken, { expires: 1 });
+            setLoading(false);
 
-        setToken(accessToken);
-        setIsAuthenticated(true);
-        navigate("/"); // Redirect to home page after login
+            // Set up periodic token check after initial authentication check
+            tokenCheckInterval = setInterval(() => {
+                const isExpired = removeExpiredTokens();
+                if (isExpired) {
+                    refreshTokens();
+                }
+            }, 60000);
+        })();
+
+        // Cleanup function
+        return () => {
+            if (tokenCheckInterval) {
+                clearInterval(tokenCheckInterval);
+            }
+        };
+    }, []);
+
+    const login = (accessToken: string, refreshToken: string) => {
+        if (!isTokenExpired(accessToken)) {
+            Cookies.set("accessToken", accessToken, { expires: 10 / 1440 });
+            Cookies.set("refreshToken", refreshToken, { expires: 1 });
+            setToken(accessToken);
+            setIsAuthenticated(true);
+            navigate("/");
+        } else {
+            console.error("Attempted to login with expired token");
+            logout();
+        }
     };
 
-    // Logout function to remove tokens from cookies and state
     const logout = () => {
         Cookies.remove("accessToken");
         Cookies.remove("refreshToken");
         setToken(null);
         setIsAuthenticated(false);
-        navigate("/login"); // Redirect to login page after logout
+        navigate("/login");
     };
 
     if (loading) {
-        return <div>Loading...</div>; // Show a loading indicator while checking authentication
+        return <div>Loading...</div>;
     }
 
     return (
@@ -113,7 +154,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     );
 };
 
-// Custom hook to access AuthContext
 export const useAuthContext = (): AuthContextProps => {
     const context = useContext(AuthContext);
     if (!context) {

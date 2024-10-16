@@ -1,5 +1,9 @@
 // import { useAuthContext } from "@/context/authcontext";
-import { useLoginService, useSignUpService } from "@/services/useAuthService";
+import {
+    useOtpVerificationService,
+    useLoginService,
+    useSignUpService,
+} from "@/services/useAuthService";
 import { useMutation } from "@tanstack/react-query";
 
 const useAuth = () => {
@@ -10,10 +14,14 @@ const useAuth = () => {
     const loginMutation = useMutation({
         mutationFn: useLoginService,
     });
+    const emailVerification = useMutation({
+        mutationFn: useOtpVerificationService,
+    });
 
     return {
         signUpMutation,
         loginMutation,
+        emailVerification,
     };
 };
 

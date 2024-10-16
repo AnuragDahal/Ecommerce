@@ -40,7 +40,6 @@ const OtpCard = (data: InputOtpProps) => {
                             </InputOTPGroup>
                         </InputOTP>
                     </CardContent>
-                    <Button className="w-full mt-6 first">Verify</Button>
                 </Card>
             </div>
         </div>

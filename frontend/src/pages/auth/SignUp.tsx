@@ -34,6 +34,7 @@ export default function SignUp() {
     const handleSignUp = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setIsLoading(true);
+        localStorage.setItem(email);
         signUpMutation.mutate(signUpData, {
             onSuccess: (data) => {
                 setIsLoading(false);

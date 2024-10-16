@@ -44,7 +44,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ message, number }) => {
                 </CardContent>
                 <CardFooter className="w-full flex justify-between items-center space-y-2">
                     <p className="text-2xl font-bold">${message.price}</p>
-                    <Button variant={"outline"} size="sm">
+                    <Button variant={"default"} size="sm">
                         Add to Cart
                     </Button>
                 </CardFooter>

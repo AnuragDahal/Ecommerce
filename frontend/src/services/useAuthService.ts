@@ -7,9 +7,9 @@ interface ISignUpData {
     email: string;
     password: string;
 }
-interface IEmailVerificationData {
+interface IOtpVerificationData {
     email: string;
-    otp: number;
+    otp: string;
     verificationToken?: string;
 }
 
@@ -55,9 +55,7 @@ export const useLoginService = async (data: Partial<ISignUpData>) => {
     }
 };
 
-export const useEmailVerificationService = async (
-    data: IEmailVerificationData
-) => {
+export const useOtpVerificationService = async (data: IOtpVerificationData) => {
     try {
         const response = await axios.post(
             "http://localhost:3000/api/auth/verify",
@@ -74,7 +72,7 @@ export const useEmailVerificationService = async (
 };
 
 export const useForgotPasswordService = async (
-    data: Partial<IEmailVerificationData>
+    data: Partial<IOtpVerificationData>
 ) => {
     try {
         const response = await axios.post(
