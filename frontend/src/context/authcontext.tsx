@@ -47,7 +47,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
                 const { accessToken } = response.data.data;
 
                 // Set accessToken in cookies (if needed) and state
-                Cookies.set("accessToken", accessToken, { expires: 10 / 1440 });
+                Cookies.set("accessToken", accessToken, { expires: 5 / 86400 });
                 setToken(accessToken);
                 setIsAuthenticated(true);
             }

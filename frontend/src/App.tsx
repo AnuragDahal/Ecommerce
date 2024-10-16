@@ -12,7 +12,7 @@ import { Toaster } from "@/components/ui/toaster";
 import ProtectedRoute from "@/components/reuseable/ProtectedRoute";
 import { AuthProvider } from "@/context/authcontext";
 import { ThemeProvider } from "@/components/themes/theme-provider";
-import VerifyOtp from "./pages/auth/Verify";
+import VerifyOtp from "./pages/auth/EmailVerification";
 
 const App = () => {
     return (
