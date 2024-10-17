@@ -87,7 +87,7 @@ const Header = () => {
 
                 <div className="flex items-center space-x-4">
                     <ModeToggle />
-                    <Avatar>
+                    <Avatar className="hidden md:block">
                         <AvatarImage src="/placeholder-avatar.jpg" />
                         <AvatarFallback>UN</AvatarFallback>
                     </Avatar>

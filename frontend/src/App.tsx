@@ -13,7 +13,7 @@ import ProtectedRoute from "@/components/reuseable/ProtectedRoute";
 import { AuthProvider } from "@/context/authcontext";
 import { ThemeProvider } from "@/components/themes/theme-provider";
 import EmailVerification from "./pages/auth/EmailVerification";
-
+import SingleProduct from "./pages/product/SingleProduct";
 
 const App = () => {
     return (
@@ -65,6 +65,10 @@ const App = () => {
                                                     <Contact />
                                                 </ProtectedRoute>
                                             }
+                                        />
+                                        <Route
+                                            path="/products/:id"
+                                            element={<SingleProduct />}
                                         />
                                         <Route
                                             path="*"

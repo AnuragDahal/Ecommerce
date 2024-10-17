@@ -8,9 +8,11 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 interface ProductCardProps {
     message: {
+        id?: string | number;
         title: string;
         description: string;
         price: number;
@@ -20,9 +22,16 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ message, number }) => {
+    const navigate = useNavigate();
     return (
         <>
-            <Card className="max-w-[22rem] w-full" key={number}>
+            <Card
+                className="max-w-[22rem] w-full hover:cursor-pointer"
+                key={number}
+                onClick={() => {
+                    navigate(`/products/${message.id}`);
+                }}
+            >
                 <CardHeader>
                     <img
                         src={message.images[1]}
