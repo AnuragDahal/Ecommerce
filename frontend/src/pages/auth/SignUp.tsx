@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
+import { ToastAction } from "@/components/ui/toast";
 
 export default function SignUp() {
     const { toast } = useToast();
@@ -34,14 +35,15 @@ export default function SignUp() {
     const handleSignUp = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setIsLoading(true);
-        localStorage.setItem(email);
         signUpMutation.mutate(signUpData, {
             onSuccess: (data) => {
+                localStorage.setItem("email", email);
                 setIsLoading(false);
                 toast({
                     title: "Sign up successful!",
                     description:
                         "A verification email has been sent to your email address.",
+                    variant: "default",
                 });
                 console.log(data);
             },
@@ -50,6 +52,7 @@ export default function SignUp() {
                 toast({
                     title: "Sign up failed!",
                     description: error.response.data.message,
+                    variant: "destructive",
                 });
             },
         });

@@ -13,24 +13,50 @@ import {
     InputOTPSeparator,
     InputOTPSlot,
 } from "@/components/ui/input-otp";
+import { useToast } from "@/hooks/use-toast";
 import { useOtpVerificationService } from "@/services/useAuthService";
+import { ToastClose } from "@radix-ui/react-toast";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const EmailVerification = () => {
+    const { toast } = useToast();
     const [otp, setOtp] = useState("");
+    const navigate = useNavigate();
 
-    const data = {
+    const emailData = {
         otp: otp,
-        email:
-    }
-    const handleVerify = () => {
-        const { data, error, status } = useMutation({
-            mutationFn: useOtpVerificationService,
-        });
+        email: "abcd123@gmail.com",
     };
-    
+    const mutation = useMutation({
+        mutationFn: useOtpVerificationService,
+        onSuccess: () => {
+            toast({
+                title: "Verification successful!",
+                description: "You have successfully verified your email.",
+                variant: "success",
+            });
+            navigate("/auth/login");
+        },
+        onError: (data) => {
+            toast({
+                title: "Verification failed!",
+                description: data.message,
+                variant: "success",
+                action: (
+                    <ToastClose>
+                        <Button>Close</Button>
+                    </ToastClose>
+                ),
+            });
+        },
+    });
 
+    const handleVerify = () => {
+        console.log(emailData);
+        mutation.mutate(emailData);
+    };
 
     return (
         <div className="h-screen w-full flex items-center justify-center bg-black/80">
