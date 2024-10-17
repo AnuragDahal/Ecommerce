@@ -14,6 +14,7 @@ import { AuthProvider } from "@/context/authcontext";
 import { ThemeProvider } from "@/components/themes/theme-provider";
 import EmailVerification from "./pages/auth/EmailVerification";
 
+
 const App = () => {
     return (
         <>
@@ -23,7 +24,10 @@ const App = () => {
                     <Routes>
                         <Route path="/login" element={<Login />} />
                         <Route path="/sign-up" element={<SignUp />} />
-                        <Route path="/verify-email" element={<EmailVerification />} />
+                        <Route
+                            path="/verify-email"
+                            element={<EmailVerification />}
+                        />
                         <Route
                             path="/*"
                             element={
