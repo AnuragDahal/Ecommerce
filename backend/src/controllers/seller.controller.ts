@@ -13,7 +13,6 @@
 //         phone: string;
 //         email: string;
 //
-
 //     }>;
 //     createdAt: Date;
 //     updatedAt: Date;
@@ -39,13 +38,13 @@ export const handleSellerUserCreation = async (req: Request, res: Response) => {
         sendUnauthorized(res, API_RESPONSES.UNAUTHORIZED);
         return;
     }
-
     try {
         const {
             storeName,
-            categoryOfProduct,
+            businessEmail,
             paymentDetails,
             address,
+
             contact,
         } = req.body;
 
@@ -57,9 +56,8 @@ export const handleSellerUserCreation = async (req: Request, res: Response) => {
         }
         const sellerDetails = {
             userId,
-            email: user?.email,
+            email: businessEmail,
             storeName,
-            categoryOfProduct,
             paymentDetails,
             contact,
             address,

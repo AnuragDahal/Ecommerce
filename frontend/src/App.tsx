@@ -14,6 +14,7 @@ import { AuthProvider } from "@/context/authcontext";
 import { ThemeProvider } from "@/components/themes/theme-provider";
 import EmailVerification from "./pages/auth/EmailVerification";
 import SingleProduct from "./pages/product/SingleProduct";
+import UpgradeAccount from "./pages/settings/UpgradeAccount";
 
 const App = () => {
     return (
@@ -73,6 +74,10 @@ const App = () => {
                                         <Route
                                             path="*"
                                             element={<NotFound />}
+                                        />
+                                        <Route
+                                            path="/settings"
+                                            element={<UpgradeAccount />}
                                         />
                                     </Routes>
                                 </Layout>

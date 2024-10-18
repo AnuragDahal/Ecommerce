@@ -25,7 +25,6 @@ import { navList } from "@/config/constants";
 const Header = () => {
     const [isOpen, setIsOpen] = useState(false);
     const toggleMenu = () => setIsOpen(!isOpen);
-
     // Profile menu items for mobile only
     const profileMenuItems = [
         { name: "My Profile", icon: User, link: "/profile" },
@@ -34,7 +33,6 @@ const Header = () => {
         { name: "Settings", icon: Settings, link: "/settings" },
         { name: "Logout", icon: LogOut, link: "/logout" },
     ];
-
     // Original NavItems component for desktop
     const NavItems = ({ closeMenu }: { closeMenu: () => void }) => (
         <>
@@ -42,7 +40,7 @@ const Header = () => {
                 <Link
                     to={item.link}
                     key={index}
-                    className="block py-2 md:p-0"
+                    className="flex py-3 px-2 space-x-3 md:p-0 hover:bg-accent rounded-lg"
                     onClick={closeMenu}
                 >
                     {item.name}
