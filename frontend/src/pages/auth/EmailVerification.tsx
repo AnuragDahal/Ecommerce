@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/input-otp";
 import { useToast } from "@/hooks/use-toast";
 import { useOtpVerificationService } from "@/services/useAuthService";
-import { ToastClose } from "@radix-ui/react-toast";
+import { ToastClose } from "@/components/ui/toast";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -43,7 +43,7 @@ const EmailVerification = () => {
             toast({
                 title: "Verification failed!",
                 description: data.message,
-                variant: "success",
+                variant: "destructive",
                 action: (
                     <ToastClose>
                         <Button>Close</Button>

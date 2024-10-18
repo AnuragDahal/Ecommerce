@@ -6,7 +6,7 @@ export const sendBadRequest = (
     res: Response,
     message = API_RESPONSES.BAD_REQUEST
 ) => {
-    return res.status(HTTP_STATUS_CODES.BAD_GATEWAY).json({
+    return res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
         statusCode: HTTP_STATUS_CODES.BAD_REQUEST,
         message: message,
     });
@@ -32,7 +32,7 @@ export const sendForbidden = (
     });
 };
 
-export const sendAlreadyExists= (
+export const sendAlreadyExists = (
     res: Response,
     message = API_RESPONSES.USER_ALREADY_EXISTS
 ) => {
@@ -80,5 +80,3 @@ export const sendSuccess = (
         data: data,
     });
 };
-
-

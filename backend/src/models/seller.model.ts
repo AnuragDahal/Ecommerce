@@ -46,24 +46,6 @@ const sellerSchema = new Schema(
             required: true,
             unique: true,
         },
-        storeName: {
-            type: String,
-            required: true,
-        },
-        categoryOfProduct: {
-            type: String,
-            required: true,
-        },
-        imageUrl: {
-            type: String,
-            required: true,
-        },
-        products: [
-            {
-                type: Schema.Types.ObjectId,
-                ref: "Product",
-            },
-        ],
         paymentDetails: [
             {
                 bankAccountNumber: {
@@ -94,13 +76,15 @@ const sellerSchema = new Schema(
                     type: String,
                     required: true,
                 },
-                required: false,
             },
         ],
-        address: {
-            type: String,
-            required: true,
-            index: true,
+        createdAt: {
+            type: Date,
+            default: Date.now,
+        },
+        updatedAt: {
+            type: Date,
+            default: Date.now,
         },
     },
     { timestamps: true }

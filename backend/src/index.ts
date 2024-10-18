@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import { connect } from "./db/db.connect";
 import authRouter from "./apis/auth.routes";
 import productRouter from "./apis/product.routes";
+import sellerRouter from "./apis/seller.routes";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
@@ -22,6 +23,7 @@ app.use(cookieParser());
 
 app.use("/api/auth", authRouter);
 app.use("/api/products", productRouter);
+app.use("/api/seller", sellerRouter);
 
 connect()
     .then(() => {

@@ -19,7 +19,6 @@
 
 import { Request, Response } from "express";
 import Seller from "../models/seller.model";
-import { get } from "http";
 import { getPayloadDataFromHeader } from "../utils/tokenUtils";
 import {
     sendInternalServerError,
@@ -39,14 +38,8 @@ export const handleSellerUserCreation = async (req: Request, res: Response) => {
         return;
     }
     try {
-        const {
-            storeName,
-            businessEmail,
-            paymentDetails,
-            address,
-
-            contact,
-        } = req.body;
+        const { storeName, businessEmail, paymentDetails, address, contact } =
+            req.body;
 
         const userId = payload._id;
         const user = await User.findOne({ _id: userId });

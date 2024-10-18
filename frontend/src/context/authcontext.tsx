@@ -60,7 +60,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
                 const { accessToken } = response.data.data;
 
-                Cookies.set("accessToken", accessToken, { expires: 5 / 86400 });
+                Cookies.set("accessToken", accessToken, { expires: 10 });
                 setToken(accessToken);
                 setIsAuthenticated(true);
                 return true;
@@ -124,8 +124,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
     const login = (accessToken: string, refreshToken: string) => {
         if (!isTokenExpired(accessToken)) {
-            Cookies.set("accessToken", accessToken, { expires: 10 / 1440 });
-            Cookies.set("refreshToken", refreshToken, { expires: 1 });
+            Cookies.set("accessToken", accessToken, { expires: 10 });
+            Cookies.set("refreshToken", refreshToken, { expires: 10 });
             setToken(accessToken);
             setIsAuthenticated(true);
             navigate("/");
