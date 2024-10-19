@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { useProductServices } from "@/services/useProductCreationService";
 import { useMutation } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 
 const CreateProduct = () => {
@@ -15,6 +16,7 @@ const CreateProduct = () => {
     const [category, setCategory] = useState<string>("");
     const [imagePreview, setImagePreview] = useState<string[]>([]);
     const [images, setImages] = useState<File[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const { createProduct } = useProductServices();
 
     const ProductData = useMemo(
@@ -32,6 +34,7 @@ const CreateProduct = () => {
     const mutation = useMutation({
         mutationFn: createProduct,
         onSuccess: (data) => {
+            setIsLoading(false);
             toast({
                 title: "Product created successfully!",
                 description: data.message,
@@ -50,6 +53,7 @@ const CreateProduct = () => {
 
     const handleSubmit = useCallback(
         (e: React.FormEvent<HTMLFormElement>) => {
+            setIsLoading(true);
             e.preventDefault();
             mutation.mutate(ProductData);
         },
@@ -73,8 +77,8 @@ const CreateProduct = () => {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <form onSubmit={handleSubmit}>
-                            <div>
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <div className="space-y-2">
                                 <Label
                                     htmlFor="name"
                                     className="font-semibold text-muted-foreground"
@@ -90,7 +94,7 @@ const CreateProduct = () => {
                                     required
                                 />
                             </div>
-                            <div>
+                            <div className="space-y-2">
                                 <Label
                                     htmlFor="description"
                                     className="text-sm font-semibold text-muted-foreground"
@@ -108,7 +112,7 @@ const CreateProduct = () => {
                                     required
                                 />
                             </div>
-                            <div>
+                            <div className="space-y-2">
                                 <Label
                                     htmlFor="price"
                                     className="text-sm font-semibold text-muted-foreground"
@@ -126,7 +130,7 @@ const CreateProduct = () => {
                                     required
                                 />
                             </div>
-                            <div>
+                            <div className="space-y-2">
                                 <Label
                                     htmlFor="totalQuantity"
                                     className="text-sm font-semibold text-muted-foreground"
@@ -144,7 +148,7 @@ const CreateProduct = () => {
                                     required
                                 />
                             </div>
-                            <div>
+                            <div className="space-y-2">
                                 <Label
                                     htmlFor="category"
                                     className="text-sm font-semibold text-muted-foreground"
@@ -162,7 +166,7 @@ const CreateProduct = () => {
                                     required
                                 />
                             </div>
-                            <div>
+                            <div className="space-y-2">
                                 <Label
                                     htmlFor="images"
                                     className="text-sm font-semibold text-muted-foreground"
@@ -192,8 +196,14 @@ const CreateProduct = () => {
                                     ))}
                                 </div>
                             )}
-                            <div className="pt-5 text-center">
-                                <Button type="submit">Create Product</Button>
+                            <div className="space-y-2 text-center">
+                                <Button type="submit" disabled={isLoading}>
+                                    {isLoading ? (
+                                        <Loader2 className="animate-spin mr-2 h-5 w-5" />
+                                    ) : (
+                                        "Create Product"
+                                    )}
+                                </Button>
                             </div>
                         </form>
                     </CardContent>

@@ -1,10 +1,10 @@
 import { Route, Routes } from "react-router-dom";
-import Product from "@/pages/product/Product";
+import Product from "@/pages/users/product/Product";
 import NotFound from "@/pages/NotFound";
-import SignUp from "@/pages/auth/SignUp";
-import Login from "@/pages/auth/Login";
+import SignUp from "@/pages/users/auth/SignUp";
+import Login from "@/pages/users/auth/Login";
 import About from "@/pages/static/About";
-import Categories from "@/pages/product/Categories";
+import Categories from "@/pages/users/product/Categories";
 import Contact from "@/pages/static/Contact";
 import Home from "@/pages/Home";
 import Layout from "@/components/layout/Layout";
@@ -12,10 +12,11 @@ import { Toaster } from "@/components/ui/toaster";
 import ProtectedRoute from "@/components/reuseable/ProtectedRoute";
 import { AuthProvider } from "@/context/authcontext";
 import { ThemeProvider } from "@/components/themes/theme-provider";
-import EmailVerification from "./pages/auth/EmailVerification";
-import SingleProduct from "./pages/product/SingleProduct";
-import UpgradeAccount from "./pages/settings/UpgradeAccount";
-import CreateProduct from "./pages/product/CreateProduct";
+import EmailVerification from "./pages/users/auth/EmailVerification";
+import SingleProduct from "./pages/users/product/SingleProduct";
+import UpgradeAccount from "./pages/users/settings/UpgradeAccount";
+import CreateProduct from "./pages/seller/dashboard/CreateProduct";
+import Profile from "./pages/users/profile/Profile";
 
 const App = () => {
     return (
@@ -70,7 +71,11 @@ const App = () => {
                                         />
                                         <Route
                                             path="/products/:id"
-                                            element={<SingleProduct />}
+                                            element={
+                                                <ProtectedRoute>
+                                                    <SingleProduct />
+                                                </ProtectedRoute>
+                                            }
                                         />
                                         <Route
                                             path="*"
@@ -78,11 +83,38 @@ const App = () => {
                                         />
                                         <Route
                                             path="/settings"
-                                            element={<UpgradeAccount />}
+                                            element={
+                                                <ProtectedRoute>
+                                                    <UpgradeAccount />
+                                                </ProtectedRoute>
+                                            }
                                         />
                                         <Route
                                             path="/seller/create-product"
-                                            element={<CreateProduct />}
+                                            element={
+                                                <ProtectedRoute>
+                                                    <CreateProduct />
+                                                </ProtectedRoute>
+                                            }
+                                        />
+                                        <Route
+                                            path="/seller/dashboard"
+                                            element={
+                                                <ProtectedRoute>
+                                                    <div className="font-extrabold text-3xl flex items-center justify-center w-full h-96">
+                                                        Seller Dashboard to be
+                                                        made
+                                                    </div>
+                                                </ProtectedRoute>
+                                            }
+                                        />
+                                        <Route
+                                            path="/profile"
+                                            element={
+                                                <ProtectedRoute>
+                                                    <Profile />
+                                                </ProtectedRoute>
+                                            }
                                         />
                                     </Routes>
                                 </Layout>
