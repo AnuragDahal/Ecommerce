@@ -57,8 +57,8 @@ export default function ProfileCard() {
                         <Input
                             name="name"
                             value={profile.name}
-                            onChange={handleInputChange}
                             className="text-center text-2xl font-bold"
+                            readOnly
                         />
                     ) : (
                         profile.name
@@ -68,15 +68,6 @@ export default function ProfileCard() {
             <CardContent className="space-y-4">
                 {isEditing ? (
                     <form onSubmit={handleSubmit} className="space-y-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="email">Email</Label>
-                            <Input
-                                id="email"
-                                name="email"
-                                value={profile.email}
-                                onChange={handleInputChange}
-                            />
-                        </div>
                         <div className="space-y-2">
                             <Label htmlFor="phone">Phone</Label>
                             <Input
@@ -124,7 +115,15 @@ export default function ProfileCard() {
                     <div className="space-x-2">
                         <Button
                             variant="outline"
-                            onClick={() => setIsEditing(false)}
+                            onClick={() => (
+                                setIsEditing(false),
+                                setProfile({
+                                    name: "John Doe",
+                                    email: "johndoe@example.com",
+                                    phone: "+1 (555) 123-4567",
+                                    location: "San Francisco, CA",
+                                })
+                            )}
                         >
                             Cancel
                         </Button>

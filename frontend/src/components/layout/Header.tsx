@@ -73,7 +73,7 @@ const Header = () => {
                     <Link to="/" className="flex items-center space-x-2">
                         <ShoppingCart className="h-6 w-6" />
                         <span className="font-bold sm:inline-block">
-                            ShopNow
+                            Bazario
                         </span>
                     </Link>
                 </div>
@@ -141,7 +141,7 @@ const Header = () => {
                                     <h3 className="px-2 mb-2 text-sm font-semibold text-muted-foreground">
                                         Menu
                                     </h3>
-                                    <div className="flex flex-col space-y-1">
+                                    <div className="flex flex-col space-y-1 space-x-3">
                                         <NavItems
                                             closeMenu={() => setIsOpen(false)}
                                         />

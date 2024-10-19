@@ -15,8 +15,9 @@ import { ThemeProvider } from "@/components/themes/theme-provider";
 import EmailVerification from "./pages/users/auth/EmailVerification";
 import SingleProduct from "./pages/users/product/SingleProduct";
 import UpgradeAccount from "./pages/users/settings/UpgradeAccount";
-import CreateProduct from "./pages/seller/dashboard/CreateProduct";
+import CreateProduct from "./pages/seller/dashboard/components/CreateProduct";
 import Profile from "./pages/users/profile/Profile";
+import SellerDashboard from "./pages/seller/dashboard/Dashboard";
 
 const App = () => {
     return (
@@ -101,10 +102,7 @@ const App = () => {
                                             path="/seller/dashboard"
                                             element={
                                                 <ProtectedRoute>
-                                                    <div className="font-extrabold text-3xl flex items-center justify-center w-full h-96">
-                                                        Seller Dashboard to be
-                                                        made
-                                                    </div>
+                                                    <SellerDashboard />
                                                 </ProtectedRoute>
                                             }
                                         />

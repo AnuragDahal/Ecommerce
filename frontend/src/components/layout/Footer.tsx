@@ -1,16 +1,16 @@
-import { ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Footer = () => {
+    const currentYear = new Date().getFullYear();
     return (
         <div>
-            <footer className="w-full py-6 bg-gray-100">
+            <footer className="w-full py-6">
                 <div className="container mx-auto px-4">
-                    <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-                        <div className="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
-                            <ShoppingCart className="h-6 w-6" />
-                            <p className="text-center text-sm leading-loose md:text-left">
-                                © 2023 ShopNow. All rights reserved.
+                    <div className="flex items-center justify-between gap-4 md:flex-row">
+                        <div className="flex items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+                            <p className="text-center text-md leading-loose md:text-left">
+                                &copy; &nbsp;{currentYear} Bazario. All rights
+                                reserved.
                             </p>
                         </div>
                         <div className="flex gap-4">
