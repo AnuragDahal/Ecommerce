@@ -12,8 +12,7 @@ import {
     imagekit,
     uploadMultipleFiles,
 } from "../utils/imageKit";
-import { HTTP_STATUS_CODES } from "../constants/statusCodes";
-import upload from "../utils/multer";
+import { HTTP_STATUS_CODES } from "../constants/statusCodes"
 
 interface MulterRequest extends Request {
     files?: Express.Multer.File[];
@@ -28,7 +27,7 @@ export const handleCreateProduct = async (
         const multerReq = req as MulterRequest;
 
         if (!multerReq.files || multerReq.files.length === 0) {
-            sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
+            sendBadRequest(res, API_RESPONSES.IMAGE_UPLOAD_FAILED);
             return;
         }
 
@@ -48,7 +47,10 @@ export const handleCreateProduct = async (
             imageUrl: [], // Initialize the imageUrl array
         });
 
-        const result = await uploadMultipleFiles(multerReq.files);
+        const result = await uploadMultipleFiles(
+            multerReq.files,
+            "/ecommerce/products"
+        );
         product.imageUrl = result;
 
         await product.save({ validateBeforeSave: false });

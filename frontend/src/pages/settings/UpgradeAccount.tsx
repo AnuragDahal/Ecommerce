@@ -39,6 +39,7 @@ const UpgradeAccount = () => {
             });
         },
         onError: (data) => {
+            console.log(businessLogo);
             console.log(AccountData);
             toast({
                 title: "Account upgrade failed!",
@@ -110,6 +111,10 @@ const UpgradeAccount = () => {
                             <Label htmlFor="businessLogo">Logo</Label>
                             <Input
                                 id="businessLogo"
+                                value={businessLogo}
+                                onChange={(e) =>
+                                    setBusinessLogo(e.target.value)
+                                }
                                 type="file"
                                 accept="image/"
                                 size={1}

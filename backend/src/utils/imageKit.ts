@@ -9,7 +9,8 @@ export const imagekit = new ImageKit({
 });
 
 export const uploadMultipleFiles = async (
-    files: Express.Multer.File[]
+    files: Express.Multer.File[],
+    folderName: string = "/ecommerce"
 ): Promise<string[]> => {
     if (files.length === 0) {
         return [];
@@ -19,6 +20,7 @@ export const uploadMultipleFiles = async (
             imagekit.upload({
                 file: file.buffer,
                 fileName: file.originalname,
+                folder: folderName,
             })
         );
         const uploadResults = await Promise.all(uploadPromises);

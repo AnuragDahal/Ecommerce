@@ -15,6 +15,7 @@ import { ThemeProvider } from "@/components/themes/theme-provider";
 import EmailVerification from "./pages/auth/EmailVerification";
 import SingleProduct from "./pages/product/SingleProduct";
 import UpgradeAccount from "./pages/settings/UpgradeAccount";
+import CreateProduct from "./pages/product/CreateProduct";
 
 const App = () => {
     return (
@@ -78,6 +79,10 @@ const App = () => {
                                         <Route
                                             path="/settings"
                                             element={<UpgradeAccount />}
+                                        />
+                                        <Route
+                                            path="/seller/create-product"
+                                            element={<CreateProduct />}
                                         />
                                     </Routes>
                                 </Layout>
