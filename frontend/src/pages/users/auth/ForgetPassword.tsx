@@ -18,23 +18,33 @@ import { useNavigate } from "react-router-dom";
 
 const ForgetPassword = () => {
     const [email, setEmail] = useState<string>("");
-    // const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const navigate = useNavigate();
 
-    const { mutate, isPending } = useMutation({
+    const { mutate } = useMutation({
         mutationFn: useForgotPasswordService,
         onSuccess: (data) => {
             localStorage.setItem("email", email);
+            setIsLoading(false);
             toast({
                 variant: "default",
                 title: "Email sent",
                 description: `${data.message}`,
             });
-            // navigate("/reset-password");
+            navigate("/reset-password");
+        },
+        onError: (data) => {
+            setIsLoading(false);
+            toast({
+                variant: "destructive",
+                title: "Failed to send email",
+                description: `${data.message}`,
+            });
         },
     });
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setIsLoading(true);
         mutate({ email });
     };
 
@@ -63,19 +73,17 @@ const ForgetPassword = () => {
                                 />
                             </div>
                         </CardContent>
-                        <CardFooter className="btn">
-                            <div>
-                                <Button type="submit">
-                                    {isPending ? (
-                                        <>
-                                            <Loader2 className="h-6 w-6 animate-spin" />
-                                            "...Sending"
-                                        </>
-                                    ) : (
-                                        "Send Email"
-                                    )}
-                                </Button>
-                            </div>
+                        <CardFooter className="w-full flex justify-center">
+                            <Button type="submit">
+                                {isLoading ? (
+                                    <>
+                                        <Loader2 className="h-6 w-6 animate-spin" />
+                                        "...Sending"
+                                    </>
+                                ) : (
+                                    "Send Email"
+                                )}
+                            </Button>
                         </CardFooter>
                     </Card>
                 </div>
