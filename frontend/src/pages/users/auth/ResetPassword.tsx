@@ -39,6 +39,7 @@ const ResetPassword = () => {
         mutationFn: useResetPasswordService,
         onSuccess: (data) => {
             setIsLoading(false);
+            localStorage.removeItem("email");
             toast({
                 variant: "default",
                 title: "Password reset",
