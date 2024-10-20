@@ -15,9 +15,15 @@ import { ThemeProvider } from "@/components/themes/theme-provider";
 import EmailVerification from "./pages/users/auth/EmailVerification";
 import SingleProduct from "./pages/users/product/SingleProduct";
 import UpgradeAccount from "./pages/users/settings/UpgradeAccount";
-import CreateProduct from "./pages/seller/dashboard/components/CreateProduct";
+import CreateProduct from "./pages/seller/dashboard/_components/CreateProduct";
 import Profile from "./pages/users/profile/Profile";
+import Analytics from "./pages/seller/dashboard/_components/Analytics";
+
+import Overview from "./pages/seller/dashboard/_components/Overview";
+import Orders from "./pages/seller/dashboard/_components/Orders";
+import ManageProducts from "./pages/seller/dashboard/_components/ManageProducts";
 import SellerDashboard from "./pages/seller/dashboard/Dashboard";
+import SideBar from "./pages/seller/dashboard/_components/SideBar";
 
 const App = () => {
     return (
@@ -104,6 +110,55 @@ const App = () => {
                                                 <ProtectedRoute>
                                                     <SellerDashboard />
                                                 </ProtectedRoute>
+                                            }
+                                        />
+                                        <Route
+                                            path="/seller/dashboard/*"
+                                            element={
+                                                <SideBar>
+                                                    <Routes>
+                                                        <Route
+                                                            path="/overview"
+                                                            element={
+                                                                <ProtectedRoute>
+                                                                    <Overview />
+                                                                </ProtectedRoute>
+                                                            }
+                                                        />
+                                                        <Route
+                                                            path="/create-product"
+                                                            element={
+                                                                <ProtectedRoute>
+                                                                    <CreateProduct />
+                                                                </ProtectedRoute>
+                                                            }
+                                                        />
+                                                        <Route
+                                                            path="/view-orders"
+                                                            element={
+                                                                <ProtectedRoute>
+                                                                    <Orders />
+                                                                </ProtectedRoute>
+                                                            }
+                                                        />
+                                                        <Route
+                                                            path="/manage-products"
+                                                            element={
+                                                                <ProtectedRoute>
+                                                                    <ManageProducts />
+                                                                </ProtectedRoute>
+                                                            }
+                                                        />
+                                                        <Route
+                                                            path="/analytics"
+                                                            element={
+                                                                <ProtectedRoute>
+                                                                    <Analytics />
+                                                                </ProtectedRoute>
+                                                            }
+                                                        />
+                                                    </Routes>
+                                                </SideBar>
                                             }
                                         />
                                         <Route

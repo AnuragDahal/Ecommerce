@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart3, DollarSign, Package, ShoppingCart } from "lucide-react";
-import React from "react";
 
 const Overview = () => {
     return (
