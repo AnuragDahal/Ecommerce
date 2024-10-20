@@ -142,30 +142,6 @@ export const handleLogin = async (req: Request, res: Response) => {
     }
 };
 
-export const handleLogout = async (req: Request, res: Response) => {
-    const payload = getPayloadDataFromHeader(req, res);
-    if (!payload) {
-        sendUnauthorized(res, API_RESPONSES.INVALID_TOKEN);
-        return;
-    }
-    const userId = payload._id;
-    try {
-        const loggedInUser = await User.findByIdAndUpdate(
-            userId,
-            { $set: { refreshToken: "" } },
-            { new: true }
-        );
-        if (!loggedInUser) {
-            sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
-            return;
-        }
-        res.clearCookie("accessToken");
-        sendSuccess(res, API_RESPONSES.USER_LOGGED_OUT);
-    } catch (error) {
-        sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
-    }
-};
-
 export const handleRefreshToken = async (req: Request, res: Response) => {
     const { refreshToken } = req.body;
     const payload = verifyToken(refreshToken, process.env.REFRESH_TOKEN_SECRET);

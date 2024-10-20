@@ -2,7 +2,6 @@ import { Router } from "express";
 import {
     handleSignUp,
     handleLogin,
-    handleLogout,
     handleRefreshToken,
     handleOtpVerification,
     handlePasswordReset,
@@ -14,7 +13,6 @@ const router = Router();
 
 router.post("/signup", handleSignUp);
 router.post("/login", handleLogin);
-router.post("/logout", handleLogout);
 router.post("/refresh-token", handleRefreshToken);
 router.post("/verify", handleOtpVerification);
 router.post("/forgot-password", handleForgetPassword);
