@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -23,6 +23,7 @@ const Login = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [input, setInput] = useState<string>("");
     const [password, setPassword] = useState<string>("");
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleSignIn = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -95,21 +96,43 @@ const Login = () => {
                                 >
                                     Password
                                 </Label>
-                                <Input
-                                    id="password"
-                                    value={password}
-                                    onChange={(e) =>
-                                        setPassword(e.target.value)
+                                <div className="relative">
+                                    <Input
+                                        id="password"
+                                        value={password}
+                                        onChange={(e) =>
+                                            setPassword(e.target.value)
+                                        }
+                                        placeholder="Enter your password"
+                                        type={
+                                            showPassword ? "text" : "password"
+                                        }
+                                        required
+                                        className="bg-gray-700/50 border-gray-600 text-white pr-10"
+                                    />
+                                    {
+                                        // Toggle password visibility
+                                        showPassword ? (
+                                            <Eye
+                                                onClick={() =>
+                                                    setShowPassword(false)
+                                                }
+                                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer"
+                                            />
+                                        ) : (
+                                            <EyeOff
+                                                onClick={() =>
+                                                    setShowPassword(true)
+                                                }
+                                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer"
+                                            />
+                                        )
                                     }
-                                    placeholder="Enter your password"
-                                    type="password"
-                                    required
-                                    className="bg-gray-700/50 border-gray-600 text-white placeholder-gray-400"
-                                />
+                                </div>
                             </div>
                             <Button
                                 type="submit"
-                                className="w-full bg-purple-600 hover:bg-purple-700 text-white text-lg py-6"
+                                className="w-full bg-purple-600 hover:bg-purple-700 text-lg py-6"
                                 disabled={isLoading}
                             >
                                 {isLoading ? (
@@ -123,8 +146,8 @@ const Login = () => {
                             </Button>
                         </form>
                     </CardContent>
-                    <CardFooter>
-                        <p className="text-sm text-gray-400 text-center w-full">
+                    <CardFooter className="flex items-center gap-1">
+                        <p className="text-sm text-muted-foreground text-center w-full">
                             Don't have an account?{" "}
                             <a
                                 href="#"
@@ -132,6 +155,14 @@ const Login = () => {
                             >
                                 <Link to="/sign-up">Sign Up</Link>
                             </a>
+                        </p>
+                        <p className="text-sm text-muted-foreground text-center w-full">
+                            <Link
+                                to="/forgot-password"
+                                className="text-purple-400 hover:text-purple-300 underline underline-offset-4"
+                            >
+                                Forgot Password?
+                            </Link>
                         </p>
                     </CardFooter>
                 </Card>

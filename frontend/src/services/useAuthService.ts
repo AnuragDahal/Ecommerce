@@ -127,24 +127,6 @@ export const userChangePasswordService = async (data: IChangePassword) => {
     }
 };
 
-export const useLogoutService = async () => {
-    try {
-        const response = await axios.post(
-            "http://localhost:3000/api/auth/logout",
-            {
-                withCredentials: true,
-            }
-        );
-        return response.data;
-    } catch (error) {
-        if (axios.isAxiosError(error) && error.response) {
-            throw error.response.data;
-        } else {
-            throw new Error("Network Error");
-        }
-    }
-};
-
 export const useRefreshTokenService = async () => {
     try {
         const response = await axios.post(

@@ -23,6 +23,8 @@ import Orders from "./pages/seller/dashboard/_components/Orders";
 import ManageProducts from "./pages/seller/dashboard/_components/ManageProducts";
 import SideBar from "./pages/seller/dashboard/_components/SideBar";
 import ChangePassword from "./pages/users/settings/ChangePassword";
+import ForgetPassword from "./pages/users/auth/ForgetPassword";
+import ResetPassword from "./pages/users/auth/ResetPassword";
 
 const App = () => {
     return (
@@ -36,6 +38,14 @@ const App = () => {
                         <Route
                             path="/verify-email"
                             element={<EmailVerification />}
+                        />
+                        <Route
+                            path="/forgot-password"
+                            element={<ForgetPassword />}
+                        />
+                        <Route
+                            path="/reset-password"
+                            element={<ResetPassword />}
                         />
                         <Route
                             path="/*"
