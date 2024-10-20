@@ -377,9 +377,9 @@ export const handlePasswordChange = async (req: Request, res: Response) => {
             return;
         }
         sendSuccess(res, API_RESPONSES.PASSWORD_CHANGED);
+        return;
     } catch (error) {
         sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
         return;
     }
 };
-

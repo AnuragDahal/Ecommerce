@@ -1,4 +1,5 @@
 import axios from "axios";
+import Cookies from "js-cookie";
 
 interface ISignUpData {
     firstName: string;
@@ -111,7 +112,9 @@ export const userChangePasswordService = async (data: IChangePassword) => {
             "http://localhost:3000/api/auth/change-password",
             data,
             {
-                withCredentials: true,
+                headers: {
+                    Authorization: `Bearer ${Cookies.get("accessToken")}`,
+                },
             }
         );
         return response.data;

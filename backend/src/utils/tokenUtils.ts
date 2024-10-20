@@ -32,22 +32,31 @@ export const getPayloadDataFromHeader = (req: Request, res: Response) => {
     const authHeader = req.headers["authorization"];
     if (!authHeader) {
         sendUnauthorized(res, API_RESPONSES.MISSING_HEADERS);
-        return;
+        return; // Ensure immediate return
     }
     const token = authHeader.split(" ")[1];
     if (!process.env.ACCESS_TOKEN_SECRET) {
         sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
-        return;
+        return; // Ensure immediate return
     }
-    const payload = jwt.verify(
-        token,
-        process.env.ACCESS_TOKEN_SECRET
-    ) as IJWTPayload2;
-    return {
-        _id: payload._id,
-        email: payload.email,
-        userName: payload.userName,
-    };
+    try {
+        const payload = jwt.verify(
+            token,
+            process.env.ACCESS_TOKEN_SECRET
+        ) as IJWTPayload2;
+        return {
+            _id: payload._id,
+            email: payload.email,
+            userName: payload.userName,
+        };
+    } catch (error) {
+        if (error instanceof jwt.JsonWebTokenError) {
+            sendUnauthorized(res, API_RESPONSES.UNAUTHORIZED);
+        } else {
+            sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
+            return; // Ensure immediate return
+        }
+    }
 };
 
 export const verifyToken = (

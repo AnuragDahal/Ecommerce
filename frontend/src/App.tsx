@@ -18,12 +18,11 @@ import UpgradeAccount from "./pages/users/settings/UpgradeAccount";
 import CreateProduct from "./pages/seller/dashboard/_components/CreateProduct";
 import Profile from "./pages/users/profile/Profile";
 import Analytics from "./pages/seller/dashboard/_components/Analytics";
-
 import Overview from "./pages/seller/dashboard/_components/Overview";
 import Orders from "./pages/seller/dashboard/_components/Orders";
 import ManageProducts from "./pages/seller/dashboard/_components/ManageProducts";
-import SellerDashboard from "./pages/seller/dashboard/Dashboard";
 import SideBar from "./pages/seller/dashboard/_components/SideBar";
+import ChangePassword from "./pages/users/settings/ChangePassword";
 
 const App = () => {
     return (
@@ -89,11 +88,26 @@ const App = () => {
                                             element={<NotFound />}
                                         />
                                         <Route
-                                            path="/settings"
+                                            path="/settings/*"
                                             element={
-                                                <ProtectedRoute>
-                                                    <UpgradeAccount />
-                                                </ProtectedRoute>
+                                                <Routes>
+                                                    <Route
+                                                        path="/upgrade-account"
+                                                        element={
+                                                            <ProtectedRoute>
+                                                                <UpgradeAccount />
+                                                            </ProtectedRoute>
+                                                        }
+                                                    />
+                                                    <Route
+                                                        path="/change-password"
+                                                        element={
+                                                            <ProtectedRoute>
+                                                                <ChangePassword />
+                                                            </ProtectedRoute>
+                                                        }
+                                                    />
+                                                </Routes>
                                             }
                                         />
                                         <Route
@@ -101,14 +115,6 @@ const App = () => {
                                             element={
                                                 <ProtectedRoute>
                                                     <CreateProduct />
-                                                </ProtectedRoute>
-                                            }
-                                        />
-                                        <Route
-                                            path="/seller/dashboard"
-                                            element={
-                                                <ProtectedRoute>
-                                                    <SellerDashboard />
                                                 </ProtectedRoute>
                                             }
                                         />
