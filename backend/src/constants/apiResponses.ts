@@ -21,6 +21,7 @@ export const API_RESPONSES = {
     UNABLE_TO_UPDATE_PRODUCT: "Unable to update product",
     IMAGE_UPLOAD_FAILED: "Image upload failed",
     PRODUCT_NOT_FOUND: "Product not found",
+    SAME_PASSWORD: "New password must be different from the old password",
 
     // VALIDATION ERRORS
     INVALID_EMAIL: "Invalid email",

@@ -358,6 +358,11 @@ export const handlePasswordChange = async (req: Request, res: Response) => {
             sendBadRequest(res, API_RESPONSES.INVALID_PASSWORD);
             return;
         }
+        const isPasswordSame = await user.isPasswordCorrect(newPassword);
+        if (isPasswordSame) {
+            sendBadRequest(res, API_RESPONSES.SAME_PASSWORD);
+            return;
+        }
         user.password = newPassword;
         await user.save({ validateBeforeSave: false });
         const emailData = {
