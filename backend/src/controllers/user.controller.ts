@@ -269,8 +269,13 @@ export const handlePasswordReset = async (req: Request, res: Response) => {
             sendBadRequest(res, API_RESPONSES.OTP_EXPIRED);
             return;
         }
-        if (user.otp !== otp) {
+        if (user.otp != otp) {
             sendBadRequest(res, API_RESPONSES.INVALID_CREDENTIALS);
+            return;
+        }
+        const isOldPassword = await user.isPasswordCorrect(newPassword);
+        if (isOldPassword) {
+            sendBadRequest(res, API_RESPONSES.SAME_PASSWORD);
             return;
         }
         user.password = newPassword;

@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { useForgotPasswordService } from "@/services/useAuthService";
 import { useMutation } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
+import { Loader2, SendHorizontalIcon } from "lucide-react";
 import { useState } from "react";
 
 import { useNavigate } from "react-router-dom";
@@ -78,10 +78,10 @@ const ForgetPassword = () => {
                                 {isLoading ? (
                                     <>
                                         <Loader2 className="h-6 w-6 animate-spin" />
-                                        "...Sending"
+                                        ...Sending
                                     </>
                                 ) : (
-                                    "Send Email"
+                                    " Send Email"
                                 )}
                             </Button>
                         </CardFooter>

@@ -63,24 +63,23 @@ const ResetPassword = () => {
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (email) {
-            if (input.newPassword !== input.confirmPassword) {
-                return toast({
-                    variant: "destructive",
-                    title: "Password mismatch",
-                    description: "Please enter the same password",
-                });
-            }
-            const updatedInput = { ...input, email };
-            mutation.mutate(updatedInput);
-            setIsLoading(true);
+        if (!email) {
+            toast({
+                variant: "destructive",
+                title: "Email not found",
+                description: "Please go back to the forget password page",
+            });
         }
-        console.log(input);
-        toast({
-            variant: "destructive",
-            title: "Email not found",
-            description: "Please enter a valid email",
-        });
+        if (input.newPassword !== input.confirmPassword) {
+            return toast({
+                variant: "destructive",
+                title: "Password mismatch",
+                description: "Please enter the same password in both fields",
+            });
+        }
+        const updatedInput = { ...input, email: email ?? "" };
+        setIsLoading(true);
+        mutation.mutate(updatedInput);
     };
     return (
         <div>
@@ -180,7 +179,14 @@ const ResetPassword = () => {
                         </CardContent>
                         <CardFooter className="btn">
                             <div className="w-full flex justify-center">
-                                <Button type="submit">
+                                <Button
+                                    className={
+                                        isLoading
+                                            ? "bg-accent-foreground text-muted-foreground"
+                                            : ""
+                                    }
+                                    type="submit"
+                                >
                                     {isLoading ? (
                                         <>
                                             <Loader2 className="h-6 w-6 animate-spin mr-2" />
