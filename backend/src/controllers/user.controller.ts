@@ -329,7 +329,7 @@ export const handlePasswordChange = async (req: Request, res: Response) => {
             sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
             return;
         }
-        const user = await User.findOne({ _id: userId });
+        const user = await User.findById({ _id: userId });
         if (!user) {
             sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
             return;
@@ -363,6 +363,29 @@ export const handlePasswordChange = async (req: Request, res: Response) => {
             return;
         }
         sendSuccess(res, API_RESPONSES.PASSWORD_CHANGED);
+        return;
+    } catch (error) {
+        sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
+        return;
+    }
+};
+
+export const handleGetRole = async (req: Request, res: Response) => {
+    const payload = getPayloadDataFromHeader(req, res);
+    if (!payload) {
+        sendUnauthorized(res, API_RESPONSES.INVALID_TOKEN);
+        return;
+    }
+    const userId = payload._id;
+    try {
+        const user = await User.findById({ _id: userId });
+        if (!user) {
+            sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
+            return;
+        }
+        sendSuccess(res, API_RESPONSES.SUCCESS, HTTP_STATUS_CODES.OK, {
+            role: user.role,
+        });
         return;
     } catch (error) {
         sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
