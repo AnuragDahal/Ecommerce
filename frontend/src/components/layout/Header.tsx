@@ -20,12 +20,10 @@ const Header = () => {
                 <div className="flex items-center space-x-4">
                     <Navbar />
                     <ModeToggle />
-                    <Avatar className="hidden md:block">
+                    <Avatar className="hidden md:block hover:cursor-pointer">
                         <AvatarImage src="/placeholder-avatar.jpg" />
                         <AvatarFallback>UN</AvatarFallback>
                     </Avatar>
-
-                    {/* Include Navbar for both desktop and mobile navigation */}
                 </div>
             </div>
         </header>

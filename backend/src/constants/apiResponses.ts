@@ -11,6 +11,7 @@ export const API_RESPONSES = {
     PRODUCT_DELETED: "Product successfully deleted",
     IMAGE_UPLOAD_SUCCESS: "Image uploaded successfully",
     SELLER_CREATED: "Seller successfully created",
+    SUCCESS: "Success",
     // Error Responses
     USER_NOT_FOUND: "User not found",
     USER_ALREADY_EXISTS: "User already exists",

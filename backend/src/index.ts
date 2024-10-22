@@ -6,6 +6,7 @@ import productRouter from "./apis/product.routes";
 import sellerRouter from "./apis/seller.routes";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import { isAuthenticated } from "./middleware/authenticated";
 
 dotenv.config();
 
@@ -22,8 +23,8 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api/auth", authRouter);
-app.use("/api/products", productRouter);
-app.use("/api/seller", sellerRouter);
+app.use("/api/products", isAuthenticated, productRouter);
+app.use("/api/seller", isAuthenticated, sellerRouter);
 
 connect()
     .then(() => {

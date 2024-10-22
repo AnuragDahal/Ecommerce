@@ -20,7 +20,7 @@ router.post("/verify", handleOtpVerification);
 router.post("/forgot-password", handleForgetPassword);
 router.post("/reset-password", handlePasswordReset);
 router.post("/change-password", isAuthenticated, handlePasswordChange);
-router.get("/get-role", isAuthenticated, handleGetRole);
+router.get("/get-role", handleGetRole);
 
 // router.post("/resend-verification-email" /* handler */);
 

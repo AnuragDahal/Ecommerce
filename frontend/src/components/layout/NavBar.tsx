@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigationType } from "react-router-dom";
 import Cookies from "js-cookie";
 import { navList } from "@/config/constants";
-import { ModeToggle } from "@/components/themes/mode-toggle";
 import {
     Sheet,
     SheetContent,
@@ -14,25 +13,46 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Menu, LogOut, ShoppingBag, Heart, User, Settings } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useGetRoleService } from "@/services/useAuthService";
 
 // NavItems for both desktop and mobile
-const NavItems = ({ closeMenu }: { closeMenu: () => void }) => (
+const NavItems = ({
+    closeMenu,
+    role,
+}: {
+    closeMenu: () => void;
+    role: string | undefined;
+}) => (
     <>
-        {navList.map((item, index) =>
-            item.name === "Logout" ? (
-                <Link
-                    to={item.link}
-                    key={index}
-                    className="flex py-3 px-2 space-x-3 md:p-0 hover:bg-accent rounded-lg"
-                    onClick={() => {
-                        Cookies.remove("accessToken");
-                        Cookies.remove("refreshToken");
-                        closeMenu();
-                    }}
-                >
-                    {item.name}
-                </Link>
-            ) : (
+        {navList.map((item, index) => {
+            // Check if the item is "Dashboard" and the role is "user"
+            const isDashboard = item.name === "Dashboard" && role === "user";
+            // Render the logout link separately
+            if (item.name === "Logout") {
+                return (
+                    <Link
+                        to={item.link}
+                        key={index}
+                        className="flex py-3 px-2 space-x-3 md:p-0 hover:bg-accent rounded-lg"
+                        onClick={() => {
+                            Cookies.remove("accessToken");
+                            Cookies.remove("refreshToken");
+                            closeMenu();
+                        }}
+                    >
+                        {item.name}
+                    </Link>
+                );
+            }
+
+            // Render the dashboard link conditionally
+            if (isDashboard) {
+                return null; // Don't render the Dashboard link for users
+            }
+
+            // Render all other links
+            return (
                 <Link
                     to={item.link}
                     key={index}
@@ -41,8 +61,8 @@ const NavItems = ({ closeMenu }: { closeMenu: () => void }) => (
                 >
                     {item.name}
                 </Link>
-            )
-        )}
+            );
+        })}
     </>
 );
 
@@ -92,12 +112,17 @@ const MobileProfileSection = ({ closeMenu }: { closeMenu: () => void }) => {
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const toggleMenu = () => setIsOpen(!isOpen);
+    const { data } = useQuery({
+        queryKey: ["user"],
+        queryFn: useGetRoleService,
+    });
+    const role = data?.data?.role;
 
     return (
         <>
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-                <NavItems closeMenu={() => {}} />
+                <NavItems closeMenu={() => {}} role={role} />
             </nav>
 
             {/* Mobile Menu */}
@@ -152,7 +177,10 @@ const Navbar = () => {
                                 Menu
                             </h3>
                             <div className="flex flex-col space-y-1 space-x-3">
-                                <NavItems closeMenu={() => setIsOpen(false)} />
+                                <NavItems
+                                    closeMenu={() => setIsOpen(false)}
+                                    role={role}
+                                />
                             </div>
                         </div>
                     </div>

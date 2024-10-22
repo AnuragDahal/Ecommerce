@@ -144,3 +144,23 @@ export const useRefreshTokenService = async () => {
         }
     }
 };
+
+export const useGetRoleService = async () => {
+    try {
+        const response = await axios.get(
+            "http://localhost:3000/api/auth/get-role",
+            {
+                headers: {
+                    Authorization: `Bearer ${Cookies.get("accessToken")}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+            throw error.response.data;
+        } else {
+            throw new Error("Network Error");
+        }
+    }
+};

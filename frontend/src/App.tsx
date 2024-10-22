@@ -25,6 +25,7 @@ import SideBar from "./pages/seller/dashboard/_components/SideBar";
 import ChangePassword from "./pages/users/settings/ChangePassword";
 import ForgetPassword from "./pages/users/auth/ForgetPassword";
 import ResetPassword from "./pages/users/auth/ResetPassword";
+import ProductDetailCard from "./components/reuseable/ProductDetailCard";
 
 const App = () => {
     return (

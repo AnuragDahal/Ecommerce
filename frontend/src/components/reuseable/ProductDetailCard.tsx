@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Maximize2 } from "lucide-react";
+import { Maximize2, Minus, Plus } from "lucide-react";
 
 interface ProductColor {
     name: string;
@@ -95,7 +95,7 @@ export default function ProductDetailCard({
                         </span>
                     </div>
                     <p className="text-muted-foreground text-lg">
-                        {description}
+                        {description.slice(0, 100)}...
                     </p>
                     <div>
                         <Label htmlFor="color" className="text-lg">
@@ -123,16 +123,29 @@ export default function ProductDetailCard({
                             <Label htmlFor="quantity" className="text-lg">
                                 Quantity
                             </Label>
-                            <Input
-                                type="number"
-                                id="quantity"
-                                min={1}
-                                value={quantity}
-                                onChange={(e) =>
-                                    setQuantity(parseInt(e.target.value))
-                                }
-                                className="mt-1"
-                            />
+                            <div className="relative">
+                                <Input
+                                    type="text"
+                                    id="quantity"
+                                    min={1}
+                                    value={quantity || ""}
+                                    onChange={(e) =>
+                                        setQuantity(parseInt(e.target.value))
+                                    }
+                                    defaultValue={1}
+                                    className="mt-1 pr-10 pl-9 text-center text-md font-md" // Adds right padding so text doesn’t overlap with the icon
+                                />
+                                <Minus
+                                    className="absolute top-1/2 left-2 transform -translate-y-1/2 h-6 w-6 text-muted-foreground hover:cursor-pointer"
+                                    onClick={() =>
+                                        setQuantity(Math.max(quantity - 1, 1))
+                                    }
+                                />
+                                <Plus
+                                    className="absolute top-1/2 right-2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground hover:cursor-pointer"
+                                    onClick={() => setQuantity(quantity + 1)}
+                                />
+                            </div>
                         </div>
                         <Button size="lg" className="flex-1">
                             Add to Cart
@@ -157,12 +170,7 @@ export default function ProductDetailCard({
                     <h2 className="text-2xl font-semibold mb-4">
                         Product Description
                     </h2>
-                    <p className="text-lg">
-                        Detailed description of the {name} would go here. This
-                        section can include multiple paragraphs, bullet points,
-                        or any other relevant information about the product's
-                        features, benefits, and use cases.
-                    </p>
+                    <p className="text-lg">{description}</p>
                 </TabsContent>
                 <TabsContent value="additional" className="mt-6">
                     <h2 className="text-2xl font-semibold mb-4">
