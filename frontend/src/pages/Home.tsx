@@ -30,7 +30,7 @@ const Home = () => {
                                 <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
                                     Welcome to ShopNow
                                 </h1>
-                                <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
+                                <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
                                     Discover amazing products at unbeatable
                                     prices. Start shopping now and transform
                                     your lifestyle!
@@ -45,7 +45,7 @@ const Home = () => {
                         </div>
                     </div>
                 </section>
-                <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100">
+                <section className="w-full py-12 md:py-24 lg:py-32 bg-muted">
                     <div className="container mx-auto px-4">
                         <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-center mb-12">
                             Featured Products
@@ -108,21 +108,25 @@ const Home = () => {
                         </div>
                     </div>
                 </section>
-                <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100">
+                <section className="w-full py-12 md:py-24 lg:py-3 bg-muted">
                     <div className="container mx-auto px-4">
                         <div className="flex flex-col items-center space-y-4 text-center">
                             <div className="space-y-2">
                                 <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
                                     Start Shopping Today
                                 </h2>
-                                <p className="mx-auto max-w-[600px] text-gray-500 md:text-xl">
+                                <p className="mx-auto max-w-[600px] text-accent-foreground md:text-xl">
                                     Join thousands of satisfied customers and
                                     experience the best in online shopping.
                                 </p>
                             </div>
-                            <Button className="inline-flex items-center">
-                                Shop Now <ArrowRight className="ml-2 h-4 w-4" />
-                            </Button>
+
+                            <Link to="/products">
+                                <Button>
+                                    Shop Now
+                                    <ArrowRight className="ml-2 h-4 w-4" />
+                                </Button>
+                            </Link>
                         </div>
                     </div>
                 </section>
