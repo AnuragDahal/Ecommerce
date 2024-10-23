@@ -68,7 +68,7 @@ const Login = () => {
                 transition={{ duration: 0.5 }}
                 className="w-full max-w-2xl px-4 sm:px-0"
             >
-                <Card className="bg-gray-800/40 backdrop-blur-md border-gray-700">
+                <Card className="bg-background/0 backdrop-blur-md border-gray-700">
                     <CardHeader className="pb-4">
                         <CardTitle className="text-3xl font-bold text-center text-white">
                             Sign In
