@@ -8,12 +8,14 @@ import React, {
 import Cookies from "js-cookie";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useGetRoleService } from "@/services/useAuthService";
 
 interface AuthContextProps {
     isAuthenticated: boolean;
     token: string | null;
     login: (accessToken: string, refreshToken: string) => void;
     logout: () => void;
+    getUserRole: () => Promise<string | undefined>;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -135,6 +137,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         }
     };
 
+    const getUserRole = async () => {
+        try {
+            const response = await useGetRoleService();
+            return response.data.role;
+        } catch (error) {
+            console.error("Failed to get user role:", error);
+            return undefined;
+        }
+    };
+
     const logout = () => {
         Cookies.remove("accessToken");
         Cookies.remove("refreshToken");
@@ -148,7 +160,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, token, logout, login }}>
+        <AuthContext.Provider
+            value={{ isAuthenticated, token, logout, login, getUserRole }}
+        >
             {children}
         </AuthContext.Provider>
     );

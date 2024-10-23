@@ -9,14 +9,22 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-    const { isAuthenticated } = useAuthContext();
+    const { isAuthenticated, getUserRole } = useAuthContext();
     const navigate = useNavigate();
+    const path = "/seller";
 
     useEffect(() => {
-        if (!isAuthenticated) {
-            navigate("/login");
-        }
-    }, [isAuthenticated, navigate]);
+        const checkAuthentication = async () => {
+            if (!isAuthenticated) {
+                navigate("/login");
+            }
+            const role = await getUserRole();
+            if (role !== "seller" && location.pathname.includes(path)) {
+                navigate("/");
+            }
+        };
+        checkAuthentication();
+    }, [isAuthenticated, navigate, getUserRole]);
 
     // If the user is authenticated, render the children (protected content)
     if (!isAuthenticated) {
