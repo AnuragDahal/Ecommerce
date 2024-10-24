@@ -26,6 +26,7 @@ import ChangePassword from "./pages/users/settings/ChangePassword";
 import ForgetPassword from "./pages/users/auth/ForgetPassword";
 import ResetPassword from "./pages/users/auth/ResetPassword";
 import ProductDetailCard from "./components/reuseable/ProductDetailCard";
+import Cart from "./pages/users/product/Cart";
 
 const App = () => {
     return (
@@ -59,6 +60,14 @@ const App = () => {
                                             element={
                                                 <ProtectedRoute>
                                                     <Product />
+                                                </ProtectedRoute>
+                                            }
+                                        />
+                                        <Route
+                                            path="/cart"
+                                            element={
+                                                <ProtectedRoute>
+                                                    <Cart />
                                                 </ProtectedRoute>
                                             }
                                         />
