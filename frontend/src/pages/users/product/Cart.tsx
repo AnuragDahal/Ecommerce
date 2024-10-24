@@ -34,14 +34,14 @@ const Cart = () => {
             name: "Smartphone Case",
             price: 19.99,
             quantity: 2,
-            image: "/placeholder.svg?height=100&width=100",
+            image: "https://images.unsplash.com/photo-1533474573390-2c9396cbec1c?q=80&w=1065&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
         },
         {
             id: 3,
             name: "USB-C Cable",
             price: 9.99,
             quantity: 3,
-            image: "/placeholder.svg?height=100&width=100",
+            image: "https://img.freepik.com/free-photo/usb-cable-type-c-blue-background_58702-4532.jpg?t=st=1729752722~exp=1729756322~hmac=b77503b33ecde96e0eda575d75c725e92b85c0e966c911b683d6c40732808079&w=996",
         },
     ]);
 
@@ -106,7 +106,7 @@ const Cart = () => {
                                         loading="lazy"
                                         src={item.image}
                                         alt={item.name}
-                                        className="rounded-md w-[100px] h-[100px]"
+                                        className="rounded-md w-[100px] h-[100px] object-cover"
                                     />
                                     <div className="ml-4 flex-grow space-y-2">
                                         <h3 className="font-semibold">

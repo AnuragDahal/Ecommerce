@@ -27,6 +27,7 @@ import ForgetPassword from "./pages/users/auth/ForgetPassword";
 import ResetPassword from "./pages/users/auth/ResetPassword";
 import ProductDetailCard from "./components/reuseable/ProductDetailCard";
 import Cart from "./pages/users/product/Cart";
+import MyOrdersPage from "./pages/users/product/Orders";
 
 const App = () => {
     return (
@@ -68,6 +69,14 @@ const App = () => {
                                             element={
                                                 <ProtectedRoute>
                                                     <Cart />
+                                                </ProtectedRoute>
+                                            }
+                                        />
+                                        <Route
+                                            path="/orders"
+                                            element={
+                                                <ProtectedRoute>
+                                                    <MyOrdersPage />
                                                 </ProtectedRoute>
                                             }
                                         />
