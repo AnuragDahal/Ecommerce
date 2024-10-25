@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Outlet, Route, Routes } from "react-router-dom";
 import Product from "@/pages/users/product/Product";
 import NotFound from "@/pages/NotFound";
 import SignUp from "@/pages/users/auth/SignUp";
@@ -28,211 +28,185 @@ import ResetPassword from "./pages/users/auth/ResetPassword";
 import Cart from "./pages/users/product/Cart";
 import MyOrdersPage from "./pages/users/product/Orders";
 import StripeCheckout from "./pages/users/auth/StripeCheckout";
-import CompletePage from "./components/reuseable/CompletePage";
 import StripeComplete from "./pages/users/auth/StripeComplete";
 
-const App = () => {
-    return (
-        <>
-            <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-                <AuthProvider>
-                    <Toaster />
+const App = () => (
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <AuthProvider>
+            <Toaster />
 
-                    <Routes>
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/sign-up" element={<SignUp />} />
-                        <Route
-                            path="/verify-email"
-                            element={<EmailVerification />}
-                        />
-                        <Route
-                            path="/forgot-password"
-                            element={<ForgetPassword />}
-                        />
-                        <Route
-                            path="/reset-password"
-                            element={<ResetPassword />}
-                        />
+            <Routes>
+                {/* Auth Routes */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/sign-up" element={<SignUp />} />
+                <Route path="/verify-email" element={<EmailVerification />} />
+                <Route path="/forgot-password" element={<ForgetPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
 
+                {/* Main App Layout with Nested Routes */}
+                <Route path="/*" element={<Layout />}>
+                    <Route index element={<Home />} />
+
+                    {/* Protected Routes */}
+                    <Route
+                        path="products"
+                        element={
+                            <ProtectedRoute>
+                                <Product />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="complete"
+                        element={
+                            <ProtectedRoute>
+                                <StripeComplete />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="checkout"
+                        element={
+                            <ProtectedRoute>
+                                <StripeCheckout />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="cart"
+                        element={
+                            <ProtectedRoute>
+                                <Cart />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="orders"
+                        element={
+                            <ProtectedRoute>
+                                <MyOrdersPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="about"
+                        element={
+                            <ProtectedRoute>
+                                <About />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="categories"
+                        element={
+                            <ProtectedRoute>
+                                <Categories />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="contact"
+                        element={
+                            <ProtectedRoute>
+                                <Contact />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="products/:id"
+                        element={
+                            <ProtectedRoute>
+                                <SingleProduct />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="profile"
+                        element={
+                            <ProtectedRoute>
+                                <Profile />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route path="*" element={<NotFound />} />
+
+                    {/* Settings Nested Routes */}
+                    <Route path="settings/*" element={<Outlet />}>
                         <Route
-                            path="/*"
+                            path="upgrade-account"
                             element={
-                                <Layout>
-                                    <Routes>
-                                        <Route path="/" element={<Home />} />
-                                        <Route
-                                            path="/products"
-                                            element={
-                                                <ProtectedRoute>
-                                                    <Product />
-                                                </ProtectedRoute>
-                                            }
-                                        />
-                                        <Route
-                                            path="/complete"
-                                            element={
-                                                <ProtectedRoute>
-                                                    <StripeComplete />
-                                                </ProtectedRoute>
-                                            }
-                                        />
-                                        <Route
-                                            path="/checkout"
-                                            element={
-                                                <ProtectedRoute>
-                                                    <StripeCheckout />
-                                                </ProtectedRoute>
-                                            }
-                                        />
-                                        <Route
-                                            path="/cart"
-                                            element={
-                                                <ProtectedRoute>
-                                                    <Cart />
-                                                </ProtectedRoute>
-                                            }
-                                        />
-                                        <Route
-                                            path="/orders"
-                                            element={
-                                                <ProtectedRoute>
-                                                    <MyOrdersPage />
-                                                </ProtectedRoute>
-                                            }
-                                        />
-                                        <Route
-                                            path="/about"
-                                            element={
-                                                <ProtectedRoute>
-                                                    <About />
-                                                </ProtectedRoute>
-                                            }
-                                        />
-                                        <Route
-                                            path="/categories"
-                                            element={
-                                                <ProtectedRoute>
-                                                    <Categories />
-                                                </ProtectedRoute>
-                                            }
-                                        />
-                                        <Route
-                                            path="/contact"
-                                            element={
-                                                <ProtectedRoute>
-                                                    <Contact />
-                                                </ProtectedRoute>
-                                            }
-                                        />
-                                        <Route
-                                            path="/products/:id"
-                                            element={
-                                                <ProtectedRoute>
-                                                    <SingleProduct />
-                                                </ProtectedRoute>
-                                            }
-                                        />
-                                        <Route
-                                            path="*"
-                                            element={<NotFound />}
-                                        />
-                                        <Route
-                                            path="/settings/*"
-                                            element={
-                                                <Routes>
-                                                    <Route
-                                                        path="/upgrade-account"
-                                                        element={
-                                                            <ProtectedRoute>
-                                                                <UpgradeAccount />
-                                                            </ProtectedRoute>
-                                                        }
-                                                    />
-                                                    <Route
-                                                        path="/change-password"
-                                                        element={
-                                                            <ProtectedRoute>
-                                                                <ChangePassword />
-                                                            </ProtectedRoute>
-                                                        }
-                                                    />
-                                                </Routes>
-                                            }
-                                        />
-                                        <Route
-                                            path="/seller/create-product"
-                                            element={
-                                                <ProtectedRoute>
-                                                    <CreateProduct />
-                                                </ProtectedRoute>
-                                            }
-                                        />
-                                        <Route
-                                            path="/seller/dashboard/*"
-                                            element={
-                                                <SideBar>
-                                                    <Routes>
-                                                        <Route
-                                                            path="/overview"
-                                                            element={
-                                                                <ProtectedRoute>
-                                                                    <Overview />
-                                                                </ProtectedRoute>
-                                                            }
-                                                        />
-                                                        <Route
-                                                            path="/create-product"
-                                                            element={
-                                                                <ProtectedRoute>
-                                                                    <CreateProduct />
-                                                                </ProtectedRoute>
-                                                            }
-                                                        />
-                                                        <Route
-                                                            path="/view-orders"
-                                                            element={
-                                                                <ProtectedRoute>
-                                                                    <Orders />
-                                                                </ProtectedRoute>
-                                                            }
-                                                        />
-                                                        <Route
-                                                            path="/manage-products"
-                                                            element={
-                                                                <ProtectedRoute>
-                                                                    <ManageProducts />
-                                                                </ProtectedRoute>
-                                                            }
-                                                        />
-                                                        <Route
-                                                            path="/analytics"
-                                                            element={
-                                                                <ProtectedRoute>
-                                                                    <Analytics />
-                                                                </ProtectedRoute>
-                                                            }
-                                                        />
-                                                    </Routes>
-                                                </SideBar>
-                                            }
-                                        />
-                                        <Route
-                                            path="/profile"
-                                            element={
-                                                <ProtectedRoute>
-                                                    <Profile />
-                                                </ProtectedRoute>
-                                            }
-                                        />
-                                    </Routes>
-                                </Layout>
+                                <ProtectedRoute>
+                                    <UpgradeAccount />
+                                </ProtectedRoute>
                             }
                         />
-                    </Routes>
-                </AuthProvider>
-            </ThemeProvider>
-        </>
-    );
-};
+                        <Route
+                            path="change-password"
+                            element={
+                                <ProtectedRoute>
+                                    <ChangePassword />
+                                </ProtectedRoute>
+                            }
+                        />
+                    </Route>
+
+                    {/* Seller Dashboard Nested Routes */}
+                    <Route path="seller/*" element={<Outlet />}>
+                        <Route
+                            path="create-product"
+                            element={
+                                <ProtectedRoute>
+                                    <CreateProduct />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route path="dashboard/*" element={<SideBar />}>
+                            <Route
+                                path="overview"
+                                element={
+                                    <ProtectedRoute>
+                                        <Overview />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="create-product"
+                                element={
+                                    <ProtectedRoute>
+                                        <CreateProduct />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="view-orders"
+                                element={
+                                    <ProtectedRoute>
+                                        <Orders />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="manage-products"
+                                element={
+                                    <ProtectedRoute>
+                                        <ManageProducts />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="analytics"
+                                element={
+                                    <ProtectedRoute>
+                                        <Analytics />
+                                    </ProtectedRoute>
+                                }
+                            />
+                        </Route>
+                    </Route>
+                </Route>
+            </Routes>
+        </AuthProvider>
+    </ThemeProvider>
+);
 
 export default App;

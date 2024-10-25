@@ -4,21 +4,17 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Link } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import { LayoutDashboard } from "lucide-react";
 import { ReactNode } from "react";
 import { useLocation } from "react-router-dom";
-
-interface SidebarProps {
-    children: ReactNode;
-}
 
 interface NavigationItem {
     path: string;
     label: string;
 }
 
-const SideBar: React.FC<SidebarProps> = ({ children }) => {
+const SideBar = () => {
     const location = useLocation();
 
     const navigationItems: NavigationItem[] = [
@@ -71,7 +67,7 @@ const SideBar: React.FC<SidebarProps> = ({ children }) => {
                 </div>
             </aside>
             <main className="flex-1 p-8 overflow-auto bg-background">
-                {children}
+                <Outlet />
             </main>
         </div>
     );
