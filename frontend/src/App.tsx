@@ -10,7 +10,7 @@ import Home from "@/pages/Home";
 import Layout from "@/components/layout/Layout";
 import { Toaster } from "@/components/ui/toaster";
 import ProtectedRoute from "@/components/reuseable/ProtectedRoute";
-import { AuthProvider } from "@/context/authcontext";
+import { AuthProvider, useAuthContext } from "@/context/authcontext";
 import { ThemeProvider } from "@/components/themes/theme-provider";
 import EmailVerification from "./pages/users/auth/EmailVerification";
 import SingleProduct from "./pages/users/product/SingleProduct";
@@ -25,9 +25,11 @@ import SideBar from "./pages/seller/dashboard/_components/SideBar";
 import ChangePassword from "./pages/users/settings/ChangePassword";
 import ForgetPassword from "./pages/users/auth/ForgetPassword";
 import ResetPassword from "./pages/users/auth/ResetPassword";
-import ProductDetailCard from "./components/reuseable/ProductDetailCard";
 import Cart from "./pages/users/product/Cart";
 import MyOrdersPage from "./pages/users/product/Orders";
+import StripeCheckout from "./pages/users/auth/StripeCheckout";
+import CompletePage from "./components/reuseable/CompletePage";
+import StripeComplete from "./pages/users/auth/StripeComplete";
 
 const App = () => {
     return (
@@ -35,6 +37,7 @@ const App = () => {
             <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
                 <AuthProvider>
                     <Toaster />
+
                     <Routes>
                         <Route path="/login" element={<Login />} />
                         <Route path="/sign-up" element={<SignUp />} />
@@ -50,6 +53,7 @@ const App = () => {
                             path="/reset-password"
                             element={<ResetPassword />}
                         />
+
                         <Route
                             path="/*"
                             element={
@@ -61,6 +65,22 @@ const App = () => {
                                             element={
                                                 <ProtectedRoute>
                                                     <Product />
+                                                </ProtectedRoute>
+                                            }
+                                        />
+                                        <Route
+                                            path="/complete"
+                                            element={
+                                                <ProtectedRoute>
+                                                    <StripeComplete />
+                                                </ProtectedRoute>
+                                            }
+                                        />
+                                        <Route
+                                            path="/checkout"
+                                            element={
+                                                <ProtectedRoute>
+                                                    <StripeCheckout />
                                                 </ProtectedRoute>
                                             }
                                         />

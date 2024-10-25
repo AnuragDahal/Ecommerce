@@ -8,6 +8,12 @@ interface IProductData {
     category: string;
     images: File[];
 }
+interface IPaymentData {
+    items: Array<{
+        id: string;
+        amount: number;
+    }>;
+}
 export const useProductServices = () => {
     const createProduct = async (data: IProductData) => {
         const fd = new FormData();
@@ -39,8 +45,28 @@ export const useProductServices = () => {
             }
         }
     };
-
+    const makePayment = async (data: IPaymentData) => {
+        try {
+            const response = await axios.post(
+                "http://localhost:3000/api/auth/payment",
+                data,
+                {
+                    headers: {
+                        Authorization: `Bearer ${Cookies.get("accessToken")}`,
+                    },
+                }
+            );
+            return response.data;
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response) {
+                throw error.response.data;
+            } else {
+                throw new Error("Network Error");
+            }
+        }
+    };
     return {
         createProduct,
+        makePayment,
     };
 };

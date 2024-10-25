@@ -13,6 +13,8 @@ import { useGetRoleService } from "@/services/useAuthService";
 interface AuthContextProps {
     isAuthenticated: boolean;
     token: string | null;
+    clientSecret: string;
+    setClientSecret: (clientSecret: string) => void;
     login: (accessToken: string, refreshToken: string) => void;
     logout: () => void;
     getUserRole: () => Promise<string | undefined>;
@@ -43,6 +45,7 @@ const removeExpiredTokens = () => {
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     children,
 }) => {
+    const [clientSecret, setClientSecret] = useState("");
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [token, setToken] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
@@ -161,7 +164,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
     return (
         <AuthContext.Provider
-            value={{ isAuthenticated, token, logout, login, getUserRole }}
+            value={{
+                isAuthenticated,
+                token,
+                logout,
+                login,
+                getUserRole,
+                clientSecret,
+                setClientSecret,
+            }}
         >
             {children}
         </AuthContext.Provider>

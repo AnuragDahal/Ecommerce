@@ -19,6 +19,7 @@ import {
 import { sendEmail } from "../utils/emailUtils";
 import { forgotPasswordTemplate } from "../constants/emailTemplates/forgetPassword";
 import { passwordChangeTemplate } from "../constants/emailTemplates/passwordChange";
+import { stripe } from "../utils/paymentUtils";
 
 export const handleSignUp = async (req: Request, res: Response) => {
     try {
@@ -389,6 +390,33 @@ export const handleGetRole = async (req: Request, res: Response) => {
         return;
     } catch (error) {
         sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
+        return;
+    }
+};
+
+export const handlePaymentIntent = async (req: Request, res: Response) => {
+    try {
+        const { items } = req.body;
+        if (!items) {
+            sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
+            return;
+        }
+        const totalAmount = items
+            .map((item: any) => parseInt(item.amount))
+            .reduce((a: any, b: any) => a + b);
+        const payemntIntent = await stripe.paymentIntents.create({
+            amount: totalAmount,
+            currency: "usd",
+            payment_method_types: ["card"],
+        });
+        sendSuccess(res, API_RESPONSES.SUCCESS, HTTP_STATUS_CODES.OK, {
+            clientSecret: payemntIntent.client_secret,
+        });
+        return;
+    } catch (error) {
+        sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR, {
+            message: JSON.stringify((error as Error).message),
+        });
         return;
     }
 };

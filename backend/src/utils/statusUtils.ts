@@ -64,12 +64,14 @@ export const sendNotFound = (
 
 export const sendInternalServerError = (
     res: Response,
-    message = API_RESPONSES.INTERNAL_SERVER_ERROR
+    message = API_RESPONSES.INTERNAL_SERVER_ERROR,
+    error = {}
 ) => {
     if (!res.headersSent) {
         return res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             statusCode: HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
             message: message,
+            error: JSON.stringify(error),
         });
     }
 };

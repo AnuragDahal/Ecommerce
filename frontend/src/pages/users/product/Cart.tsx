@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -10,8 +9,14 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useAuthContext } from "@/context/authcontext";
+import { toast } from "@/hooks/use-toast";
+import { useProductServices } from "@/services/useProductCreationService";
+import { useMutation } from "@tanstack/react-query";
 import { Minus, Plus, Trash2 } from "lucide-react";
-
+import { title } from "process";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 interface CartItem {
     id: number;
     name: string;
@@ -21,6 +26,9 @@ interface CartItem {
 }
 
 const Cart = () => {
+    const { makePayment } = useProductServices();
+    const { setClientSecret } = useAuthContext();
+    const navigate = useNavigate();
     const [cartItems, setCartItems] = useState<CartItem[]>([
         {
             id: 1,
@@ -70,27 +78,35 @@ const Cart = () => {
     const tax = subtotal * 0.1; // Assuming 10% tax
     const total = subtotal + tax;
 
+    // Prepare payment data
+    const paymentData = {
+        items: [
+            ...cartItems.map((item) => ({
+                id: item.id.toString(),
+                amount: item.price * item.quantity,
+            })),
+        ],
+    };
+    console.log(paymentData);
+    const mutation = useMutation({
+        mutationFn: makePayment,
+        onSuccess: (data) => {
+            setClientSecret(data?.data.clientSecret);
+            navigate("/checkout");
+        },
+        onError: (data) => {
+            toast({
+                title: "Payment Error",
+                description: data.message,
+                variant: "destructive",
+            });
+            console.log(data.message);
+        },
+    });
+
     // Handle checkout and send cart data to backend
     const handleCheckout = async () => {
-        try {
-            const response = await fetch("/api/checkout", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ cartItems, subtotal, total }),
-            });
-
-            if (response.ok) {
-                // Handle successful checkout
-                console.log("Checkout successful!");
-            } else {
-                // Handle checkout error
-                console.error("Checkout failed.");
-            }
-        } catch (error) {
-            console.error("Error during checkout:", error);
-        }
+        mutation.mutate(paymentData);
     };
 
     return (
@@ -189,12 +205,8 @@ const Cart = () => {
                             </div>
                         </CardContent>
                         <CardFooter>
-                            <Button
-                                className="w-full"
-                                onClick={handleCheckout}
-                                disabled={cartItems.length === 0}
-                            >
-                                Proceed to Checkout
+                            <Button onClick={handleCheckout}>
+                                Proceed To Checkout
                             </Button>
                         </CardFooter>
                     </Card>
