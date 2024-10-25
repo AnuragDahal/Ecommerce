@@ -25,7 +25,7 @@ export const isAuthenticated = (
     try {
         const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!);
         req.user = decoded;
-        next(decoded);
+        next();
     } catch (error) {
         sendUnauthorized(res, API_RESPONSES.INVALID_TOKEN);
         return;
