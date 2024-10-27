@@ -396,21 +396,32 @@ export const handleGetRole = async (req: Request, res: Response) => {
 
 export const handlePaymentIntent = async (req: Request, res: Response) => {
     try {
-        const { items } = req.body;
+        const { items, shippingDetails } = req.body;
         if (!items) {
             sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
             return;
         }
         const totalAmount = items
-            .map((item: any) => parseInt(item.amount))
+            .map((item: any) => parseFloat(item.amount))
             .reduce((a: any, b: any) => a + b);
         const payemntIntent = await stripe.paymentIntents.create({
-            amount: totalAmount,
+            amount: totalAmount * 100,
             currency: "usd",
             payment_method_types: ["card"],
+            shipping: {
+                name: shippingDetails.name,
+                address: {
+                    line1: shippingDetails.address,
+                    city: shippingDetails.city,
+                    state: shippingDetails.state,
+                    postal_code: shippingDetails.postalCode,
+                    country: shippingDetails.country,
+                },
+            },
         });
         sendSuccess(res, API_RESPONSES.SUCCESS, HTTP_STATUS_CODES.OK, {
             clientSecret: payemntIntent.client_secret,
+            totalAmount: totalAmount,
         });
         return;
     } catch (error) {

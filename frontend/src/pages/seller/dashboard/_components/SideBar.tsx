@@ -6,7 +6,6 @@ import {
 } from "@/components/ui/accordion";
 import { Link, Outlet } from "react-router-dom";
 import { LayoutDashboard } from "lucide-react";
-import { ReactNode } from "react";
 import { useLocation } from "react-router-dom";
 
 interface NavigationItem {

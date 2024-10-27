@@ -10,7 +10,7 @@ import Home from "@/pages/Home";
 import Layout from "@/components/layout/Layout";
 import { Toaster } from "@/components/ui/toaster";
 import ProtectedRoute from "@/components/reuseable/ProtectedRoute";
-import { AuthProvider, useAuthContext } from "@/context/authcontext";
+import { AuthProvider } from "@/context/authcontext";
 import { ThemeProvider } from "@/components/themes/theme-provider";
 import EmailVerification from "./pages/users/auth/EmailVerification";
 import SingleProduct from "./pages/users/product/SingleProduct";

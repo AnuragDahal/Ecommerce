@@ -27,7 +27,6 @@ interface CartItem {
 
 const Cart = () => {
     const { makePayment } = useProductServices();
-    const { setClientSecret } = useAuthContext();
     const navigate = useNavigate();
     const [cartItems, setCartItems] = useState<CartItem[]>([
         {
@@ -87,11 +86,10 @@ const Cart = () => {
             })),
         ],
     };
-    console.log(paymentData);
     const mutation = useMutation({
         mutationFn: makePayment,
         onSuccess: (data) => {
-            setClientSecret(data?.data.clientSecret);
+            localStorage.setItem("clientSecret", data?.data.clientSecret);
             navigate("/checkout");
         },
         onError: (data) => {

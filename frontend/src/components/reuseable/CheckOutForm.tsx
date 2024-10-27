@@ -1,8 +1,10 @@
+"use-server";
 import { useState } from "react";
 import {
     PaymentElement,
     useStripe,
     useElements,
+    AddressElement,
 } from "@stripe/react-stripe-js";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,18 +22,22 @@ export default function CheckoutForm() {
 
     const [message, setMessage] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
-
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         if (!stripe || !elements) {
-            // Stripe.js hasn't yet loaded.
-            // Make sure to disable form submission until Stripe.js has loaded.
             return;
         }
 
         setIsLoading(true);
 
+        const addressElement = elements.getElement(AddressElement);
+        const address = await addressElement?.getValue();
+        if (!address?.complete) {
+            setMessage("Please complete your shipping details.");
+            setIsLoading(false);
+            return;
+        }
         const { error } = await stripe.confirmPayment({
             elements,
             confirmParams: {
@@ -39,12 +45,6 @@ export default function CheckoutForm() {
                 return_url: "http://localhost:5173/complete",
             },
         });
-
-        // This point will only be reached if there is an immediate error when
-        // confirming the payment. Otherwise, your customer will be redirected to
-        // your `return_url`. For some payment methods like iDEAL, your customer will
-        // be redirected to an intermediate site first to authorize the payment, then
-        // redirected to the `return_url`.
         if (
             error?.type === "card_error" ||
             error?.type === "validation_error"
@@ -63,18 +63,22 @@ export default function CheckoutForm() {
 
     return (
         <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-screen">
-            <Card className="w-full max-w-md border-2 shadow-md">
-                <CardHeader>
-                    <CardTitle className="text-2xl font-bold text-center">
-                        Checkout
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <form
-                        id="payment-form"
-                        onSubmit={handleSubmit}
-                        className="space-y-6"
-                    >
+            <form
+                id="payment-form"
+                onSubmit={handleSubmit}
+                className="space-y-6"
+            >
+                <Card className="w-full max-w-md border-2 shadow-md">
+                    <CardHeader>
+                        <CardTitle className="text-2xl font-bold text-center">
+                            Checkout
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <AddressElement
+                            id="address-element"
+                            options={{ mode: "shipping" }}
+                        />
                         <PaymentElement
                             id="payment-element"
                             options={paymentElementOptions}
@@ -106,9 +110,9 @@ export default function CheckoutForm() {
                                 {message}
                             </div>
                         )}
-                    </form>
-                </CardContent>
-            </Card>
+                    </CardContent>
+                </Card>
+            </form>
         </div>
     );
 }
