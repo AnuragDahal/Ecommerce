@@ -396,7 +396,7 @@ export const handleGetRole = async (req: Request, res: Response) => {
 
 export const handlePaymentIntent = async (req: Request, res: Response) => {
     try {
-        const { items, shippingDetails } = req.body;
+        const { items } = req.body;
         if (!items) {
             sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
             return;
@@ -408,16 +408,6 @@ export const handlePaymentIntent = async (req: Request, res: Response) => {
             amount: totalAmount * 100,
             currency: "usd",
             payment_method_types: ["card"],
-            shipping: {
-                name: shippingDetails.name,
-                address: {
-                    line1: shippingDetails.address,
-                    city: shippingDetails.city,
-                    state: shippingDetails.state,
-                    postal_code: shippingDetails.postalCode,
-                    country: shippingDetails.country,
-                },
-            },
         });
         sendSuccess(res, API_RESPONSES.SUCCESS, HTTP_STATUS_CODES.OK, {
             clientSecret: payemntIntent.client_secret,

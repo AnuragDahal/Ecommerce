@@ -1,3 +1,4 @@
+import React from "react";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
@@ -14,7 +15,6 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
-import { ToastAction } from "@/components/ui/toast";
 
 export default function SignUp() {
     const { toast } = useToast();
@@ -32,7 +32,7 @@ export default function SignUp() {
         email,
         password,
     };
-    const handleSignUp = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSignUp  = (event:React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setIsLoading(true);
         signUpMutation.mutate(signUpData, {
@@ -47,7 +47,7 @@ export default function SignUp() {
                 });
                 console.log(data);
             },
-            onError: (error: any) => {
+            onError: (error:any) => {
                 setIsLoading(false);
                 toast({
                     title: "Sign up failed!",

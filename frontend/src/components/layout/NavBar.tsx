@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigationType } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Cookies from "js-cookie";
 import { navList } from "@/config/constants";
 import {

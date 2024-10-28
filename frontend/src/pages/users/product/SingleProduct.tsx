@@ -7,6 +7,7 @@ const SingleProduct = () => {
     return (
         <>
             <ProductDetailCard
+                productId={`${id}`}
                 name="Product Name"
                 priceRange={{ min: 10, max: 20 }}
                 description="Product Description lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet."
@@ -29,7 +30,7 @@ const SingleProduct = () => {
                         src: "https://img.freepik.com/free-photo/pretty-woman-posing-confident-way_23-2148974032.jpg?t=st=1729754722~exp=1729758322~hmac=bced4e16f6037ff6a0cd8c5be718896afa3983ca4a2fd03bdafa5a5240cb3875&w=740",
                     },
                 ]}
-                sku="SKU123"
+
                 category="Category"
             />
         </>

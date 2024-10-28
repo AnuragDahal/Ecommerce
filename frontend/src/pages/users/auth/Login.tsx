@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -39,7 +39,7 @@ const Login = () => {
                 setIsLoading(false);
                 login(data?.data?.accessToken, data?.data?.refreshToken);
                 toast({
-                    variant: "default",
+                    variant: "success",
                     title: `${data?.message}`,
                 });
                 navigate("/");
@@ -84,7 +84,7 @@ const Login = () => {
                                     id="input"
                                     placeholder="Enter your username or email"
                                     value={input}
-                                    onChange={(e) => setInput(e.target.value)}
+                                    onChange={(e:React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
                                     required
                                     className="bg-gray-700/50 border-gray-600 text-white placeholder-gray-400"
                                 />
