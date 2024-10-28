@@ -5,8 +5,8 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Maximize2, Minus, Plus } from "lucide-react";
-import { Link } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
+import { set } from "date-fns";
 
 interface ProductColor {
     name: string;
@@ -21,10 +21,7 @@ interface ProductImage {
 interface ProductProps {
     productId: string;
     name: string;
-    priceRange: {
-        min: number;
-        max: number;
-    };
+    price: number;
     description: string;
     colors?: ProductColor[];
     images: ProductImage[];
@@ -34,7 +31,7 @@ interface ProductProps {
 export default function ProductDetailCard({
     productId,
     name,
-    priceRange,
+    price,
     description,
     colors,
     images,
@@ -44,27 +41,31 @@ export default function ProductDetailCard({
         colors ? colors[0].name : ""
     );
     const [quantity, setQuantity] = useState(1);
-    const [hoveredImage, setHoveredImage] = useState(null);
-    const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
+    const [activeImageIndex, setActiveImageIndex] = useState<number | null>(
+        null
+    );
+    const [mainImage, setMainImage] = useState<string>(images[0].src);
+    // const [hoveredImage, setHoveredImage] = useState(null);
+    // const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
 
-    const handleMouseMove = (e: any, image: any) => {
-        const rect = e.target.getBoundingClientRect();
-        const x = ((e.clientX - rect.left) / rect.width) * 100;
-        const y = ((e.clientY - rect.top) / rect.height) * 100;
-        setHoveredImage(image.color);
-        setCursorPos({ x, y });
-    };
+    // const handleMouseMove = (e: any, image: any) => {
+    //     const rect = e.target.getBoundingClientRect();
+    //     const x = ((e.clientX - rect.left) / rect.width) * 100;
+    //     const y = ((e.clientY - rect.top) / rect.height) * 100;
+    //     setHoveredImage(image.color);
+    //     setCursorPos({ x, y });
+    // };
 
-    const handleMouseLeave = () => {
-        setHoveredImage(null);
-    };
+    // const handleMouseLeave = () => {
+    //     setHoveredImage(null);
+    // };
 
     const handleAddToCart = () => {
         try {
             const newItem = {
                 productId,
                 name,
-                price: priceRange.min,
+                price,
                 quantity,
                 image:
                     images.find((img) => img.color === selectedColor)?.src ||
@@ -115,25 +116,40 @@ export default function ProductDetailCard({
             });
         }
     };
-
-    const mainImage =
-        images.find((img) => img.color === selectedColor)?.src || images[0].src;
-
     return (
         <div className="container mx-auto px-4 py-8">
             {/* Image section remains the same */}
             <div className="grid md:grid-cols-2 gap-8 mb-12">
                 <div className="space-y-4">
-                    {/* ... image section code ... */}
+                    <img
+                        src={mainImage}
+                        alt={`${name} in ${selectedColor}`}
+                        className="rounded-lg object-cover w-full h-auto max-w-[40rem] md:max-w-[25rem] md:h-[25rem] lg:max-w-[45rem]"
+                    />
+                    <div className="flex gap-3 overflow-x-auto">
+                        {images.map((image, index) => (
+                            <img
+                                key={index}
+                                src={image.src}
+                                alt={`${name} in ${selectedColor}`}
+                                className={`rounded-lg object-cover h-24 border transiton duration-200 ${
+                                    activeImageIndex === index
+                                        ? "border-2 border-accent-foreground"
+                                        : "border-muted-foreground"
+                                } hover:cursor-pointer`}
+                                onClick={() => (
+                                    setMainImage(image.src),
+                                    setActiveImageIndex(index)
+                                )}
+                            />
+                        ))}
+                    </div>
                 </div>
                 <div className="space-y-6">
                     {/* Product info section */}
                     <div>
                         <h1 className="text-4xl font-bold">{name}</h1>
-                        <p className="text-3xl font-semibold mt-2">
-                            ${priceRange.min.toFixed(2)} - $
-                            {priceRange.max.toFixed(2)}
-                        </p>
+                        <p className="text-3xl font-semibold mt-2">${price}</p>
                         <span className="text-sm text-muted-foreground">
                             + Free Shipping
                         </span>
