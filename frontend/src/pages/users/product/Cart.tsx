@@ -129,7 +129,6 @@ const Cart = () => {
             localStorage.setItem("clientSecret", data?.data.clientSecret);
             // Clear cart after successful payment
             setCartItems([]);
-            saveCartItems([]); // Also clear localStorage
             navigate("/checkout");
         },
         onError: (data) => {

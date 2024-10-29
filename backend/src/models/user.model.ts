@@ -48,6 +48,22 @@ const userSchema = new Schema({
     otp: {
         type: Number,
     },
+    cart: [
+        {
+            productId: {
+                type: Schema.Types.ObjectId,
+                ref: "Product",
+            },
+            quantity: {
+                type: Number,
+                req: true,
+            },
+            sellerId: {
+                type: Schema.Types.ObjectId,
+                ref: "Seller",
+            },
+        },
+    ],
     otpExpires: {
         type: Date,
         required: false,

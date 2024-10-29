@@ -12,7 +12,7 @@ import {
     imagekit,
     uploadMultipleFiles,
 } from "../utils/imageKit";
-import { HTTP_STATUS_CODES } from "../constants/statusCodes"
+import { HTTP_STATUS_CODES } from "../constants/statusCodes";
 
 interface MulterRequest extends Request {
     files?: Express.Multer.File[];
@@ -192,5 +192,20 @@ export const handleDeleteProduct = async (
         console.error("Error deleting product:", error);
         sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
         return;
+    }
+};
+
+export const handleAddToCart = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+    try {
+        const { products } = req.body;
+        if (!products) {
+            sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
+            return;
+        }
+    } catch (error) {
+        sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
     }
 };
