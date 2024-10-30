@@ -200,6 +200,93 @@ export const handleDeleteProduct = async (
         return;
     }
 };
+
+// Get product details
+
+export const handleAllProductsRetrieval = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+    try {
+        const products = await Product.find()
+            .populate({
+                path: "sellerId",
+                model: "Seller",
+                select: ["_id", "storeName", "businessEmail"],
+            })
+            .lean();
+
+        if (!products) {
+            sendNotFound(res, API_RESPONSES.NOT_FOUND);
+            return;
+        }
+
+        const formattedProducts = products.map((product) => {
+            return {
+                title: product.name,
+                price: product.price,
+                description: product.description,
+                images: product.imageUrl,
+                category: product.category,
+                seller: {
+                    storeName: (product.sellerId as SellerDetails).storeName,
+                    businessEmail: (product.sellerId as SellerDetails)
+                        .businessEmail,
+                },
+            };
+        });
+        sendSuccess(
+            res,
+            API_RESPONSES.SUCCESS,
+            HTTP_STATUS_CODES.OK,
+            formattedProducts
+        );
+        return;
+    } catch (error) {
+        sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
+        return;
+    }
+};
+
+export const handleProductRetrieval = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+    try {
+        const { productId } = req.params;
+        if (!productId) {
+            sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
+            return;
+        }
+        const product = await Product.findById(productId)
+            .populate({
+                path: "sellerId",
+                model: "Seller",
+                select: ["_id", "storeName"],
+            })
+            .lean();
+
+        if (!product) {
+            sendNotFound(res, API_RESPONSES.NOT_FOUND);
+            return;
+        }
+        sendSuccess(res, API_RESPONSES.SUCCESS, HTTP_STATUS_CODES.OK, {
+            title: product.name,
+            price: product.price,
+            description: product.description,
+            images: product.imageUrl,
+            category: product.category,
+            sellerid: product.sellerId,
+        });
+        return;
+    } catch (error) {
+        sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR, {
+            message: (error as Error).message,
+        });
+        return;
+    }
+};
+
 // Cart related functions
 export const handleAddToCart = async (
     req: Request,
@@ -276,7 +363,7 @@ export const handleClearCart = async (
     }
 };
 
-export const handleGetCart = async (
+export const getCartContents = async (
     req: Request,
     res: Response
 ): Promise<void> => {

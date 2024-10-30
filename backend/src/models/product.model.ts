@@ -1,4 +1,5 @@
 import mongoose, { Types } from "mongoose";
+import { SellerDetails } from "../types/user";
 export interface IProduct extends mongoose.Document {
     name: string;
     description: string;
@@ -13,7 +14,7 @@ export interface IProduct extends mongoose.Document {
     updatedAt: Date;
     discount: number;
     reviews: Array<string>;
-    sellerId: Types.ObjectId;
+    sellerId: Types.ObjectId | SellerDetails;
 }
 
 const ProductSchema = new mongoose.Schema(

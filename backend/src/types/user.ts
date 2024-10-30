@@ -27,6 +27,7 @@ export interface ProductDetails {
 export interface SellerDetails {
     _id: Types.ObjectId;
     storeName: string;
+    businessEmail: string;
 }
 
 export interface IUser extends Document {
