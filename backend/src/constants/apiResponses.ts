@@ -13,6 +13,8 @@ export const API_RESPONSES = {
     SELLER_CREATED: "Seller successfully created",
     SUCCESS: "Success",
     ADDED_TO_CART: "Product successfully added to cart",
+    CART_FETCHED: "Cart successfully fetched",
+
     // Error Responses
     USER_NOT_FOUND: "User not found",
     USER_ALREADY_EXISTS: "User already exists",

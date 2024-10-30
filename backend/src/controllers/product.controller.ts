@@ -16,6 +16,7 @@ import { HTTP_STATUS_CODES } from "../constants/statusCodes";
 import Seller from "../models/seller.model";
 import { send } from "process";
 import User from "../models/user.model";
+import { ProductDetails, SellerDetails } from "../types/user";
 
 interface MulterRequest extends Request {
     files?: Express.Multer.File[];
@@ -230,7 +231,7 @@ export const handleRemoveFromCart = async (
 ): Promise<void> => {
     try {
         const { productId } = req.params;
-        console.log(productId);
+
         if (!productId) {
             sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
             return;
@@ -240,7 +241,7 @@ export const handleRemoveFromCart = async (
             sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
             return;
         }
-        console.log(user.cart);
+
         user.cart = user.cart.filter(
             (item) => item.productId.toString() !== productId
         );
@@ -268,6 +269,54 @@ export const handleClearCart = async (
         user.cart = [];
         await user.save({ validateBeforeSave: false });
         sendSuccess(res, API_RESPONSES.SUCCESS, HTTP_STATUS_CODES.OK);
+        return;
+    } catch (error) {
+        sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
+        return;
+    }
+};
+
+export const handleGetCart = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+    try {
+        const user = await User.findById(req.user?._id).populate([
+            {
+                path: "cart.productId",
+                model: "Product",
+                select: ["_id", "name", "category", "price", "imageUrl"],
+            },
+            {
+                path: "cart.sellerId",
+                model: "Seller",
+                select: ["_id", "storeName"],
+            },
+        ]);
+
+        if (!user) {
+            sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
+            return;
+        }
+        const cart = user.cart.map((item) => {
+            const product = item.productId as ProductDetails;
+            const seller = item.sellerId as SellerDetails;
+
+            return {
+                title: product.name,
+                category: product.category,
+                price: product.price,
+                images: product.imageUrl,
+                quantity: item.quantity,
+                seller: {
+                    storeName: seller.storeName,
+                },
+            };
+        });
+
+        sendSuccess(res, API_RESPONSES.CART_FETCHED, HTTP_STATUS_CODES.OK, {
+            cart,
+        });
         return;
     } catch (error) {
         sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);

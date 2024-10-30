@@ -4,6 +4,7 @@ import {
     handleClearCart,
     handleCreateProduct,
     handleDeleteProduct,
+    handleGetCart,
     handleRemoveFromCart,
     handleUpdateProduct,
 } from "../controllers/product.controller";
@@ -18,7 +19,7 @@ router.delete("/delete/:id", upload.array("images", 5), handleDeleteProduct);
 router.post("/add-to-cart", handleAddToCart);
 router.delete("/cart/:productId", handleRemoveFromCart);
 router.delete("/clear-cart", handleClearCart);
-router.get("/get-cart"); //handleCartRetrieval);
+router.get("/cart", handleGetCart); //handleCartRetrieval);
 router.get("/:id"); //handleProductRetrieval);
 
 export default router;

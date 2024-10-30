@@ -11,36 +11,53 @@
 // createdAt Date
 // updateAt Date
 
-import { Types } from "mongoose";
+import { Document, Types } from "mongoose";
 
 type EnumRole = "user" | "seller" | "admin";
+
+export interface ProductDetails {
+    name: string;
+    price: number;
+    description: string;
+    totalQuantity: number;
+    category: string;
+    imageUrl: string[];
+}
+
+export interface SellerDetails {
+    _id: Types.ObjectId;
+    storeName: string;
+}
+
 export interface IUser extends Document {
-    firstName: String;
-    lastName: String;
-    email: String;
-    userName: String;
-    address?: String;
-    isEmailVerified?: Boolean;
+    _id: Types.ObjectId;
+    firstName: string;
+    lastName: string;
+    email: string;
+    userName: string;
+    address?: string;
+    isEmailVerified?: boolean;
     cart: Array<{
-        productId: Types.ObjectId;
-        quantity: Number;
-        sellerId: Types.ObjectId;
+        productId: Types.ObjectId | ProductDetails;
+        price: number;
+        quantity: number;
+        sellerId: Types.ObjectId | SellerDetails;
     }>;
     role: EnumRole;
-    password: String;
-    avatar: String;
-    otp?: String;
+    password: string;
+    avatar: string;
+    otp?: string;
     otpExpires?: Date;
-    refreshToken: String;
-    isPasswordCorrect(candidatePassword: String): Promise<Boolean>;
-    generateAccessToken(): String;
-    generateRefreshToken(): String;
+    refreshToken: string;
+    isPasswordCorrect(candidatePassword: string): Promise<boolean>;
+    generateAccessToken(): string;
+    generateRefreshToken(): string;
 }
 
 export interface IJWTPayload {
     _id: Types.ObjectId;
-    email: String;
-    userName: String;
+    email: string;
+    userName: string;
 }
 
 export interface IJWTPayload2 {
