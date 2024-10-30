@@ -14,10 +14,12 @@ interface ISeller extends Document {
     categoryOfProduct: string;
     imageUrl: string;
     products: Array<Types.ObjectId>;
-    address: string;
+    orders: Array<Types.ObjectId>;
+    storeAddress: string;
     paymentDetails: Array<{
         bankAccountNumber: string;
     }>;
+
     contact: Array<{
         phone: string;
         email: string;
@@ -55,6 +57,9 @@ const sellerSchema = new Schema(
             unique: true,
         },
         products: {
+            type: Array,
+        },
+        orders: {
             type: Array,
         },
         paymentDetails: [

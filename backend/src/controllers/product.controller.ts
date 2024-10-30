@@ -14,6 +14,8 @@ import {
 } from "../utils/imageKit";
 import { HTTP_STATUS_CODES } from "../constants/statusCodes";
 import Seller from "../models/seller.model";
+import { send } from "process";
+import User from "../models/user.model";
 
 interface MulterRequest extends Request {
     files?: Express.Multer.File[];
@@ -182,25 +184,14 @@ export const handleDeleteProduct = async (
         try {
             const isImageDeleted = await deletePreviousImages(images);
             if (!isImageDeleted) {
-                console.log(
-                    "Failed to delete some or all images for product:",
-                    productId
-                );
-                // Optionally, you might want to proceed with product deletion even if image deletion fails
+                sendInternalServerError(res, API_RESPONSES.IMAGE_DELETE_FAILED);
+                return;
             }
         } catch (imageDeleteError) {
             console.error("Error during image deletion:", imageDeleteError);
-            // Optionally, you might want to proceed with product deletion even if image deletion fails
         }
 
-        // Delete the product from the database
-        await Product.findByIdAndDelete(productId);
-
-        sendSuccess(
-            res,
-            API_RESPONSES.PRODUCT_DELETED,
-            HTTP_STATUS_CODES.OK // Using 200 OK instead of 204 No Content to allow for a response body
-        );
+        sendSuccess(res, API_RESPONSES.PRODUCT_DELETED, HTTP_STATUS_CODES.OK);
         return;
     } catch (error) {
         console.error("Error deleting product:", error);
@@ -208,7 +199,7 @@ export const handleDeleteProduct = async (
         return;
     }
 };
-
+// Cart related functions
 export const handleAddToCart = async (
     req: Request,
     res: Response
@@ -219,7 +210,67 @@ export const handleAddToCart = async (
             sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
             return;
         }
+        const user = await User.findById(req.user?._id);
+        if (!user) {
+            sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
+            return;
+        }
+        user.cart.push(...products);
+        await user.save({ validateBeforeSave: false });
+        sendSuccess(res, API_RESPONSES.ADDED_TO_CART, HTTP_STATUS_CODES.OK);
     } catch (error) {
         sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
+        return;
+    }
+};
+
+export const handleRemoveFromCart = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+    try {
+        const { productId } = req.params;
+        console.log(productId);
+        if (!productId) {
+            sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
+            return;
+        }
+        const user = await User.findById(req.user?._id);
+        if (!user) {
+            sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
+            return;
+        }
+        console.log(user.cart);
+        user.cart = user.cart.filter(
+            (item) => item.productId.toString() !== productId
+        );
+        await user.save({ validateBeforeSave: false });
+        sendSuccess(res, API_RESPONSES.SUCCESS, HTTP_STATUS_CODES.OK);
+        return;
+    } catch (error) {
+        sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR, {
+            message: (error as Error).message,
+        });
+        return;
+    }
+};
+
+export const handleClearCart = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+    try {
+        const user = await User.findById(req.user?._id);
+        if (!user) {
+            sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
+            return;
+        }
+        user.cart = [];
+        await user.save({ validateBeforeSave: false });
+        sendSuccess(res, API_RESPONSES.SUCCESS, HTTP_STATUS_CODES.OK);
+        return;
+    } catch (error) {
+        sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
+        return;
     }
 };

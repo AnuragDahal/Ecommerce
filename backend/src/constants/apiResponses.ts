@@ -12,6 +12,7 @@ export const API_RESPONSES = {
     IMAGE_UPLOAD_SUCCESS: "Image uploaded successfully",
     SELLER_CREATED: "Seller successfully created",
     SUCCESS: "Success",
+    ADDED_TO_CART: "Product successfully added to cart",
     // Error Responses
     USER_NOT_FOUND: "User not found",
     USER_ALREADY_EXISTS: "User already exists",
@@ -24,6 +25,7 @@ export const API_RESPONSES = {
     PRODUCT_NOT_FOUND: "Product not found",
     SAME_PASSWORD: "New password must be different from the old password",
     SELLER_ALREADY_EXISTS: "Seller already exists",
+    IMAGE_DELETE_FAILED: "Failed to delete images from imagekit",
 
     // VALIDATION ERRORS
     INVALID_EMAIL: "Invalid email",

@@ -21,6 +21,11 @@ export interface IUser extends Document {
     userName: String;
     address?: String;
     isEmailVerified?: Boolean;
+    cart: Array<{
+        productId: Types.ObjectId;
+        quantity: Number;
+        sellerId: Types.ObjectId;
+    }>;
     role: EnumRole;
     password: String;
     avatar: String;
@@ -43,4 +48,3 @@ export interface IJWTPayload2 {
     email: string;
     userName: string;
 }
-

@@ -50,11 +50,16 @@ const userSchema = new Schema({
     },
     cart: [
         {
+            _id: false,
             productId: {
                 type: Schema.Types.ObjectId,
                 ref: "Product",
             },
             quantity: {
+                type: Number,
+                req: true,
+            },
+            price: {
                 type: Number,
                 req: true,
             },

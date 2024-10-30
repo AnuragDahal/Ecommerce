@@ -74,29 +74,20 @@ export const deletePreviousImages = async (
 ): Promise<boolean> => {
     try {
         const fileIds = await getFileIdsFromUrls(images);
-        console.log("File IDs to delete:", fileIds);
-
         if (fileIds.length === 0) {
-            console.log("No valid file IDs found to delete.");
             return true;
         }
 
         for (const fileId of fileIds) {
             try {
                 await imagekit.deleteFile(fileId);
-                console.log(`Successfully deleted file with ID: ${fileId}`);
             } catch (deleteError) {
-                console.error(
-                    `Error deleting file with ID ${fileId}:`,
-                    deleteError
-                );
+                return false;
             }
         }
-
-        console.log("Finished processing all files");
         return true;
     } catch (error) {
-        console.error("Error in deletePreviousImages:", error);
+        console.error("Error deleting images:", error);
         return false;
     }
 };

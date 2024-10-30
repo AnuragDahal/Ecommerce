@@ -71,7 +71,7 @@ export const sendInternalServerError = (
         return res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             statusCode: HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
             message: message,
-            error: JSON.stringify(error),
+            error: error,
         });
     }
 };
