@@ -208,12 +208,20 @@ export const handleAllProductsRetrieval = async (
     res: Response
 ): Promise<void> => {
     try {
-        const products = await Product.find()
+        const limit = parseInt(req.query.limit as string) || 10;
+        const page = parseInt(req.query.page as string) || 1;
+        const skip = (page - 1) * limit;
+        const category = req.query.category as string;
+        const price = req.query.price as string;
+        const products = await Product.find(category ? { category } : {})
             .populate({
                 path: "sellerId",
                 model: "Seller",
                 select: ["_id", "storeName", "businessEmail"],
             })
+            .sort({ price: price === "high" ? -1 : 1 })
+            .skip(skip)
+            .limit(limit)
             .lean();
 
         if (!products) {
