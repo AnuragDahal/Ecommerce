@@ -13,8 +13,8 @@ import { Loader2 } from "lucide-react";
 export default function CreateProduct() {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
-    const [price, setPrice] = useState(0);
-    const [totalQuantity, setTotalQuantity] = useState(0);
+    const [price, setPrice] = useState(""); // Changed to string
+    const [totalQuantity, setTotalQuantity] = useState(1);
     const [category, setCategory] = useState("");
     const [imagePreview, setImagePreview] = useState<string[]>([]);
     const [images, setImages] = useState<File[]>([]);
@@ -25,13 +25,31 @@ export default function CreateProduct() {
         () => ({
             name,
             description,
-            price,
+            price: Number(price),
             category,
             totalQuantity,
             images,
         }),
         [name, description, price, category, totalQuantity, images]
     );
+
+    // Improved price validation
+    const isValidPrice = (value: string) => {
+        const number = Number(value);
+        return !isNaN(number) && number > 0;
+    };
+
+    // Add form validation
+    const isFormValid = useMemo(() => {
+        return (
+            name.trim() !== "" &&
+            description.trim() !== "" &&
+            isValidPrice(price) &&
+            totalQuantity > 0 &&
+            category.trim() !== "" &&
+            images.length > 0
+        );
+    }, [name, description, price, totalQuantity, category, images]);
 
     const mutation = useMutation({
         mutationFn: createProduct,
@@ -44,7 +62,7 @@ export default function CreateProduct() {
             });
         },
         onError: (data) => {
-            console.log(ProductData);
+            setIsLoading(false);
             toast({
                 title: "Product creation failed!",
                 description: data.message,
@@ -61,6 +79,14 @@ export default function CreateProduct() {
         },
         [mutation, ProductData]
     );
+
+    const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        // Allow empty string or valid decimal numbers
+        if (value === "" || /^\d*\.?\d*$/.test(value)) {
+            setPrice(value);
+        }
+    };
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || []);
@@ -123,14 +149,14 @@ export default function CreateProduct() {
                                 </Label>
                                 <Input
                                     id="price"
-                                    type="number"
+                                    type="text"
                                     placeholder="Enter product price"
                                     value={price}
-                                    onChange={(e) =>
-                                        setPrice(Number(e.target.value))
-                                    }
+                                    onChange={handlePriceChange}
                                     required
                                     className="w-full"
+                                    inputMode="decimal"
+                                    pattern="^\d*\.?\d*$"
                                 />
                             </div>
                             <div className="space-y-2">
@@ -150,6 +176,7 @@ export default function CreateProduct() {
                                     }
                                     required
                                     className="w-full"
+                                    min="1"
                                 />
                             </div>
                         </div>
@@ -202,8 +229,11 @@ export default function CreateProduct() {
                         <div className="flex justify-center">
                             <Button
                                 type="submit"
-                                disabled={isLoading}
-                                className="w-full sm:w-auto"
+                                disabled={isLoading || !isFormValid}
+                                className={`w-full sm:w-auto ${
+                                    !isFormValid &&
+                                    "opacity-50 cursor-not-allowed"
+                                }`}
                             >
                                 {isLoading ? (
                                     <>

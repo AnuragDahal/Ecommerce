@@ -21,6 +21,7 @@ import { Request, Response } from "express";
 import Seller from "../models/seller.model";
 import { getPayloadDataFromHeader } from "../utils/tokenUtils";
 import {
+    sendAlreadyExists,
     sendInternalServerError,
     sendNotFound,
     sendSuccess,
@@ -38,22 +39,33 @@ export const handleSellerUserCreation = async (req: Request, res: Response) => {
         return;
     }
     try {
-        const { storeName, businessEmail, paymentDetails, address, contact } =
-            req.body;
-
+        const { storeName, businessEmail, paymentDetails, address } = req.body;
+        console.log(req.body);
+        let contact;
+        if (typeof req.body.contact === "string") {
+            contact = JSON.parse(req.body.contact);
+        } else {
+            contact = req.body.contact;
+        }
         const userId = payload._id;
-        const user = await User.findOne({ _id: userId });
+        const user = await User.findById(userId);
         if (!user) {
             sendNotFound(res, API_RESPONSES.NOT_FOUND);
             return;
         }
+        const isSeller = await Seller.findOne({ userId: userId });
+        if (isSeller) {
+            sendAlreadyExists(res, API_RESPONSES.SELLER_ALREADY_EXISTS);
+            return;
+        }
+
         const sellerDetails = {
             userId,
-            email: businessEmail,
+            businessEmail,
             storeName,
             paymentDetails,
             contact,
-            address,
+            storeAddress: address,
         };
 
         const seller = new Seller(sellerDetails);

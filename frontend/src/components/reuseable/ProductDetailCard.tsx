@@ -4,9 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Maximize2, Minus, Plus } from "lucide-react";
+import { Minus, Plus } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { set } from "date-fns";
+import ProductCard from "./ProductCard";
 
 interface ProductColor {
     name: string;
@@ -124,7 +124,7 @@ export default function ProductDetailCard({
                     <img
                         src={mainImage}
                         alt={`${name} in ${selectedColor}`}
-                        className="rounded-lg object-cover w-full h-auto max-w-[40rem] md:max-w-[25rem] md:h-[25rem] lg:max-w-[45rem]"
+                        className="rounded-lg object-cover w-full h-auto max-w-[40rem] md:max-w-[25rem] lg:max-w-[45rem]"
                     />
                     <div className="flex gap-3 overflow-x-auto">
                         {images.map((image, index) => (

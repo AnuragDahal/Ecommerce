@@ -1,11 +1,17 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Response, Request } from "express";
 import { sendUnauthorized } from "../utils/statusUtils";
 import { API_RESPONSES } from "../constants/apiResponses";
 import jwt from "jsonwebtoken";
 
 declare module "express-serve-static-core" {
     interface Request {
-        user?: any;
+        user?: {
+            _id: string;
+            firstName: string;
+            lastName: string;
+            userName: string;
+            email: string;
+        };
     }
 }
 
@@ -24,8 +30,16 @@ export const isAuthenticated = (
     }
     try {
         const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!);
-        req.user = decoded;
-        next();
+        if (typeof decoded === "object" && decoded !== null) {
+            req.user = decoded as {
+                _id: string;
+                firstName: string;
+                lastName: string;
+                userName: string;
+                email: string;
+            };
+            next();
+        }
     } catch (error) {
         sendUnauthorized(res, API_RESPONSES.INVALID_TOKEN);
         return;

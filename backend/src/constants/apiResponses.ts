@@ -23,6 +23,7 @@ export const API_RESPONSES = {
     IMAGE_UPLOAD_FAILED: "Image upload failed",
     PRODUCT_NOT_FOUND: "Product not found",
     SAME_PASSWORD: "New password must be different from the old password",
+    SELLER_ALREADY_EXISTS: "Seller already exists",
 
     // VALIDATION ERRORS
     INVALID_EMAIL: "Invalid email",

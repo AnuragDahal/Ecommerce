@@ -13,6 +13,7 @@ import {
     uploadMultipleFiles,
 } from "../utils/imageKit";
 import { HTTP_STATUS_CODES } from "../constants/statusCodes";
+import Seller from "../models/seller.model";
 
 interface MulterRequest extends Request {
     files?: Express.Multer.File[];
@@ -25,7 +26,16 @@ export const handleCreateProduct = async (
 ): Promise<void> => {
     try {
         const multerReq = req as MulterRequest;
-
+        const payload = req.user;
+        if (!payload) {
+            sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
+            return;
+        }
+        const seller = await Seller.findOne({ userId: payload._id });
+        if (!seller) {
+            sendNotFound(res, API_RESPONSES.NOT_FOUND);
+            return;
+        }
         if (!multerReq.files || multerReq.files.length === 0) {
             sendBadRequest(res, API_RESPONSES.IMAGE_UPLOAD_FAILED);
             return;
@@ -44,7 +54,8 @@ export const handleCreateProduct = async (
             description,
             totalQuantity,
             category,
-            imageUrl: [], // Initialize the imageUrl array
+            sellerId: seller?.id,
+            imageUrl: [],
         });
 
         const result = await uploadMultipleFiles(
@@ -54,6 +65,9 @@ export const handleCreateProduct = async (
         product.imageUrl = result;
 
         await product.save({ validateBeforeSave: false });
+        seller.products.push(product._id as any);
+        await seller.save({ validateBeforeSave: false });
+
         sendSuccess(
             res,
             API_RESPONSES.PRODUCT_CREATED,

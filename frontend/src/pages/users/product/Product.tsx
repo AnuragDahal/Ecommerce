@@ -82,6 +82,7 @@ const Product = () => {
                                 .slice(initialValue, finalValue)
                                 .map((product: ProductType, index: number) => (
                                     <ProductCard
+                                        key={index}
                                         number={index}
                                         message={product}
                                     />

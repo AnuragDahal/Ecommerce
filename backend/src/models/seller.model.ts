@@ -36,12 +36,20 @@ const sellerSchema = new Schema(
             type: String,
             required: true,
         },
+        storeName: {
+            type: String,
+            required: true,
+        },
+        storeAddress: {
+            type: String,
+            required: true,
+        },
         userId: {
             type: Schema.Types.ObjectId,
             ref: "User",
             required: true,
         },
-        email: {
+        businessEmail: {
             type: String,
             required: true,
             unique: true,
@@ -56,6 +64,7 @@ const sellerSchema = new Schema(
         ],
         contact: [
             {
+                _id: false,
                 phone: {
                     type: String,
                     required: true,
