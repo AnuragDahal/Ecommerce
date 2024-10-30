@@ -60,7 +60,7 @@ export const handleCreateProduct = async (
 
         const result = await uploadMultipleFiles(
             multerReq.files,
-            "/ecommerce/products"
+            `/ecommerce/products/${category}`
         );
         product.imageUrl = result;
 

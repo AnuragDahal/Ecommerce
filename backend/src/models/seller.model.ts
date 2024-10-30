@@ -54,6 +54,9 @@ const sellerSchema = new Schema(
             required: true,
             unique: true,
         },
+        products: {
+            type: Array,
+        },
         paymentDetails: [
             {
                 bankAccountNumber: {

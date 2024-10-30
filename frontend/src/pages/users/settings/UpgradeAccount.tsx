@@ -30,7 +30,6 @@ const UpgradeAccount = () => {
     const mutation = useMutation({
         mutationFn: useSellerAccountCreationService,
         onSuccess: () => {
-            console.log(AccountData);
             toast({
                 title: "Account upgrade successful!",
                 description:
