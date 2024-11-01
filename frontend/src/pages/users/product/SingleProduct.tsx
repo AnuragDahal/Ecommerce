@@ -2,6 +2,7 @@ import ProductDetailCard from "@/components/reuseable/ProductDetailCard";
 import { API_ROUTES } from "@/config/apiRoutes";
 import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
+import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -13,9 +14,7 @@ const SingleProduct = () => {
         price: number;
         description: string;
         images: string[];
-        category: {
-            name: string;
-        };
+        category: string;
     }
 
     const [product, setProduct] = useState<Product | null>(null);
@@ -23,9 +22,14 @@ const SingleProduct = () => {
     useEffect(() => {
         (async () => {
             const response = await axios.get(
-                `http://localhost:3000/api/products/${id}`
+                `http://localhost:3000/api/products/${id}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${Cookies.get("accessToken")}`,
+                    },
+                }
             );
-            setProduct(response.data); // Assuming response.data is an object
+            setProduct(response.data.data); // Assuming response.data is an object
         })();
     }, [id]);
 
@@ -40,7 +44,7 @@ const SingleProduct = () => {
                         src: image,
                     }))}
                     description={product.description}
-                    category={product.category.name}
+                    category={product.category}
                 />
             )}
         </>
