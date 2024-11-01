@@ -231,6 +231,7 @@ export const handleAllProductsRetrieval = async (
 
         const formattedProducts = products.map((product) => {
             return {
+                id: product._id,
                 title: product.name,
                 price: product.price,
                 description: product.description,

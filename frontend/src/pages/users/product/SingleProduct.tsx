@@ -22,7 +22,9 @@ const SingleProduct = () => {
 
     useEffect(() => {
         (async () => {
-            const response = await axios.get(`${API_ROUTES.PRODUCTS}/${id}`);
+            const response = await axios.get(
+                `http://localhost:3000/api/products/${id}`
+            );
             setProduct(response.data); // Assuming response.data is an object
         })();
     }, [id]);

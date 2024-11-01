@@ -6,7 +6,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Minus, Plus } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import ProductCard from "./ProductCard";
+
 
 interface ProductColor {
     name: string;
@@ -45,21 +45,6 @@ export default function ProductDetailCard({
         null
     );
     const [mainImage, setMainImage] = useState<string>(images[0].src);
-    // const [hoveredImage, setHoveredImage] = useState(null);
-    // const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
-
-    // const handleMouseMove = (e: any, image: any) => {
-    //     const rect = e.target.getBoundingClientRect();
-    //     const x = ((e.clientX - rect.left) / rect.width) * 100;
-    //     const y = ((e.clientY - rect.top) / rect.height) * 100;
-    //     setHoveredImage(image.color);
-    //     setCursorPos({ x, y });
-    // };
-
-    // const handleMouseLeave = () => {
-    //     setHoveredImage(null);
-    // };
-
     const handleAddToCart = () => {
         try {
             const newItem = {

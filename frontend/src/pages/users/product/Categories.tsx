@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Categories = () => {
     const categories = [
@@ -13,6 +15,7 @@ const Categories = () => {
         { name: "Automotive", icon: "🚗" },
     ];
 
+    const navigate = useNavigate();
     return (
         <section className="w-full py-12 md:py-24 lg:py-32">
             <div className="container mx-auto px-4">
@@ -34,7 +37,14 @@ const Categories = () => {
                                     {category.name}
                                 </h2>
                                 <div className="flex justify-center">
-                                    <Button className="md:w-full">
+                                    <Button
+                                        className="md:w-full"
+                                        onClick={() =>
+                                            navigate(
+                                                `/products?category=${category.name}`
+                                            )
+                                        }
+                                    >
                                         Explore {category.name}
                                     </Button>
                                 </div>

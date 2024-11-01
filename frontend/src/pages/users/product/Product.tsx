@@ -8,20 +8,27 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { getRandomProducts } from "@/lib/getproduct";
+import { getProducts, getRandomProducts } from "@/lib/getproduct";
 import { ProductType } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
 import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 
 const Product = () => {
     const [selectedSort, setSelectedSort] = useState("popular");
     const [initialValue, setInitialValue] = useState(2);
     const [finalValue, setFinalValue] = useState(10);
+    const [page, setPage] = useState(1);
+    const [price, setPrice] = useState("low");
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+
+    const category = queryParams.get("category") || "";
 
     const { status, data, error } = useQuery({
-        queryKey: ["products"],
-        queryFn: getRandomProducts,
+        queryKey: ["products", { category, page, price }],
+        queryFn: () => getProducts({ category, page, price }),
     });
 
     if (status === "pending") {
@@ -29,6 +36,24 @@ const Product = () => {
     }
     if (status === "error") {
         return <span>Error: {error.message}</span>;
+    }
+    if (!data.data || data.data.length === 0) {
+        return (
+            <div className="container mx-auto px-4 py-12 md:py-24 lg:py-32">
+                <div className="text-center">
+                    <h2 className="text-2xl font-semibold mb-4">
+                        No Products Found
+                    </h2>
+                    <p className="text-muted-foreground">
+                        Sorry, we couldn't find any products in the{" "}
+                        {category || "selected"} category.
+                    </p>
+                    <Link to="/categories">
+                        <Button className="mt-8">Go Back</Button>
+                    </Link>
+                </div>
+            </div>
+        );
     }
 
     return (
@@ -78,15 +103,15 @@ const Product = () => {
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 place-items-center">
                         {data &&
-                            data
-                                .slice(initialValue, finalValue)
-                                .map((product: ProductType, index: number) => (
+                            data.data.map(
+                                (product: ProductType, index: number) => (
                                     <ProductCard
                                         key={index}
                                         number={index}
                                         message={product}
                                     />
-                                ))}
+                                )
+                            )}
                     </div>
                     <div className="flex justify-center mt-8">
                         {initialValue > 4 && (
