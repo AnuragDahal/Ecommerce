@@ -8,7 +8,17 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { getProducts, getRandomProducts } from "@/lib/getproduct";
+import {
+    Pagination,
+    PaginationContent,
+    PaginationEllipsis,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from "@/components/ui/pagination";
+
+import { getProducts } from "@/lib/getproduct";
 import { ProductType } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { Search } from "lucide-react";
@@ -17,18 +27,17 @@ import { Link, useLocation } from "react-router-dom";
 
 const Product = () => {
     const [selectedSort, setSelectedSort] = useState("popular");
-    const [initialValue, setInitialValue] = useState(2);
-    const [finalValue, setFinalValue] = useState(10);
     const [page, setPage] = useState(1);
     const [price, setPrice] = useState("low");
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
+    const limit = 2;
 
     const category = queryParams.get("category") || "";
 
     const { status, data, error } = useQuery({
-        queryKey: ["products", { category, page, price }],
-        queryFn: () => getProducts({ category, page, price }),
+        queryKey: ["products", { category, page, price, limit }],
+        queryFn: () => getProducts({ category, page, price, limit }),
     });
 
     if (status === "pending") {
@@ -114,29 +123,47 @@ const Product = () => {
                             )}
                     </div>
                     <div className="flex justify-center mt-8">
-                        {initialValue > 4 && (
-                            <Button
-                                className="mr-2"
-                                onClick={() => (
-                                    setFinalValue(initialValue),
-                                    setInitialValue(
-                                        initialValue -
-                                            (finalValue - initialValue)
-                                    )
-                                )}
-                            >
-                                Previous
-                            </Button>
-                        )}
-                        <Button
-                            className="ml-2"
-                            onClick={() => (
-                                setInitialValue(finalValue),
-                                setFinalValue(finalValue + 8)
-                            )}
-                        >
-                            Next
-                        </Button>
+                        <Pagination>
+                            <PaginationContent>
+                                <PaginationItem>
+                                    <Button
+                                        variant={"link"}
+                                        disabled={page === 1}
+                                    >
+                                        <PaginationPrevious
+                                            onClick={() =>
+                                                setPage((prev) => prev - 1)
+                                            }
+                                        />
+                                    </Button>
+                                </PaginationItem>
+                                <PaginationItem>
+                                    {data.data.length <= limit && (
+                                        <PaginationLink
+                                            isActive={page === 1}
+                                            onClick={() => setPage(1)}
+                                        >
+                                            1
+                                        </PaginationLink>
+                                    )}
+                                </PaginationItem>
+                                <PaginationItem>
+                                    <PaginationEllipsis />
+                                </PaginationItem>
+                                <PaginationItem>
+                                    <Button variant={"link"}>
+                                        <PaginationNext
+                                            onClick={() =>
+                                                setPage((prev) => prev + 1)
+                                            }
+                                            aria-disabled={
+                                                data.data.length < limit
+                                            }
+                                        />
+                                    </Button>
+                                </PaginationItem>
+                            </PaginationContent>
+                        </Pagination>
                     </div>
                 </div>
             </section>

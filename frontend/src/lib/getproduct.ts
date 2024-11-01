@@ -30,7 +30,7 @@ export const getProducts = async (data: IProductFilter) => {
         const response = await axios.get("http://localhost:3000/api/products", {
             params: {
                 category: data.category,
-                limit: data.limit ? data.limit : 10,
+                limit: data.limit ? data.limit : 1,
                 page: data.page ? data.page : 1,
                 price: data.price ? data.price : "low",
             },

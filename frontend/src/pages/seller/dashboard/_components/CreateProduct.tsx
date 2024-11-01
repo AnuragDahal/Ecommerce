@@ -8,17 +8,26 @@ import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { useProductServices } from "@/services/useProductCreationService";
 import { useMutation } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
+import { Loader2, X } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 export default function CreateProduct() {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
-    const [price, setPrice] = useState(""); // Changed to string
+    const [price, setPrice] = useState("");
     const [totalQuantity, setTotalQuantity] = useState(1);
     const [category, setCategory] = useState("");
     const [imagePreview, setImagePreview] = useState<string[]>([]);
     const [images, setImages] = useState<File[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [dragging, setDragging] = useState(false);
     const { createProduct } = useProductServices();
 
     const ProductData = useMemo(
@@ -33,13 +42,11 @@ export default function CreateProduct() {
         [name, description, price, category, totalQuantity, images]
     );
 
-    // Improved price validation
     const isValidPrice = (value: string) => {
         const number = Number(value);
         return !isNaN(number) && number > 0;
     };
 
-    // Add form validation
     const isFormValid = useMemo(() => {
         return (
             name.trim() !== "" &&
@@ -82,17 +89,49 @@ export default function CreateProduct() {
 
     const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
-        // Allow empty string or valid decimal numbers
         if (value === "" || /^\d*\.?\d*$/.test(value)) {
             setPrice(value);
         }
     };
 
+    const handleFiles = (files: File[]) => {
+        const newImages = [...images, ...files];
+        setImages(newImages);
+        const newPreviewUrls = files.map((file) => URL.createObjectURL(file));
+        setImagePreview((prevUrls) => [...prevUrls, ...newPreviewUrls]);
+    };
+
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || []);
-        setImages(files);
-        const previewUrls = files.map((file) => URL.createObjectURL(file));
-        setImagePreview(previewUrls);
+        handleFiles(files);
+    };
+
+    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        setDragging(true);
+    };
+
+    const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        setDragging(false);
+    };
+
+    const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        setDragging(false);
+        const files = Array.from(e.dataTransfer.files);
+        handleFiles(files);
+    };
+
+    const handleDeleteImage = (index: number) => {
+        const newImages = [...images];
+        newImages.splice(index, 1);
+        setImages(newImages);
+
+        const newImagePreview = [...imagePreview];
+        URL.revokeObjectURL(newImagePreview[index]);
+        newImagePreview.splice(index, 1);
+        setImagePreview(newImagePreview);
     };
 
     return (
@@ -129,14 +168,15 @@ export default function CreateProduct() {
                             >
                                 Description
                             </Label>
-                            <Input
+                            <Textarea
                                 id="description"
-                                type="text"
                                 placeholder="Enter product description"
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                                 required
-                                className="w-full"
+                                className="w-full no-scrollbar"
+                                maxLength={500}
+                                minLength={20}
                             />
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -187,15 +227,23 @@ export default function CreateProduct() {
                             >
                                 Category
                             </Label>
-                            <Input
-                                id="category"
-                                type="text"
-                                placeholder="Enter product category"
-                                value={category}
-                                onChange={(e) => setCategory(e.target.value)}
-                                required
-                                className="w-full"
-                            />
+                            <Select onValueChange={setCategory}>
+                                <SelectTrigger className="w-[180px]">
+                                    <SelectValue placeholder="Select Category" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Clothes">
+                                        Clothes
+                                    </SelectItem>
+                                    <SelectItem value="Shoes">Shoes</SelectItem>
+                                    <SelectItem value="Beauty">
+                                        Beauty
+                                    </SelectItem>
+                                    <SelectItem value="Electronics">
+                                        Electronics
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
                         <div className="space-y-2">
                             <Label
@@ -204,25 +252,48 @@ export default function CreateProduct() {
                             >
                                 Images
                             </Label>
-                            <Input
-                                id="images"
-                                type="file"
-                                multiple
-                                accept="image/*"
-                                onChange={handleImageChange}
-                                required
-                                className="w-full"
-                            />
+                            <div
+                                className={`border-2 border-dashed border-muted-foreground rounded-lg p-4 text-center ${
+                                    dragging ? "bg-muted" : ""
+                                }`}
+                                onDragOver={handleDragOver}
+                                onDragLeave={handleDragLeave}
+                                onDrop={handleDrop}
+                            >
+                                <p>
+                                    Drag and drop images here or click to upload
+                                </p>
+                                <Input
+                                    id="images"
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    onChange={handleImageChange}
+                                    required
+                                    className="hidden"
+                                />
+                            </div>
                         </div>
                         {imagePreview.length > 0 && (
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                                 {imagePreview.map((image, index) => (
-                                    <img
-                                        key={index}
-                                        src={image}
-                                        alt={`preview-${index}`}
-                                        className="h-24 w-full object-cover rounded-lg shadow-md"
-                                    />
+                                    <div key={index} className="relative group">
+                                        <img
+                                            src={image}
+                                            alt={`preview-${index}`}
+                                            className="h-24 w-full object-cover rounded-lg shadow-md"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                handleDeleteImage(index)
+                                            }
+                                            className="absolute top-1 right-1 bg-muted rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                            aria-label="Delete image"
+                                        >
+                                            <X className="h-4 w-4" />
+                                        </button>
+                                    </div>
                                 ))}
                             </div>
                         )}
