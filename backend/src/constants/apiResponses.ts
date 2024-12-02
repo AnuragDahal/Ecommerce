@@ -14,6 +14,7 @@ export const API_RESPONSES = {
     SUCCESS: "Success",
     ADDED_TO_CART: "Product successfully added to cart",
     CART_FETCHED: "Cart successfully fetched",
+    UPDATE_SUCCESS: "Details successfully updated",
 
     // Error Responses
     USER_NOT_FOUND: "User not found",
@@ -28,6 +29,7 @@ export const API_RESPONSES = {
     SAME_PASSWORD: "New password must be different from the old password",
     SELLER_ALREADY_EXISTS: "Seller already exists",
     IMAGE_DELETE_FAILED: "Failed to delete images from imagekit",
+    UPDATE_FAILED: "Falied to update the details",
 
     // VALIDATION ERRORS
     INVALID_EMAIL: "Invalid email",

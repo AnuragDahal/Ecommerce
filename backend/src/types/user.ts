@@ -37,6 +37,7 @@ export interface IUser extends Document {
     email: string;
     userName: string;
     address?: string;
+    phoneNumber: string;
     isEmailVerified?: boolean;
     cart: Array<{
         productId: Types.ObjectId | ProductDetails;
@@ -47,6 +48,7 @@ export interface IUser extends Document {
     role: EnumRole;
     password: string;
     avatar: string;
+    profilePic: string;
     otp?: string;
     otpExpires?: Date;
     refreshToken: string;

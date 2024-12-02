@@ -32,12 +32,14 @@ export const uploadMultipleFiles = async (
 };
 
 export const uploadSingleFile = async (
-    file: Express.Multer.File
+    file: Express.Multer.File,
+    folderName: string
 ): Promise<string> => {
     try {
         const result = await imagekit.upload({
             file: file.buffer,
             fileName: file.originalname,
+            folder: folderName,
         });
         return result.url;
     } catch (error) {

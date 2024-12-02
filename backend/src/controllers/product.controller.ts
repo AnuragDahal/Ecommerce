@@ -18,7 +18,7 @@ import { send } from "process";
 import User from "../models/user.model";
 import { ProductDetails, SellerDetails } from "../types/user";
 
-interface MulterRequest extends Request {
+export interface MulterRequest extends Request {
     files?: Express.Multer.File[];
 }
 

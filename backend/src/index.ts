@@ -5,6 +5,7 @@ import authRouter from "./apis/auth.routes";
 import productRouter from "./apis/product.routes";
 import sellerRouter from "./apis/seller.routes";
 import cookieParser from "cookie-parser";
+import userRouter from "./apis/user.routes";
 import cors from "cors";
 import { isAuthenticated } from "./middleware/authenticated";
 
@@ -25,6 +26,7 @@ app.use(cookieParser());
 app.use("/api/auth", authRouter);
 app.use("/api/products", isAuthenticated, productRouter);
 app.use("/api/seller", isAuthenticated, sellerRouter);
+app.use("/api/user", isAuthenticated, userRouter);
 
 connect()
     .then(() => {

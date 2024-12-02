@@ -32,6 +32,10 @@ const userSchema = new Schema({
     avatar: {
         type: String,
     },
+    phoneNumber: {
+        type: String,
+        required: false,
+    },
     email: {
         type: String,
         required: true,
@@ -44,6 +48,10 @@ const userSchema = new Schema({
     isEmailVerified: {
         type: Boolean,
         default: false,
+    },
+    profilePic: {
+        type: String,
+        required: false,
     },
     otp: {
         type: Number,

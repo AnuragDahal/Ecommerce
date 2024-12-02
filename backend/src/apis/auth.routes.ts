@@ -9,7 +9,7 @@ import {
     handlePasswordChange,
     handleGetRole,
     handlePaymentIntent
-} from "../controllers/user.controller";
+} from "../controllers/auth.controller";
 import { isAuthenticated } from "../middleware/authenticated";
 
 const router = Router();
