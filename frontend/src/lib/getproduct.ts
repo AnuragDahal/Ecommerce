@@ -10,19 +10,21 @@ interface IProductFilter {
 }
 
 export const getFeaturedProducts = async () => {
-    const response = await axios.get(API_ROUTES.PRODUCTS, {
+    const response = await axios.get(API_ROUTES.PRODUCTS.GET_ALL, {
         params: {
-            offset: 4,
             limit: 6,
         },
+        headers: {
+            Authorization: `Bearer ${Cookies.get("accessToken")}`,
+        },
     });
-    return response.data;
+    return response.data.data;
 };
 
 export const getRandomProducts = async () => {
-    const response = await axios.get(API_ROUTES.PRODUCTS);
+    const response = await axios.get(API_ROUTES.PRODUCTS.GET_ALL);
 
-    return response.data;
+    return response.data.data;
 };
 
 export const getProducts = async (data: IProductFilter) => {

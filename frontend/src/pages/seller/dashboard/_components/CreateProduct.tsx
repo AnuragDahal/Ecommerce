@@ -251,28 +251,29 @@ export default function CreateProduct() {
                                 className="text-sm font-medium text-muted-foreground"
                             >
                                 Images
+                                <div
+                                    className={`border-2 border-dashed border-muted-foreground rounded-lg p-4 text-center ${
+                                        dragging ? "bg-muted" : ""
+                                    }`}
+                                    onDragOver={handleDragOver}
+                                    onDragLeave={handleDragLeave}
+                                    onDrop={handleDrop}
+                                >
+                                    <p>
+                                        Drag and drop images here or click to
+                                        upload
+                                    </p>
+                                    <Input
+                                        id="images"
+                                        type="file"
+                                        multiple
+                                        accept="image/*"
+                                        onChange={handleImageChange}
+                                        required
+                                        className="hidden"
+                                    />
+                                </div>
                             </Label>
-                            <div
-                                className={`border-2 border-dashed border-muted-foreground rounded-lg p-4 text-center ${
-                                    dragging ? "bg-muted" : ""
-                                }`}
-                                onDragOver={handleDragOver}
-                                onDragLeave={handleDragLeave}
-                                onDrop={handleDrop}
-                            >
-                                <p>
-                                    Drag and drop images here or click to upload
-                                </p>
-                                <Input
-                                    id="images"
-                                    type="file"
-                                    multiple
-                                    accept="image/*"
-                                    onChange={handleImageChange}
-                                    required
-                                    className="hidden"
-                                />
-                            </div>
                         </div>
                         {imagePreview.length > 0 && (
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">

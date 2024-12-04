@@ -1,7 +1,7 @@
 "use client";
 
 import { useStripe } from "@stripe/react-stripe-js";
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import {
     Card,
     CardContent,
@@ -47,7 +47,7 @@ export default function CompletePage() {
     const [status, setStatus] = useState<string | null>(null);
     const [intentId, setIntentId] = useState<string | null>(null);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (!stripe) return;
 
         const clientSecret = new URLSearchParams(window.location.search).get(
@@ -68,7 +68,7 @@ export default function CompletePage() {
     const content = STATUS_CONTENT_MAP[status!] || {
         iconColor: "text-gray-500",
         icon: <HelpCircle className="w-12 h-12" />,
-        text: "Unknown status",
+        text: "",
     };
 
     return (
