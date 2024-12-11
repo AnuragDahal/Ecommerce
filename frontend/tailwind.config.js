@@ -1,4 +1,8 @@
 /** @type {import('tailwindcss').Config} */
+import animate from "tailwindcss-animate";
+import typography from "tailwindcss-typography";
+import scrollbarHide from "tailwind-scrollbar-hide";
+
 export default {
     darkMode: ["class"],
     content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
@@ -133,10 +137,6 @@ export default {
                 "caret-blink": "caret-blink 1.25s ease-out infinite",
             },
         },
-        plugins: [
-            require("tailwindcss-animate"),
-            require("tailwindcss-typography"),
-            require("tailwind-scrollbar-hide"),
-        ],
+        plugins: [animate, typography, scrollbarHide],
     },
 };
