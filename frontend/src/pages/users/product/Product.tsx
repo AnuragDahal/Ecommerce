@@ -28,7 +28,7 @@ import { Link, useLocation } from "react-router-dom";
 const Product = () => {
     const [selectedSort, setSelectedSort] = useState("popular");
     const [page, setPage] = useState(1);
-    const [price, setPrice] = useState("low");
+    const [price] = useState("low");
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const limit = 2;

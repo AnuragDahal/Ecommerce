@@ -1,6 +1,4 @@
 import ProductDetailCard from "@/components/reuseable/ProductDetailCard";
-import { API_ROUTES } from "@/config/apiRoutes";
-import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";

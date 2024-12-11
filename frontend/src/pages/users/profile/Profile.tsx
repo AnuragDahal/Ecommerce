@@ -90,7 +90,7 @@ export default function ProfileCard() {
     const { mutate } = useMutation({
         mutationFn: handleUserProfileUpdate,
         onSuccess: (data) => {
-            setIsLoading(false);
+            setIsLoading(!loading);
             setHasChanges(false);
             toast({
                 title: "Profile Updated",
@@ -99,7 +99,7 @@ export default function ProfileCard() {
             });
         },
         onError: (data) => {
-            setIsLoading(false);
+            setIsLoading(!loading);
             toast({
                 title: "Profile Update Failed",
                 description: data?.message,

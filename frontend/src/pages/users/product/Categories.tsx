@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import axios from "axios";
+import { Card } from "@/components/ui/card";;
 import { useNavigate } from "react-router-dom";
 
 const Categories = () => {

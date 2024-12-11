@@ -37,35 +37,37 @@ interface Order {
 }
 
 export default function MyOrdersPage() {
-    const [orders, setOrders] = useState<Order[]>([
-        {
-            id: "ORD-001",
-            date: new Date("2023-05-15"),
-            status: "Delivered",
-            total: 129.97,
-            items: [
-                { id: 1, name: "Wireless Earbuds", quantity: 1, price: 79.99 },
-                { id: 2, name: "Phone Case", quantity: 1, price: 19.99 },
-                { id: 3, name: "USB-C Cable", quantity: 3, price: 9.99 },
-            ],
-        },
-        {
-            id: "ORD-002",
-            date: new Date("2023-06-02"),
-            status: "Shipped",
-            total: 89.99,
-            items: [
-                { id: 4, name: "Bluetooth Speaker", quantity: 1, price: 89.99 },
-            ],
-        },
-        {
-            id: "ORD-003",
-            date: new Date("2023-06-10"),
-            status: "Processing",
-            total: 249.99,
-            items: [{ id: 5, name: "Smartwatch", quantity: 1, price: 249.99 }],
-        },
-    ]);
+  const orders = [
+
+      {
+          id: "ORD-001",
+          date: new Date("2023-05-15"),
+          status: "Delivered",
+          total: 129.97,
+          items: [
+              { id: 1, name: "Wireless Earbuds", quantity: 1, price: 79.99 },
+              { id: 2, name: "Phone Case", quantity: 1, price: 19.99 },
+              { id: 3, name: "USB-C Cable", quantity: 3, price: 9.99 },
+          ],
+      },
+      {
+          id: "ORD-002",
+          date: new Date("2023-06-02"),
+          status: "Shipped",
+          total: 89.99,
+          items: [
+              { id: 4, name: "Bluetooth Speaker", quantity: 1, price: 89.99 },
+          ],
+      },
+      {
+          id: "ORD-003",
+          date: new Date("2023-06-10"),
+          status: "Processing",
+          total: 249.99,
+          items: [{ id: 5, name: "Smartwatch", quantity: 1, price: 249.99 }],
+      },
+  ]
+    ;
 
     const getStatusColor = (status: Order["status"]) => {
         switch (status) {
@@ -110,7 +112,7 @@ export default function MyOrdersPage() {
                                     <TableCell>
                                         <Badge
                                             className={`${getStatusColor(
-                                                order.status
+                                                order.status as "Processing" | "Shipped" | "Delivered" | "Cancelled"
                                             )} text-white`}
                                         >
                                             {order.status}
