@@ -4,6 +4,8 @@
   "main": "index.js",
   "types": "module",
   "scripts": {
+    "prod":"node dist/index.js",
+    "build": "tsc",
     "start": "nodemon --exec ts-node src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
