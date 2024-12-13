@@ -12,8 +12,9 @@ export const getUserProfile = async () => {
     try {
         const accessToken = Cookies.get("accessToken");
         const response = await axios.get(
-            "http://localhost:3000/api/user/profile",
-
+            `${import.meta.env.VITE_BACKEND_URL}/${
+                import.meta.env.VITE_USER
+            }/profile`,
             {
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
@@ -39,7 +40,9 @@ export const handleUserProfileUpdate = async (data: Partial<IUserProfile>) => {
         fd.append("phoneNumber", data.phoneNumber || "");
         fd.append("image", data.image as File);
         const response = await axios.post(
-            "http://localhost:3000/api/user/profile",
+            `${import.meta.env.VITE_BACKEND_URL}/${
+                import.meta.env.VITE_USER
+            }/profile/update`,
             fd,
             {
                 headers: {

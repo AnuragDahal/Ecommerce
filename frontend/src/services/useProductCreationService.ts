@@ -28,7 +28,9 @@ export const useProductServices = () => {
 
         try {
             const response = await axios.post(
-                "http://localhost:3000/api/products/create",
+                `${import.meta.env.VITE_BACKEND_URL}/${
+                    import.meta.env.VITE_PRODUCT
+                }/create`,
                 fd,
                 {
                     headers: {
@@ -48,7 +50,9 @@ export const useProductServices = () => {
     const makePayment = async (data: IPaymentData) => {
         try {
             const response = await axios.post(
-                "http://localhost:3000/api/auth/payment",
+                `${import.meta.env.VITE_BACKEND_URL}/${
+                    import.meta.env.VITE_AUTH
+                }/payment`,
                 data,
                 {
                     headers: {

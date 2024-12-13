@@ -27,7 +27,9 @@ interface IChangePassword {
 export const useSignUpService = async (data: ISignUpData) => {
     try {
         const response = await axios.post(
-            "http://localhost:3000/api/auth/signup",
+            `${import.meta.env.VITE_BACKEND_URL}/${
+                import.meta.env.VITE_AUTH
+            }/signup`,
             data
         );
         return response.data;
@@ -43,7 +45,9 @@ export const useSignUpService = async (data: ISignUpData) => {
 export const useLoginService = async (data: Partial<ISignUpData>) => {
     try {
         const response = await axios.post(
-            "http://localhost:3000/api/auth/login",
+            `${import.meta.env.VITE_BACKEND_URL}/${
+                import.meta.env.VITE_AUTH
+            }/login`,
             data
         );
         return response.data;
@@ -59,7 +63,9 @@ export const useLoginService = async (data: Partial<ISignUpData>) => {
 export const useOtpVerificationService = async (data: IOtpVerificationData) => {
     try {
         const response = await axios.post(
-            "http://localhost:3000/api/auth/verify",
+            `${import.meta.env.VITE_BACKEND_URL}/${
+                import.meta.env.VITE_AUTH
+            }/verify`,
             data
         );
         return response.data;
@@ -77,7 +83,9 @@ export const useForgotPasswordService = async (
 ) => {
     try {
         const response = await axios.post(
-            "http://localhost:3000/api/auth/forgot-password",
+            `${import.meta.env.VITE_BACKEND_URL}/${
+                import.meta.env.VITE_AUTH
+            }/forgot-password`,
             data
         );
         return response.data;
@@ -93,7 +101,9 @@ export const useForgotPasswordService = async (
 export const useResetPasswordService = async (data: IResetPassword) => {
     try {
         const response = await axios.post(
-            "http://localhost:3000/api/auth/reset-password",
+            `${import.meta.env.VITE_BACKEND_URL}/${
+                import.meta.env.VITE_AUTH
+            }/reset-password`,
             data
         );
         return response.data;
@@ -109,7 +119,9 @@ export const useResetPasswordService = async (data: IResetPassword) => {
 export const userChangePasswordService = async (data: IChangePassword) => {
     try {
         const response = await axios.post(
-            "http://localhost:3000/api/auth/change-password",
+            `${import.meta.env.VITE_BACKEND_URL}/${
+                import.meta.env.VITE_AUTH
+            }/change-password`,
             data,
             {
                 headers: {
@@ -130,7 +142,9 @@ export const userChangePasswordService = async (data: IChangePassword) => {
 export const useRefreshTokenService = async () => {
     try {
         const response = await axios.post(
-            "http://localhost:3000/api/auth/refresh-token",
+            `${import.meta.env.VITE_BACKEND_URL}/${
+                import.meta.env.VITE_AUTH
+            }/refresh-token`,
             {
                 withCredentials: true,
             }
@@ -148,7 +162,9 @@ export const useRefreshTokenService = async () => {
 export const useGetRoleService = async () => {
     try {
         const response = await axios.get(
-            "http://localhost:3000/api/auth/get-role",
+            `${import.meta.env.VITE_BACKEND_URL}/${
+                import.meta.env.VITE_AUTH
+            }/get-role`,
             {
                 headers: {
                     Authorization: `Bearer ${Cookies.get("accessToken")}`,

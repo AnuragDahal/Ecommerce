@@ -23,7 +23,7 @@ export const useSellerAccountCreationService = async (data: ISellerData) => {
         fd.append("contact", JSON.stringify(data.contact));
         // fd.append("imageUrl", data.imageUrl);
         const response = await axios.post(
-            "http://localhost:3000/api/seller/create",
+            `${import.meta.env.VITE_BACKEND_URL}/${import.meta.env.VITE_SELLER}/create`,
             fd,
             {
                 withCredentials: true,

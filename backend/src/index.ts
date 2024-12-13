@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(
     cors({
-        origin: ["http://localhost:5173"], // This is the frontend URL
+        origin: ["http://localhost:5173", ""], // This is the frontend URL
         credentials: true,
     })
 );
@@ -24,7 +24,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.get("/", (req, res) => {
-    res.send("Health check");
+    res.send({ message: "Welcome!" });
 });
 
 app.use("/api/auth", authRouter);
