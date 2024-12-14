@@ -45,6 +45,7 @@ export interface IUser extends Document {
         quantity: number;
         sellerId: Types.ObjectId | SellerDetails;
     }>;
+    orders: Array<Types.ObjectId>;
     role: EnumRole;
     password: string;
     avatar: string;

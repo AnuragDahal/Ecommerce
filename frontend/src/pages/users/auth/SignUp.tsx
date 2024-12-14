@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function SignUp() {
     const { toast } = useToast();
@@ -25,6 +25,7 @@ export default function SignUp() {
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const { signUpMutation } = useAuth();
+    const navigate = useNavigate();
     const signUpData = {
         firstName,
         lastName,
@@ -32,26 +33,26 @@ export default function SignUp() {
         email,
         password,
     };
-    const handleSignUp  = (event:React.FormEvent<HTMLFormElement>) => {
+    const handleSignUp = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setIsLoading(true);
         signUpMutation.mutate(signUpData, {
-            onSuccess: (data) => {
+            onSuccess: () => {
                 localStorage.setItem("email", email);
                 setIsLoading(false);
                 toast({
                     title: "Sign up successful!",
                     description:
-                        "A verification email has been sent to your email address.",
-                    variant: "default",
+                        "Please verify your email to complete the sign up process.",
+                    variant: "success",
                 });
-                console.log(data);
+                navigate("/verify-email");
             },
-            onError: (error:any) => {
+            onError: (data) => {
                 setIsLoading(false);
                 toast({
                     title: "Sign up failed!",
-                    description: error.response.data.message,
+                    description: data.message,
                     variant: "destructive",
                 });
             },

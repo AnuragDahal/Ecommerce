@@ -84,6 +84,12 @@ const userSchema = new Schema({
     refreshToken: {
         type: String,
     },
+    orders: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Order",
+        },
+    ],
 });
 
 // Pre-hook to hash the password before saving the user

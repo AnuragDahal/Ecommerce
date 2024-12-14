@@ -84,7 +84,9 @@ const Login = () => {
                                     id="input"
                                     placeholder="Enter your username or email"
                                     value={input}
-                                    onChange={(e:React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
+                                    onChange={(
+                                        e: React.ChangeEvent<HTMLInputElement>
+                                    ) => setInput(e.target.value)}
                                     required
                                     className="bg-gray-700/50 border-gray-600 text-white placeholder-gray-400"
                                 />
@@ -146,9 +148,9 @@ const Login = () => {
                             </Button>
                         </form>
                     </CardContent>
-                    <CardFooter className="flex items-center gap-1">
-                        <p className="text-sm text-muted-foreground text-center w-full">
-                            Don't have an account?{" "}
+                    <CardFooter className="flex items-center gap-1 w-full">
+                        <p className="text-sm text-muted-foreground text-center w-full flex gap-3">
+                            <span className="">Not registered yet?</span>
                             <Link
                                 className="text-purple-400 hover:text-purple-300 underline underline-offset-4"
                                 to="/sign-up"

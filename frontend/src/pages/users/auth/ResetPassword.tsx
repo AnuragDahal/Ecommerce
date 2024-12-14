@@ -18,14 +18,14 @@ import { useNavigate } from "react-router-dom";
 
 interface IResetPassword {
     email: string;
-    otp: number;
+    otp: string;
     newPassword: string;
     confirmPassword: string;
 }
 const ResetPassword = () => {
     const [input, setInput] = useState<IResetPassword>({
         email: "",
-        otp: 0,
+        otp: "",
         newPassword: "",
         confirmPassword: "",
     });
@@ -41,8 +41,8 @@ const ResetPassword = () => {
             setIsLoading(false);
             localStorage.removeItem("email");
             toast({
-                variant: "default",
-                title: "Password reset",
+                variant: "success",
+                title: "Password reset successful",
                 description: `${data.message}`,
             });
             navigate("/login");

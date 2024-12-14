@@ -315,6 +315,7 @@ export const handleAddToCart = async (
         user.cart.push(...products);
         await user.save({ validateBeforeSave: false });
         sendSuccess(res, API_RESPONSES.ADDED_TO_CART, HTTP_STATUS_CODES.OK);
+        return;
     } catch (error) {
         sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
         return;

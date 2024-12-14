@@ -28,7 +28,7 @@ import ResetPassword from "./pages/users/auth/ResetPassword";
 import Cart from "./pages/users/product/Cart";
 import MyOrdersPage from "./pages/users/product/Orders";
 import StripeCheckout from "./pages/users/auth/StripeCheckout";
-import StripeComplete from "./pages/users/auth/StripeComplete";
+import StripeComplete from "./pages/users/auth/StripeComplete"
 
 const App = () => (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">

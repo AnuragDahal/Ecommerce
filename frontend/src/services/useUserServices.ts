@@ -59,3 +59,16 @@ export const handleUserProfileUpdate = async (data: Partial<IUserProfile>) => {
         }
     }
 };
+
+// export const getUserOrders = async () => {
+//     try {
+//         const accessToken = Cookies.get("accessToken");
+        
+//     } catch (error) {
+//         if (axios.isAxiosError(error) && error.response) {
+//             throw error.response.data;
+//         } else {
+//             throw new Error("Network Error");
+//         }
+//     }
+// };

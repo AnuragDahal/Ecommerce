@@ -28,24 +28,6 @@ const NavItems = ({
         {navList.map((item, index) => {
             // Check if the item is "Dashboard" and the role is "user"
             const isDashboard = item.name === "Dashboard" && role === "user";
-            // Render the logout link separately
-            if (item.name === "Logout") {
-                return (
-                    <Link
-                        to={item.link}
-                        key={index}
-                        className="flex py-3 px-2 space-x-3 md:p-0 hover:bg-accent rounded-lg"
-                        onClick={() => {
-                            Cookies.remove("accessToken");
-                            Cookies.remove("refreshToken");
-                            closeMenu();
-                        }}
-                    >
-                        {item.name}
-                    </Link>
-                );
-            }
-
             // Render the dashboard link conditionally
             if (isDashboard) {
                 return null; // Don't render the Dashboard link for users

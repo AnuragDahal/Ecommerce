@@ -17,29 +17,34 @@ import { useToast } from "@/hooks/use-toast";
 import { useOtpVerificationService } from "@/services/useAuthService";
 import { ToastClose } from "@/components/ui/toast";
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const EmailVerification = () => {
+    const [loading, setisLoading] = useState(false);
     const { toast } = useToast();
     const [otp, setOtp] = useState("");
     const navigate = useNavigate();
+    const [cooldown, setCooldown] = useState(0);
+    const [attemptedVerify, setHasAttemptedVerify] = useState(false);
 
     const emailData = {
         otp: otp,
-        email: "abcd123@gmail.com",
+        email: localStorage.getItem("email") as string,
     };
     const mutation = useMutation({
         mutationFn: useOtpVerificationService,
-        onSuccess: () => {
+        onSuccess: (data) => {
+            setisLoading(!loading);
             toast({
                 title: "Verification successful!",
-                description: "You have successfully verified your email.",
+                description: data.message,
                 variant: "success",
             });
-            navigate("/auth/login");
+            navigate("/login");
         },
         onError: (data) => {
+            setisLoading(!loading);
             toast({
                 title: "Verification failed!",
                 description: data.message,
@@ -52,10 +57,20 @@ const EmailVerification = () => {
             });
         },
     });
+    useEffect(() => {
+        if (cooldown > 0) {
+            const timer = setTimeout(() => setCooldown(cooldown - 1), 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [cooldown]);
 
     const handleVerify = () => {
-        console.log(emailData);
+        setHasAttemptedVerify(!attemptedVerify);
+        setisLoading(!loading);
         mutation.mutate(emailData);
+    };
+    const handleResend = () => {
+        setCooldown(60);
     };
 
     return (
@@ -89,13 +104,21 @@ const EmailVerification = () => {
                             </InputOTPGroup>
                         </InputOTP>
                     </CardContent>
-                    <CardFooter>
+                    <CardFooter className="flex flex-col items-center gap-3">
                         <Button
                             className="w-full mt-4"
                             onClick={handleVerify}
                             disabled={otp.length !== 6}
                         >
-                            Verify
+                            {loading ? "Verifying..." : "Verify"}
+                        </Button>
+                        <Button
+                            className="w-full space-y-2"
+                            disabled={cooldown > 0 || !attemptedVerify}
+                            onClick={handleResend}
+                        >
+                            Resend Verification Email{" "}
+                            {cooldown > 0 && `(${cooldown})`}
                         </Button>
                     </CardFooter>
                 </Card>

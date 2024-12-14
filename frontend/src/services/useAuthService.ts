@@ -16,7 +16,7 @@ interface IOtpVerificationData {
 
 interface IResetPassword {
     email: string;
-    otp: number;
+    otp: string;
     newPassword: string;
 }
 interface IChangePassword {

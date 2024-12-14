@@ -15,6 +15,7 @@ export const API_RESPONSES = {
     ADDED_TO_CART: "Product successfully added to cart",
     CART_FETCHED: "Cart successfully fetched",
     UPDATE_SUCCESS: "Details successfully updated",
+    ORDER_PLACED: "Your Order has been placed successfully",
 
     // Error Responses
     USER_NOT_FOUND: "User not found",

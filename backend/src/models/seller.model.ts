@@ -6,6 +6,13 @@ import { Document, Schema } from "mongoose";
 // Average Rating of Products per Seller: Calculate the average rating of products for each seller.
 // Top Sellers by Sales: Identify the top sellers based on sales data.
 // Sellers by Category: Group sellers by their product categories.
+
+interface ISellerOrder {
+    productId: string;
+    quantity: number;
+    price: number;
+    userId: string;
+}
 interface ISeller extends Document {
     name: string;
     userId: Schema.Types.ObjectId;
@@ -14,7 +21,7 @@ interface ISeller extends Document {
     categoryOfProduct: string;
     imageUrl: string;
     products: Array<Types.ObjectId>;
-    orders: Array<Types.ObjectId>;
+    orders: Array<ISellerOrder>;
     storeAddress: string;
     paymentDetails: Array<{
         bankAccountNumber: string;
