@@ -40,25 +40,26 @@ const orderSchema = new mongoose.Schema(
             type: Schema.Types.ObjectId,
             ref: "Users",
         },
-        items: {
-            sellerId: {
-                type: Schema.Types.ObjectId,
-                ref: "Seller",
+        items: [
+            {
+                sellerId: {
+                    type: Schema.Types.ObjectId,
+                    ref: "Seller",
+                },
+                productId: {
+                    type: Schema.Types.ObjectId,
+                    ref: "Product",
+                },
+                quantity: {
+                    type: Number,
+                    required: true,
+                },
+                price: {
+                    type: Number,
+                    required: true,
+                },
             },
-            productId: {
-                type: Schema.Types.ObjectId,
-                ref: "Product",
-            },
-            quantity: {
-                type: Number,
-                required: true,
-            },
-            price: {
-                type: Number,
-                required: true,
-            },
-            type: Array,
-        },
+        ],
         totalAmount: {
             type: Number,
             required: true,

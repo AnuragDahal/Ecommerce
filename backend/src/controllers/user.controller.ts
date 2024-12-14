@@ -123,3 +123,41 @@ export const createUserOrder = async (req: Request, res: Response) => {
         return;
     }
 };
+
+export const getUserOrders = async (req: Request, res: Response) => {
+    try {
+        const payload = req.user;
+        const orders = await Order.find({ userId: payload?._id })
+            .populate("items.productId", "name price")
+            .populate("items.sellerId", "storeName contact.phone")
+            .select("-items.price -items.quantity");
+        if (!orders || orders.length === 0) {
+            sendNotFound(res, API_RESPONSES.ORDER_NOT_FOUND);
+            return;
+        }
+        const transformedOrders = orders.map((order) => ({
+            id: order._id,
+            items: order.items.map((item) => ({
+                product: item.productId, // Rename productId to product
+                seller: item.sellerId, // Optionally rename sellerId to seller
+            })),
+            total: order.totalAmount,
+            status: order.status,
+            date: new Date(order.createdAt)
+                .toISOString()
+                .slice(0, 19)
+                .replace("T", " "),
+        }));
+
+        sendSuccess(res, API_RESPONSES.SUCCESS, HTTP_STATUS_CODES.OK, {
+            orders: transformedOrders,
+        });
+        sendSuccess(res, API_RESPONSES.SUCCESS, HTTP_STATUS_CODES.OK, {
+            orders,
+        });
+        return;
+    } catch (error) {
+        sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
+        return;
+    }
+};

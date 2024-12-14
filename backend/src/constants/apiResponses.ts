@@ -31,6 +31,8 @@ export const API_RESPONSES = {
     SELLER_ALREADY_EXISTS: "Seller already exists",
     IMAGE_DELETE_FAILED: "Failed to delete images from imagekit",
     UPDATE_FAILED: "Falied to update the details",
+    ORDER_FAILED: "Failed to place the order",
+    ORDER_NOT_FOUND: "No orders found",
 
     // VALIDATION ERRORS
     INVALID_EMAIL: "Invalid email",

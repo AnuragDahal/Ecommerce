@@ -18,67 +18,56 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns"; // Use parseISO for correct date handling
+import { useQuery } from "@tanstack/react-query";
+import { getUserOrders } from "@/services/userOrderServices";
 
 interface OrderItem {
-    id: number;
-    name: string;
+    product: {
+        _id: string;
+        name: string;
+        price: number;
+    };
+    seller: {
+        _id: string;
+        storeName: string;
+        contact: { phone: string }[];
+    };
     quantity: number;
-    price: number;
 }
 
 interface Order {
     id: string;
-    date: Date;
-    status: "Processing" | "Shipped" | "Delivered" | "Cancelled";
+    date: string;
+    status: string; // Adjusted to match API lowercase
     total: number;
     items: OrderItem[];
 }
 
 export default function MyOrdersPage() {
-    const orders = [
-        {
-            id: "ORD-001",
-            date: new Date("2023-05-15"),
-            status: "Delivered",
-            total: 129.97,
-            items: [
-                { id: 1, name: "Wireless Earbuds", quantity: 1, price: 79.99 },
-                { id: 2, name: "Phone Case", quantity: 1, price: 19.99 },
-                { id: 3, name: "USB-C Cable", quantity: 3, price: 9.99 },
-            ],
-        },
-        {
-            id: "ORD-002",
-            date: new Date("2023-06-02"),
-            status: "Shipped",
-            total: 89.99,
-            items: [
-                { id: 4, name: "Bluetooth Speaker", quantity: 1, price: 89.99 },
-            ],
-        },
-        {
-            id: "ORD-003",
-            date: new Date("2023-06-10"),
-            status: "Processing",
-            total: 249.99,
-            items: [{ id: 5, name: "Smartwatch", quantity: 1, price: 249.99 }],
-        },
-    ];
-    const getStatusColor = (status: Order["status"]) => {
-        switch (status) {
-            case "Processing":
+    const { data } = useQuery({
+        queryKey: ["userOrders"],
+        queryFn: getUserOrders,
+    });
+    const orderDetails: Order[] = data?.data?.orders || [];
+
+    const getStatusColor = (status: string) => {
+        switch (status.toLowerCase()) {
+            case "processing":
                 return "bg-yellow-500";
-            case "Shipped":
+            case "shipped":
                 return "bg-blue-500";
-            case "Delivered":
+            case "delivered":
                 return "bg-green-500";
-            case "Cancelled":
+            case "cancelled":
                 return "bg-red-500";
             default:
                 return "bg-gray-500";
         }
     };
+
+    const capitalizeFirstLetter = (str: string) =>
+        str.charAt(0).toUpperCase() + str.slice(1);
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -99,23 +88,24 @@ export default function MyOrdersPage() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {orders.map((order) => (
+                            {orderDetails.map((order) => (
                                 <TableRow key={order.id}>
                                     <TableCell>{order.id}</TableCell>
                                     <TableCell>
-                                        {format(order.date, "MMM dd, yyyy")}
+                                        {format(
+                                            parseISO(order.date),
+                                            "MMM dd, yyyy"
+                                        )}
                                     </TableCell>
                                     <TableCell>
                                         <Badge
                                             className={`${getStatusColor(
-                                                order.status as
-                                                    | "Processing"
-                                                    | "Shipped"
-                                                    | "Delivered"
-                                                    | "Cancelled"
+                                                order.status
                                             )} text-white`}
                                         >
-                                            {order.status}
+                                            {capitalizeFirstLetter(
+                                                order.status
+                                            )}
                                         </Badge>
                                     </TableCell>
                                     <TableCell>
@@ -142,13 +132,17 @@ export default function MyOrdersPage() {
                                                     <p>
                                                         <strong>Date:</strong>{" "}
                                                         {format(
-                                                            order.date,
+                                                            parseISO(
+                                                                order.date
+                                                            ),
                                                             "MMMM dd, yyyy"
                                                         )}
                                                     </p>
                                                     <p>
                                                         <strong>Status:</strong>{" "}
-                                                        {order.status}
+                                                        {capitalizeFirstLetter(
+                                                            order.status
+                                                        )}
                                                     </p>
                                                     <p>
                                                         <strong>Total:</strong>{" "}
@@ -163,16 +157,22 @@ export default function MyOrdersPage() {
                                                             (item) => (
                                                                 <li
                                                                     key={
-                                                                        item.id
+                                                                        item
+                                                                            .product
+                                                                            ._id
                                                                     }
                                                                 >
-                                                                    {item.name}{" "}
+                                                                    {
+                                                                        item
+                                                                            .product
+                                                                            .name
+                                                                    }{" "}
                                                                     - Qty:{" "}
                                                                     {
                                                                         item.quantity
                                                                     }{" "}
                                                                     - $
-                                                                    {item.price.toFixed(
+                                                                    {item.product.price.toFixed(
                                                                         2
                                                                     )}
                                                                 </li>
