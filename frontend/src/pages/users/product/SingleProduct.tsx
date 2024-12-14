@@ -20,7 +20,9 @@ const SingleProduct = () => {
     useEffect(() => {
         (async () => {
             const response = await axios.get(
-                `http://localhost:3000/api/products/${id}`,
+                `${import.meta.env.VITE_BACKEND_URL}/${
+                    import.meta.env.VITE_PRODUCT
+                }/${id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${Cookies.get("accessToken")}`,

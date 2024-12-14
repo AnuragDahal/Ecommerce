@@ -1,4 +1,3 @@
-import { API_ROUTES } from "@/config/apiRoutes";
 import axios from "axios";
 import Cookies from "js-cookie";
 
@@ -10,36 +9,46 @@ interface IProductFilter {
 }
 
 export const getFeaturedProducts = async () => {
-    const response = await axios.get(API_ROUTES.PRODUCTS.GET_ALL, {
-        params: {
-            limit: 6,
-        },
-        headers: {
-            Authorization: `Bearer ${Cookies.get("accessToken")}`,
-        },
-    });
+    const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/${import.meta.env.VITE_PRODUCT}`,
+        {
+            params: {
+                limit: 6,
+            },
+            headers: {
+                Authorization: `Bearer ${Cookies.get("accessToken")}`,
+            },
+        }
+    );
     return response.data.data;
 };
 
 export const getRandomProducts = async () => {
-    const response = await axios.get(API_ROUTES.PRODUCTS.GET_ALL);
+    const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/${import.meta.env.VITE_PRODUCT}`
+    );
 
     return response.data.data;
 };
 
 export const getProducts = async (data: IProductFilter) => {
     try {
-        const response = await axios.get("http://localhost:3000/api/products", {
-            params: {
-                category: data.category,
-                limit: data.limit ? data.limit : 1,
-                page: data.page ? data.page : 1,
-                price: data.price ? data.price : "low",
-            },
-            headers: {
-                Authorization: `Bearer ${Cookies.get("accessToken")}`,
-            },
-        });
+        const response = await axios.get(
+            `${import.meta.env.VITE_BACKEND_URL}/${
+                import.meta.env.VITE_PRODUCT
+            }`,
+            {
+                params: {
+                    category: data.category,
+                    limit: data.limit ? data.limit : 1,
+                    page: data.page ? data.page : 1,
+                    price: data.price ? data.price : "low",
+                },
+                headers: {
+                    Authorization: `Bearer ${Cookies.get("accessToken")}`,
+                },
+            }
+        );
 
         return response.data;
     } catch (error) {

@@ -54,7 +54,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
             if (refreshToken) {
                 const response = await axios.post(
-                    "http://localhost:3000/api/auth/refresh-token",
+                    `${import.meta.env.VITE_BACKEND_URL}/${
+                        import.meta.env.VITE_AUTH
+                    }/refresh-token`,
                     {
                         refreshToken,
                     }
