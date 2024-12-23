@@ -13,7 +13,7 @@ import { toast } from "@/hooks/use-toast";
 import { useProductServices } from "@/services/useProductCreationService";
 import { useMutation } from "@tanstack/react-query";
 import { Minus, Plus, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface CartItem {
@@ -24,13 +24,23 @@ interface CartItem {
     image: string;
 }
 
+// Debounce utility function
+function debounce(func: (...args: any[]) => void, delay: number) {
+    let timer: NodeJS.Timeout;
+    return (...args: any[]) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            func(...args);
+        }, delay);
+    };
+}
+
 const Cart = () => {
     const { makePayment } = useProductServices();
     const navigate = useNavigate();
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Enhanced localStorage management
     const saveCartItems = (items: CartItem[]) => {
         try {
             localStorage.setItem("cartItems", JSON.stringify(items));
@@ -44,32 +54,21 @@ const Cart = () => {
         }
     };
 
-    // Load cart items from localStorage on component mount
     useEffect(() => {
         const loadCartItems = () => {
             try {
                 const storedItems = localStorage.getItem("cartItems");
-                console.log("Stored items from localStorage:", storedItems);
-
                 if (storedItems) {
                     const parsedItems = JSON.parse(storedItems);
-                    // Validate parsed items
                     if (Array.isArray(parsedItems)) {
                         setCartItems(parsedItems);
-                        console.log(
-                            "Successfully loaded cart items:",
-                            parsedItems
-                        );
                     } else {
-                        console.error("Stored items are not in array format");
                         toast({
                             title: "Error",
                             description: "Invalid cart data format",
                             variant: "destructive",
                         });
                     }
-                } else {
-                    console.log("No cart items found in localStorage");
                 }
             } catch (error) {
                 console.error("Error loading cart items:", error);
@@ -86,28 +85,37 @@ const Cart = () => {
         loadCartItems();
     }, []);
 
-    // Update quantity and persist changes
-    const updateQuantity = (id: string, newQuantity: number) => {
-        if (newQuantity > 0) {
-            const updatedItems = cartItems.map((item) =>
-                item.productId === id
-                    ? { ...item, quantity: newQuantity }
-                    : item
+    const updateQuantity = useCallback(
+        debounce((id: string, newQuantity: number) => {
+            setCartItems((prevItems) =>
+                prevItems.map((item) =>
+                    item.productId === id
+                        ? { ...item, quantity: newQuantity }
+                        : item
+                )
+            );
+            saveCartItems(
+                cartItems.map((item) =>
+                    item.productId === id
+                        ? { ...item, quantity: newQuantity }
+                        : item
+                )
+            );
+        }, 300),
+        []
+    );
+
+    const removeItem = useCallback(
+        debounce((id: string) => {
+            const updatedItems = cartItems.filter(
+                (item) => item.productId !== id
             );
             setCartItems(updatedItems);
             saveCartItems(updatedItems);
-        } else {
-            removeItem(id);
-        }
-    };
+        }, 300),
+        []
+    );
 
-    const removeItem = (id: string) => {
-        const updatedItems = cartItems.filter((item) => item.productId !== id);
-        setCartItems(updatedItems);
-        saveCartItems(updatedItems);
-    };
-
-    // Calculate totals
     const subtotal = cartItems.reduce(
         (sum, item) => sum + item.price * item.quantity,
         0
@@ -115,7 +123,6 @@ const Cart = () => {
     const tax = subtotal * 0.1;
     const total = subtotal + tax;
 
-    // Prepare payment data
     const paymentData = {
         items: cartItems.map((item) => ({
             id: item.productId,
@@ -127,7 +134,6 @@ const Cart = () => {
         mutationFn: makePayment,
         onSuccess: (data) => {
             localStorage.setItem("clientSecret", data?.data.clientSecret);
-            // Clear cart after successful payment
             setCartItems([]);
             navigate("/checkout");
         },

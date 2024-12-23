@@ -83,3 +83,22 @@ export const handleSellerUserCreation = async (req: Request, res: Response) => {
         return;
     }
 };
+
+export const getReceivedOrders = async (req: Request, res: Response) => {
+    try {
+        const payload = req.user;
+        const seller = await Seller.findOne({ userId: payload?._id });
+        if (!seller) {
+            sendNotFound(res, API_RESPONSES.NOT_FOUND);
+            return;
+        }
+        const orders = seller.orders;
+        sendSuccess(res, API_RESPONSES.SUCCESS, HTTP_STATUS_CODES.OK, {
+            orders,
+        });
+        return;
+    } catch (error) {
+        sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
+        return;
+    }
+};

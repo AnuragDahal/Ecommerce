@@ -101,6 +101,7 @@ export const createUserOrder = async (req: Request, res: Response) => {
                     quantity: item.quantity,
                     price: item.price,
                     userId: payload?._id as string,
+                    id: newOrder._id,
                 };
                 seller.orders.push(order);
                 await seller.save({ validateBeforeSave: false });

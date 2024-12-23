@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -6,7 +6,19 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Minus, Plus } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useMutation } from "@tanstack/react-query";
+import { addtoCart } from "@/services/useUserServices";
 
+// Debounce utility function
+function debounce(func: (...args: any[]) => void, delay: number) {
+    let timer: NodeJS.Timeout;
+    return (...args: any[]) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            func(...args);
+        }, delay);
+    };
+}
 
 interface ProductColor {
     name: string;
@@ -26,10 +38,12 @@ interface ProductProps {
     colors?: ProductColor[];
     images: ProductImage[];
     category: string;
+    sellerId: string;
 }
 
 export default function ProductDetailCard({
     productId,
+    sellerId,
     name,
     price,
     description,
@@ -37,6 +51,7 @@ export default function ProductDetailCard({
     images,
     category,
 }: ProductProps) {
+    const [loading, setLoading] = useState(false);
     const [selectedColor, setSelectedColor] = useState<string>(
         colors ? colors[0].name : ""
     );
@@ -45,65 +60,55 @@ export default function ProductDetailCard({
         null
     );
     const [mainImage, setMainImage] = useState<string>(images[0].src);
-    const handleAddToCart = () => {
-        try {
-            const newItem = {
-                productId,
-                name,
-                price,
-                quantity,
-                image:
-                    images.find((img) => img.color === selectedColor)?.src ||
-                    images[0].src,
-            };
 
-            // Get existing cart items
-            const existingCartItems = localStorage.getItem("cartItems");
-            let cartItemsArray = [];
+    // Debounced version of quantity setter
+    const debouncedSetQuantity = useCallback(
+        debounce((value: number) => {
+            setQuantity(value);
+        }, 300),
+        []
+    );
 
-            if (existingCartItems) {
-                cartItemsArray = JSON.parse(existingCartItems);
-
-                // Ensure cartItemsArray is an array
-                if (!Array.isArray(cartItemsArray)) {
-                    cartItemsArray = [];
-                }
-            }
-
-            // Check if item already exists in cart
-            const existingItemIndex = cartItemsArray.findIndex(
-                (item: any) => item.productId === productId
-            );
-
-            if (existingItemIndex !== -1) {
-                // Update quantity if item exists
-                cartItemsArray[existingItemIndex].quantity += quantity;
-            } else {
-                // Add new item if it doesn't exist
-                cartItemsArray.push(newItem);
-            }
-
-            // Save updated cart
-            localStorage.setItem("cartItems", JSON.stringify(cartItemsArray));
-
-            // Show success message
+    const mutation = useMutation({
+        mutationKey: ["addToCart"],
+        mutationFn: addtoCart,
+        onSuccess: () => {
+            setLoading(!loading);
             toast({
+                title: "Success",
+                description: "Product added to cart",
                 variant: "success",
-                title: "Added to Cart",
-                description: `${quantity} ${name} added to your cart`,
+                duration: 5000,
             });
-        } catch (error) {
-            console.error("Error adding to cart:", error);
+        },
+        onError: () => {
+            setLoading(!loading);
             toast({
                 title: "Error",
-                description: "Failed to add item to cart",
+                description: "Failed to add product to cart",
                 variant: "destructive",
+                duration: 5000,
             });
-        }
+        },
+    });
+
+    const handleAddToCart = () => {
+        setLoading(!loading);
+        mutation.mutate({
+            products: [
+                {
+                    productId,
+                    quantity,
+                    sellerId,
+                    price,
+                    color: selectedColor,
+                },
+            ],
+        });
     };
+
     return (
         <div className="container mx-auto px-4 py-8">
-            {/* Image section remains the same */}
             <div className="grid md:grid-cols-2 gap-8 mb-12">
                 <div className="space-y-4">
                     <img
@@ -131,7 +136,6 @@ export default function ProductDetailCard({
                     </div>
                 </div>
                 <div className="space-y-6">
-                    {/* Product info section */}
                     <div>
                         <h1 className="text-4xl font-bold">{name}</h1>
                         <p className="text-3xl font-semibold mt-2">${price}</p>
@@ -143,7 +147,6 @@ export default function ProductDetailCard({
                         {description.slice(0, 100)}...
                     </p>
 
-                    {/* Color selection */}
                     {colors && (
                         <div>
                             <Label htmlFor="color" className="text-lg">
@@ -167,7 +170,6 @@ export default function ProductDetailCard({
                         </div>
                     )}
 
-                    {/* Quantity and Add to Cart section - Fixed structure */}
                     <div className="flex items-center space-x-4">
                         <div className="relative w-32">
                             <Label htmlFor="quantity" className="text-lg">
@@ -180,7 +182,7 @@ export default function ProductDetailCard({
                                     min={1}
                                     value={quantity || ""}
                                     onChange={(e) =>
-                                        setQuantity(
+                                        debouncedSetQuantity(
                                             parseInt(e.target.value) || 1
                                         )
                                     }
@@ -189,12 +191,16 @@ export default function ProductDetailCard({
                                 <Minus
                                     className="absolute top-1/2 left-2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground hover:cursor-pointer"
                                     onClick={() =>
-                                        setQuantity(Math.max(quantity - 1, 1))
+                                        debouncedSetQuantity(
+                                            Math.max(quantity - 1, 1)
+                                        )
                                     }
                                 />
                                 <Plus
                                     className="absolute top-1/2 right-2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground hover:cursor-pointer"
-                                    onClick={() => setQuantity(quantity + 1)}
+                                    onClick={() =>
+                                        debouncedSetQuantity(quantity + 1)
+                                    }
                                 />
                             </div>
                         </div>
@@ -215,7 +221,6 @@ export default function ProductDetailCard({
                 </div>
             </div>
 
-            {/* Tabs section remains the same */}
             <Tabs defaultValue="description" className="w-full">
                 <TabsList>
                     <TabsTrigger value="description">Description</TabsTrigger>

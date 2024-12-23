@@ -166,11 +166,11 @@ export default function MyOrdersPage() {
                                                                         item
                                                                             .product
                                                                             .name
-                                                                    }{" "}
-                                                                    - Qty:{" "}
+                                                                    }
+                                                                    - Qty:
                                                                     {
                                                                         item.quantity
-                                                                    }{" "}
+                                                                    }
                                                                     - $
                                                                     {item.product.price.toFixed(
                                                                         2

@@ -4,7 +4,7 @@
   "main": "index.js",
   "types": "module",
   "scripts": {
-    "prod":"node dist/index.js",
+    "prod": "node dist/index.js",
     "build": "tsc",
     "start": "nodemon --exec ts-node src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -24,7 +24,8 @@
     "mongoose": "^8.7.0",
     "node": "^20.18.0",
     "nodemailer": "^6.9.15",
-    "stripe": "^17.2.1"
+    "stripe": "^17.2.1",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

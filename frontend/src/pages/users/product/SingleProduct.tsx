@@ -13,6 +13,9 @@ const SingleProduct = () => {
         description: string;
         images: string[];
         category: string;
+        sellerid: {
+            _id: string;
+        };
     }
 
     const [product, setProduct] = useState<Product | null>(null);
@@ -37,7 +40,8 @@ const SingleProduct = () => {
         <>
             {product && (
                 <ProductDetailCard
-                    productId={product.id}
+                    sellerId={product.sellerid._id}
+                    productId={id as string}
                     name={product.title}
                     price={product.price}
                     images={product.images.map((image) => ({

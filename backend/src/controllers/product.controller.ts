@@ -7,16 +7,12 @@ import {
     sendNotFound,
     sendSuccess,
 } from "../utils/statusUtils";
-import {
-    deletePreviousImages,
-    imagekit,
-    uploadMultipleFiles,
-} from "../utils/imageKit";
+import { deletePreviousImages, uploadMultipleFiles } from "../utils/imageKit";
 import { HTTP_STATUS_CODES } from "../constants/statusCodes";
 import Seller from "../models/seller.model";
-import { send } from "process";
 import User from "../models/user.model";
 import { ProductDetails, SellerDetails } from "../types/user";
+import { Types } from "mongoose";
 
 export interface MulterRequest extends Request {
     files?: Express.Multer.File[];
@@ -296,6 +292,12 @@ export const handleProductRetrieval = async (
     }
 };
 
+interface CartProduct {
+    productId: string;
+    quantity: number;
+    price: number;
+    sellerId: string;
+}
 // Cart related functions
 export const handleAddToCart = async (
     req: Request,
@@ -303,20 +305,63 @@ export const handleAddToCart = async (
 ): Promise<void> => {
     try {
         const { products } = req.body;
-        if (!products) {
+
+        // Validate request payload
+        if (!products || !Array.isArray(products)) {
             sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
             return;
         }
+
+        // Find user
         const user = await User.findById(req.user?._id);
         if (!user) {
             sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
             return;
         }
-        user.cart.push(...products);
+
+        // Initialize cart if it doesn't exist
+        if (!user.cart) {
+            user.cart = [];
+        }
+
+        // Process each product in the request payload
+        products.forEach((product: CartProduct) => {
+            // Convert string IDs to ObjectId for comparison
+            const productObjectId = new Types.ObjectId(product.productId);
+            const sellerObjectId = new Types.ObjectId(product.sellerId);
+
+            // Find existing item using ObjectId comparison
+            const existingItemIndex = user.cart.findIndex(
+                (item) =>
+                    (item.productId as Types.ObjectId).equals(
+                        productObjectId
+                    ) &&
+                    (item.sellerId as Types.ObjectId).equals(sellerObjectId)
+            );
+
+            if (existingItemIndex !== -1) {
+                // Update existing cart item
+                user.cart[existingItemIndex].quantity += Number(
+                    product.quantity
+                );
+                user.cart[existingItemIndex].price = Number(product.price);
+            } else {
+                // Add new cart item
+                user.cart.push({
+                    productId: productObjectId,
+                    sellerId: sellerObjectId,
+                    quantity: Number(product.quantity),
+                    price: Number(product.price),
+                });
+            }
+        });
+
+        // Save user with updated cart
         await user.save({ validateBeforeSave: false });
         sendSuccess(res, API_RESPONSES.ADDED_TO_CART, HTTP_STATUS_CODES.OK);
         return;
     } catch (error) {
+        console.error("Error in handleAddToCart:", error);
         sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
         return;
     }

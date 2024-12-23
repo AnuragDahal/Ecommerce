@@ -1,5 +1,8 @@
 import { Router } from "express";
-import { handleSellerUserCreation } from "../controllers/seller.controller";
+import {
+    getReceivedOrders,
+    handleSellerUserCreation,
+} from "../controllers/seller.controller";
 import upload from "../utils/multer";
 
 const router = Router();
@@ -9,5 +12,6 @@ router.get("/", (req, res) => {
 });
 
 router.post("/create", upload.none(), handleSellerUserCreation);
+router.get("/orders", getReceivedOrders);
 
 export default router;

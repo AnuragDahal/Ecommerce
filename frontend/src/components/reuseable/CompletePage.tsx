@@ -10,16 +10,12 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
-import { CheckCircle2, XCircle, HelpCircle, Clock } from "lucide-react";
+
+import { CheckCircle2, XCircle, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { placeUserOrder } from "@/services/userOrderServices";
+import { useToast } from "@/hooks/use-toast";
 
 const STATUS_CONTENT_MAP: {
     [key: string]: { iconColor: string; icon: JSX.Element; text: string };
@@ -27,7 +23,7 @@ const STATUS_CONTENT_MAP: {
     succeeded: {
         iconColor: "text-green-500",
         icon: <CheckCircle2 className="w-12 h-12" />,
-        text: "Payment succeeded",
+        text: "Payment successful Order placed",
     },
     processing: {
         iconColor: "text-yellow-500",
@@ -41,11 +37,44 @@ const STATUS_CONTENT_MAP: {
     },
     // Add other statuses as needed
 };
+interface ICart {
+    items: {
+        productId: string;
+        sellerId: string;
+        price: number;
+        quantity: number;
+    }[];
+    shippingAddress?: string;
+    paymentMethod?: string;
+}
 
-export default function CompletePage() {
+export default function CompletePage({ cartItems }: { cartItems: ICart }) {
+    // get the cart items from the local    storage
+
+    const { toast } = useToast();
     const stripe = useStripe();
     const [status, setStatus] = useState<string | null>(null);
-    const [intentId, setIntentId] = useState<string | null>(null);
+
+    const mutation = useMutation({
+        mutationFn: placeUserOrder,
+        mutationKey: ["placeUserOrder"],
+        onSuccess: () => {
+            toast({
+                title: "Order Placed",
+                description: "Your order has been placed successfully",
+                variant: "success",
+                duration: 5000,
+            });
+        },
+        onError: (error) => {
+            toast({
+                title: "Error",
+                description: error.message,
+                variant: "destructive",
+                duration: 5000,
+            });
+        },
+    });
 
     useLayoutEffect(() => {
         if (!stripe) return;
@@ -59,81 +88,42 @@ export default function CompletePage() {
         stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
             if (!paymentIntent) return;
 
+            if (paymentIntent.status === "succeeded") {
+                mutation.mutate({
+                    items: [],
+                    shippingAddress: "",
+                    paymentMethod: "",
+                });
+            }
+
             setStatus(paymentIntent.status);
-            setIntentId(paymentIntent.id);
         });
     }, [stripe]);
 
     // Set a fallback for when `status` is not defined or doesn't match a key in `STATUS_CONTENT_MAP`
-    const content = STATUS_CONTENT_MAP[status!] || {
-        iconColor: "text-gray-500",
-        icon: <HelpCircle className="w-12 h-12" />,
-        text: "",
-    };
 
     return (
         <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-screen">
             <Card className="w-full max-w-md">
                 <CardHeader>
-                    <CardTitle className="text-2xl font-bold text-center">
-                        Payment Status
-                    </CardTitle>
+                    <CardTitle>Order Status</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                    <div className="flex flex-col items-center space-y-4">
-                        <div className={`${content.iconColor}`}>
-                            {content.icon}
-                        </div>
-                        <h2 className="text-xl font-semibold">
-                            {content.text}
-                        </h2>
+                <CardContent>
+                    <div className="flex items-center justify-center">
+                        {status && STATUS_CONTENT_MAP[status]?.icon}
                     </div>
-                    {intentId && (
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-[100px]">
-                                        Field
-                                    </TableHead>
-                                    <TableHead>Value</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                <TableRow>
-                                    <TableCell className="font-medium">
-                                        ID
-                                    </TableCell>
-                                    <TableCell className="font-mono text-sm break-all">
-                                        {intentId}
-                                    </TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="font-medium">
-                                        Status
-                                    </TableCell>
-                                    <TableCell className="font-mono text-sm">
-                                        {status}
-                                    </TableCell>
-                                </TableRow>
-                            </TableBody>
-                        </Table>
-                    )}
+                    <div className="text-center mt-4">
+                        <p className="text-lg font-semibold">
+                            {status && STATUS_CONTENT_MAP[status]?.text}
+                        </p>
+                    </div>
                 </CardContent>
-                <CardFooter className="flex flex-col space-y-2">
-                    {intentId && (
-                        <Button asChild variant="outline" className="w-full">
-                            <Link
-                                to={`https://dashboard.stripe.com/payments/${intentId}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                View details in Stripe Dashboard
-                            </Link>
-                        </Button>
-                    )}
-                    <Button asChild className="w-full">
-                        <Link to="/checkout">Test another payment</Link>
-                    </Button>
+                <CardFooter>
+                    <div className="flex items-center justify-center">
+                        <Link to="/orders">
+                            <Button variant="link">View Orders</Button>
+                        </Link>
+                    </div>
                 </CardFooter>
             </Card>
         </div>

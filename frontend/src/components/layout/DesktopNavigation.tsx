@@ -49,36 +49,33 @@ const DesktopNavigation = () => {
                     </Avatar>
                 </PopoverTrigger>
                 <PopoverContent className="w-full space-y-2">
-                    {desktopSettings.map((item, index) => (
-                        <>
-                            {item.label === "Logout" ? (
-                                <Link
-                                    key={index}
-                                    to={item.link}
-                                    className="flex items-center space-x-2 p-2 hover:bg-muted w-full hover:rounded-lg"
-                                    onClick={() => {
-                                        Cookies.remove("accessToken");
-                                        Cookies.remove("refreshToken");
-                                        setPopoverOpen(false);
-                                    }}
-                                >
-                                    {item.icon}
-                                    <span className="pl-3">{item.label}</span>
-                                </Link>
-                            ) : (
-                                <Link
-                                    key={index}
-                                    to={item.link}
-                                    className="flex items-center space-x-2 p-2 hover:bg-muted w-full hover:rounded-lg"
-                                    // Close the popover when a link is clicked
-                                    onClick={() => setPopoverOpen(false)}
-                                >
-                                    {item.icon}
-                                    <span className="pl-3">{item.label}</span>
-                                </Link>
-                            )}
-                        </>
-                    ))}
+                    {desktopSettings.map((item, index) =>
+                        item.label === "Logout" ? (
+                            <Link
+                                key={index} // Key applied directly to the Link
+                                to={item.link}
+                                className="flex items-center space-x-2 p-2 hover:bg-muted w-full hover:rounded-lg"
+                                onClick={() => {
+                                    Cookies.remove("accessToken");
+                                    Cookies.remove("refreshToken");
+                                    setPopoverOpen(false);
+                                }}
+                            >
+                                {item.icon}
+                                <span className="pl-3">{item.label}</span>
+                            </Link>
+                        ) : (
+                            <Link
+                                key={index} // Key applied directly to the Link
+                                to={item.link}
+                                className="flex items-center space-x-2 p-2 hover:bg-muted w-full hover:rounded-lg"
+                                onClick={() => setPopoverOpen(false)}
+                            >
+                                {item.icon}
+                                <span className="pl-3">{item.label}</span>
+                            </Link>
+                        )
+                    )}
                 </PopoverContent>
             </Popover>
         </div>
