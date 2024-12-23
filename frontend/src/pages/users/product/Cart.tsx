@@ -11,17 +11,26 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { useProductServices } from "@/services/useProductCreationService";
-import { useMutation } from "@tanstack/react-query";
+import {
+    getUserCartItems,
+    manageCartQuantity,
+} from "@/services/useUserServices";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface CartItem {
-    productId: string;
-    name: string;
+    id: string;
+    title: string;
     price: number;
+    category: string;
     quantity: number;
-    image: string;
+    images: Array<string>;
+    seller: {
+        id: string;
+        storeName: string;
+    };
 }
 
 // Debounce utility function
@@ -38,97 +47,37 @@ function debounce(func: (...args: any[]) => void, delay: number) {
 const Cart = () => {
     const { makePayment } = useProductServices();
     const navigate = useNavigate();
-    const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
-    const saveCartItems = (items: CartItem[]) => {
-        try {
-            localStorage.setItem("cartItems", JSON.stringify(items));
-        } catch (error) {
-            console.error("Error saving cart items:", error);
-            toast({
-                title: "Error",
-                description: "Failed to save cart items",
-                variant: "destructive",
-            });
-        }
-    };
-
+    const { data } = useQuery({
+        queryKey: ["cart"],
+        queryFn: getUserCartItems,
+    });
     useEffect(() => {
-        const loadCartItems = () => {
-            try {
-                const storedItems = localStorage.getItem("cartItems");
-                if (storedItems) {
-                    const parsedItems = JSON.parse(storedItems);
-                    if (Array.isArray(parsedItems)) {
-                        setCartItems(parsedItems);
-                    } else {
-                        toast({
-                            title: "Error",
-                            description: "Invalid cart data format",
-                            variant: "destructive",
-                        });
-                    }
-                }
-            } catch (error) {
-                console.error("Error loading cart items:", error);
-                toast({
-                    title: "Error",
-                    description: "Failed to load cart items",
-                    variant: "destructive",
-                });
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        loadCartItems();
-    }, []);
-
-    const updateQuantity = useCallback(
-        debounce((id: string, newQuantity: number) => {
-            setCartItems((prevItems) =>
-                prevItems.map((item) =>
-                    item.productId === id
-                        ? { ...item, quantity: newQuantity }
-                        : item
-                )
-            );
-            saveCartItems(
-                cartItems.map((item) =>
-                    item.productId === id
-                        ? { ...item, quantity: newQuantity }
-                        : item
-                )
-            );
-        }, 300),
-        []
-    );
-
-    const removeItem = useCallback(
-        debounce((id: string) => {
-            const updatedItems = cartItems.filter(
-                (item) => item.productId !== id
-            );
-            setCartItems(updatedItems);
-            saveCartItems(updatedItems);
-        }, 300),
-        []
-    );
-
-    const subtotal = cartItems.reduce(
-        (sum, item) => sum + item.price * item.quantity,
-        0
-    );
-    const tax = subtotal * 0.1;
-    const total = subtotal + tax;
+        if (data) {
+            setCartItems(data.data.cart);
+            setIsLoading(false);
+        }
+    }, [data]);
 
     const paymentData = {
         items: cartItems.map((item) => ({
-            id: item.productId,
+            id: item.id,
             amount: item.price * item.quantity,
         })),
     };
+    const quantityUpdate = useMutation({
+        mutationKey: ["updateQuantity"],
+        mutationFn: manageCartQuantity,
+        onMutate: (data) => {
+            const { productId, quantity } = data;
+            const index = cartItems.findIndex((item) => item.id === productId);
+            const newCartItems = [...cartItems];
+            newCartItems[index].quantity = quantity;
+            setCartItems(newCartItems);
+        },
+    });
 
     const mutation = useMutation({
         mutationFn: makePayment,
@@ -180,18 +129,18 @@ const Cart = () => {
                         </Card>
                     ) : (
                         cartItems.map((item) => (
-                            <Card key={item.productId} className="mb-4">
+                            <Card key={item.id} className="mb-4">
                                 <CardContent className="p-4">
                                     <div className="flex items-center">
                                         <img
                                             loading="lazy"
-                                            src={item.image}
-                                            alt={item.name}
+                                            src={item.images[0]}
+                                            alt={item.title}
                                             className="rounded-md w-[100px] h-[100px] object-cover"
                                         />
                                         <div className="ml-4 flex-grow space-y-2">
                                             <h3 className="font-semibold">
-                                                {item.name}
+                                                {item.title}
                                             </h3>
                                             <p className="text-sm">
                                                 ${item.price.toFixed(2)}
@@ -202,11 +151,13 @@ const Cart = () => {
                                                 variant="outline"
                                                 size="icon"
                                                 onClick={() =>
-                                                    updateQuantity(
-                                                        item.productId,
-                                                        item.quantity - 1
-                                                    )
+                                                    quantityUpdate.mutate({
+                                                        productId: item.id,
+                                                        quantity:
+                                                            item.quantity - 1,
+                                                    })
                                                 }
+                                                disabled={item.quantity === 1}
                                             >
                                                 <Minus className="h-4 w-4" />
                                             </Button>
@@ -214,12 +165,12 @@ const Cart = () => {
                                                 type="number"
                                                 value={item.quantity}
                                                 onChange={(e) =>
-                                                    updateQuantity(
-                                                        item.productId,
-                                                        parseInt(
+                                                    quantityUpdate.mutate({
+                                                        productId: item.id,
+                                                        quantity: parseInt(
                                                             e.target.value
-                                                        ) || 0
-                                                    )
+                                                        ),
+                                                    })
                                                 }
                                                 className="w-16 mx-2 text-center"
                                                 min={1}
@@ -228,10 +179,11 @@ const Cart = () => {
                                                 variant="outline"
                                                 size="icon"
                                                 onClick={() =>
-                                                    updateQuantity(
-                                                        item.productId,
-                                                        item.quantity + 1
-                                                    )
+                                                    quantityUpdate.mutate({
+                                                        productId: item.id,
+                                                        quantity:
+                                                            item.quantity + 1,
+                                                    })
                                                 }
                                             >
                                                 <Plus className="h-4 w-4" />
@@ -241,9 +193,9 @@ const Cart = () => {
                                             variant="ghost"
                                             size="icon"
                                             className="ml-4"
-                                            onClick={() =>
-                                                removeItem(item.productId)
-                                            }
+                                            // onClick={() =>
+                                            //     removeItem(item.id)
+                                            // }
                                         >
                                             <Trash2 className="h-4 w-4" />
                                         </Button>
@@ -262,15 +214,15 @@ const Cart = () => {
                             <div className="space-y-2">
                                 <div className="flex justify-between">
                                     <span>Subtotal</span>
-                                    <span>${subtotal.toFixed(2)}</span>
+                                    {/* <span>${subtotal.toFixed(2)}</span> */}
                                 </div>
                                 <div className="flex justify-between">
                                     <span>Tax</span>
-                                    <span>${tax.toFixed(2)}</span>
+                                    {/* <span>${tax.toFixed(2)}</span> */}
                                 </div>
                                 <div className="flex justify-between font-bold">
                                     <span>Total</span>
-                                    <span>${total.toFixed(2)}</span>
+                                    {/* <span>${total.toFixed(2)}</span> */}
                                 </div>
                             </div>
                         </CardContent>

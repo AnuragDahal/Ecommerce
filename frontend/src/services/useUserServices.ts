@@ -105,3 +105,33 @@ export const addtoCart = async (data: ICart) => {
         throw new Error("Network Error");
     }
 };
+
+interface ICartQuantity {
+    productId: string;
+    quantity: number;
+}
+
+export const manageCartQuantity = async (data: ICartQuantity) => {
+    try {
+        const response = await axios.put(
+            `${import.meta.env.VITE_BACKEND_URL}/${
+                import.meta.env.VITE_PRODUCT
+            }/cart/${data.productId}`,
+            null,
+            {
+                params: {
+                    quantity: data.quantity,
+                },
+                headers: {
+                    Authorization: `Bearer ${Cookies.get("accessToken")}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+            throw error.response.data;
+        }
+        throw new Error("Network Error");
+    }
+};

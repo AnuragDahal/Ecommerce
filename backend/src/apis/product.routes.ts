@@ -9,6 +9,7 @@ import {
     handleUpdateProduct,
     handleProductRetrieval,
     handleAllProductsRetrieval,
+    manageCartQuantity,
 } from "../controllers/product.controller";
 import upload from "../utils/multer";
 
@@ -22,6 +23,7 @@ router.post("/add-to-cart", handleAddToCart);
 router.delete("/cart/:productId", handleRemoveFromCart);
 router.delete("/clear-cart", handleClearCart);
 router.get("/cart", getCartContents); //handleCartRetrieval);
+router.put("/cart/:productId", manageCartQuantity);
 router.get("/:productId", handleProductRetrieval);
 
 export default router;

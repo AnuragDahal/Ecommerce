@@ -445,12 +445,14 @@ export const getCartContents = async (
             const seller = item.sellerId as SellerDetails;
 
             return {
+                id: product._id,
                 title: product.name,
                 category: product.category,
                 price: product.price,
                 images: product.imageUrl,
                 quantity: item.quantity,
                 seller: {
+                    id: seller._id,
                     storeName: seller.storeName,
                 },
             };
@@ -459,6 +461,39 @@ export const getCartContents = async (
         sendSuccess(res, API_RESPONSES.CART_FETCHED, HTTP_STATUS_CODES.OK, {
             cart,
         });
+        return;
+    } catch (error) {
+        sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
+        return;
+    }
+};
+
+export const manageCartQuantity = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+    try {
+        const { productId } = req.params;
+        const { quantity } = req.query;
+        if (!productId || !quantity) {
+            sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
+            return;
+        }
+        const user = await User.findById(req.user?._id);
+        if (!user) {
+            sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
+            return;
+        }
+        const cartItem = user.cart.find(
+            (item) => item.productId.toString() === productId
+        );
+        if (!cartItem) {
+            sendNotFound(res, API_RESPONSES.NOT_FOUND);
+            return;
+        }
+        cartItem.quantity = Number(quantity);
+        await user.save({ validateBeforeSave: false });
+        sendSuccess(res, API_RESPONSES.SUCCESS, HTTP_STATUS_CODES.OK);
         return;
     } catch (error) {
         sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);

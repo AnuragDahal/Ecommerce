@@ -16,6 +16,7 @@ import { Document, Types } from "mongoose";
 type EnumRole = "user" | "seller" | "admin";
 
 export interface ProductDetails {
+    _id: string;
     name: string;
     price: number;
     description: string;
@@ -25,7 +26,7 @@ export interface ProductDetails {
 }
 
 export interface SellerDetails {
-    _id: Types.ObjectId;
+    _id: string;
     storeName: string;
     businessEmail: string;
 }
