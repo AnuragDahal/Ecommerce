@@ -12,12 +12,15 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { useProductServices } from "@/services/useProductCreationService";
 import {
+    clearCart,
     getUserCartItems,
     manageCartQuantity,
+    removeFromCart,
+    // clearCartItems, ]
 } from "@/services/useUserServices";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Minus, Plus, Trash2 } from "lucide-react";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface CartItem {
@@ -49,11 +52,20 @@ const Cart = () => {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(true);
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
+    const [total, setTotal] = useState(0);
 
     const { data } = useQuery({
         queryKey: ["cart"],
         queryFn: getUserCartItems,
     });
+
+    const calculateTotal = useCallback(() => {
+        return cartItems.reduce(
+            (acc, item) => acc + item.price * item.quantity,
+            0
+        );
+    }, [cartItems]);
+
     useEffect(() => {
         if (data) {
             setCartItems(data.data.cart);
@@ -61,12 +73,17 @@ const Cart = () => {
         }
     }, [data]);
 
+    useEffect(() => {
+        setTotal(calculateTotal());
+    }, [cartItems, calculateTotal]);
+
     const paymentData = {
         items: cartItems.map((item) => ({
             id: item.id,
             amount: item.price * item.quantity,
         })),
     };
+
     const quantityUpdate = useMutation({
         mutationKey: ["updateQuantity"],
         mutationFn: manageCartQuantity,
@@ -76,6 +93,44 @@ const Cart = () => {
             const newCartItems = [...cartItems];
             newCartItems[index].quantity = quantity;
             setCartItems(newCartItems);
+        },
+    });
+
+    const debouncedQuantityUpdate = useMemo(
+        () =>
+            debounce((productId: string, quantity: number) => {
+                quantityUpdate.mutate({ productId, quantity });
+            }, 300),
+        [quantityUpdate]
+    );
+
+    const removeItem = useMutation({
+        mutationKey: ["removeItem"],
+        mutationFn: removeFromCart,
+        onMutate: (data) => {
+            const newCartItems = cartItems.filter((item) => item.id !== data);
+            setCartItems(newCartItems);
+        },
+    });
+
+    const clearAllCart = useMutation({
+        mutationKey: ["clearCart"],
+        mutationFn: clearCart,
+        onSuccess: () => {
+            setCartItems([]);
+            setTotal(0);
+            toast({
+                title: "Cart Cleared",
+                description: "All items have been removed from your cart.",
+                variant: "success",
+            });
+        },
+        onError: () => {
+            toast({
+                title: "Error",
+                description: "Failed to clear the cart. Please try again.",
+                variant: "destructive",
+            });
         },
     });
 
@@ -123,6 +178,18 @@ const Cart = () => {
             <h1 className="text-3xl font-bold mb-8">Your Cart</h1>
             <div className="grid md:grid-cols-3 gap-8">
                 <div className="md:col-span-2">
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-xl font-semibold">Cart Items</h2>
+                        {cartItems.length > 0 && (
+                            <Button
+                                variant="outline"
+                                onClick={() => clearAllCart.mutate()}
+                                className="text-red-600 border-red-600 hover:bg-red-600 hover:text-white"
+                            >
+                                Clear Cart
+                            </Button>
+                        )}
+                    </div>
                     {cartItems.length === 0 ? (
                         <Card className="p-8 text-center">
                             <p className="text-gray-500">Your cart is empty</p>
@@ -151,11 +218,10 @@ const Cart = () => {
                                                 variant="outline"
                                                 size="icon"
                                                 onClick={() =>
-                                                    quantityUpdate.mutate({
-                                                        productId: item.id,
-                                                        quantity:
-                                                            item.quantity - 1,
-                                                    })
+                                                    debouncedQuantityUpdate(
+                                                        item.id,
+                                                        item.quantity - 1
+                                                    )
                                                 }
                                                 disabled={item.quantity === 1}
                                             >
@@ -165,12 +231,10 @@ const Cart = () => {
                                                 type="number"
                                                 value={item.quantity}
                                                 onChange={(e) =>
-                                                    quantityUpdate.mutate({
-                                                        productId: item.id,
-                                                        quantity: parseInt(
-                                                            e.target.value
-                                                        ),
-                                                    })
+                                                    debouncedQuantityUpdate(
+                                                        item.id,
+                                                        parseInt(e.target.value)
+                                                    )
                                                 }
                                                 className="w-16 mx-2 text-center"
                                                 min={1}
@@ -179,11 +243,10 @@ const Cart = () => {
                                                 variant="outline"
                                                 size="icon"
                                                 onClick={() =>
-                                                    quantityUpdate.mutate({
-                                                        productId: item.id,
-                                                        quantity:
-                                                            item.quantity + 1,
-                                                    })
+                                                    debouncedQuantityUpdate(
+                                                        item.id,
+                                                        item.quantity + 1
+                                                    )
                                                 }
                                             >
                                                 <Plus className="h-4 w-4" />
@@ -193,9 +256,9 @@ const Cart = () => {
                                             variant="ghost"
                                             size="icon"
                                             className="ml-4"
-                                            // onClick={() =>
-                                            //     removeItem(item.id)
-                                            // }
+                                            onClick={() =>
+                                                removeItem.mutate(item.id)
+                                            }
                                         >
                                             <Trash2 className="h-4 w-4" />
                                         </Button>
@@ -212,17 +275,9 @@ const Cart = () => {
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-2">
-                                <div className="flex justify-between">
-                                    <span>Subtotal</span>
-                                    {/* <span>${subtotal.toFixed(2)}</span> */}
-                                </div>
-                                <div className="flex justify-between">
-                                    <span>Tax</span>
-                                    {/* <span>${tax.toFixed(2)}</span> */}
-                                </div>
                                 <div className="flex justify-between font-bold">
                                     <span>Total</span>
-                                    {/* <span>${total.toFixed(2)}</span> */}
+                                    <span>${total.toFixed(2)}</span>
                                 </div>
                             </div>
                         </CardContent>

@@ -135,3 +135,44 @@ export const manageCartQuantity = async (data: ICartQuantity) => {
         throw new Error("Network Error");
     }
 };
+
+export const removeFromCart = async (productId: string) => {
+    try {
+        const response = await axios.delete(
+            `${import.meta.env.VITE_BACKEND_URL}/${
+                import.meta.env.VITE_PRODUCT
+            }/cart/${productId}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${Cookies.get("accessToken")}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+            throw error.response.data;
+        }
+        throw new Error("Network Error");
+    }
+};
+export const clearCart = async () => {
+    try {
+        const response = await axios.delete(
+            `${import.meta.env.VITE_BACKEND_URL}/${
+                import.meta.env.VITE_PRODUCT
+            }/clear-cart`,
+            {
+                headers: {
+                    Authorization: `Bearer ${Cookies.get("accessToken")}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+            throw error.response.data;
+        }
+        throw new Error("Network Error");
+    }
+};

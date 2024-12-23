@@ -388,7 +388,9 @@ export const handleRemoveFromCart = async (
             (item) => item.productId.toString() !== productId
         );
         await user.save({ validateBeforeSave: false });
-        sendSuccess(res, API_RESPONSES.SUCCESS, HTTP_STATUS_CODES.OK);
+        sendSuccess(res, API_RESPONSES.SUCCESS, HTTP_STATUS_CODES.DELETED, {
+            message: "Product removed from cart",
+        });
         return;
     } catch (error) {
         sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR, {
