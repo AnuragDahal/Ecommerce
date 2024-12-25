@@ -9,6 +9,7 @@ interface IUserProfile {
     phoneNumber: string;
     image: File | string;
 }
+
 export const getUserProfile = async () => {
     try {
         const accessToken = Cookies.get("accessToken");

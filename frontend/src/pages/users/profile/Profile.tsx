@@ -46,7 +46,7 @@ export default function ProfileCard() {
     const { data } = useQuery({
         queryFn: getUserProfile,
         queryKey: ["userProfile"],
-        staleTime: 1000 * 60 * 10,
+        // staleTime: 1000 * 60 * 10,
     });
 
     useEffect(() => {

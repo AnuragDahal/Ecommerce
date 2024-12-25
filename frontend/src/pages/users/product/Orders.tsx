@@ -48,6 +48,7 @@ export default function MyOrdersPage() {
     const { data } = useQuery({
         queryKey: ["userOrders"],
         queryFn: getUserOrders,
+        staleTime: 1000 * 60 * 5, // 5 minutes
     });
     const orderDetails: Order[] = data?.data?.orders || [];
 

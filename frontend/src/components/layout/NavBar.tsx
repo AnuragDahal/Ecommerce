@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Cookies from "js-cookie";
 import { navList } from "@/config/constants";
@@ -15,6 +15,8 @@ import { Button } from "@/components/ui/button";
 import { Menu, LogOut, ShoppingBag, Heart, User, Settings } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useGetRoleService } from "@/services/useAuthService";
+import { getUserProfile } from "@/services/useUserServices";
+import { IFetchedProfile } from "@/types";
 
 // NavItems for both desktop and mobile
 const NavItems = ({
@@ -94,11 +96,31 @@ const MobileProfileSection = ({ closeMenu }: { closeMenu: () => void }) => {
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const toggleMenu = () => setIsOpen(!isOpen);
-    const { data } = useQuery({
+    const [profileData, setProfileData] = useState<IFetchedProfile>({
+        firstName: "",
+        lastName: "",
+        email: "",
+        avatar: "",
+        phoneNumber: "",
+        address: "",
+    });
+    const { data: roleData } = useQuery({
         queryKey: ["user"],
         queryFn: useGetRoleService,
+        staleTime: 1000 * 60 * 5,
     });
-    const role = data?.data?.role;
+    const role = roleData?.data?.role;
+
+    const { data: profile } = useQuery({
+        queryKey: ["userProfile"],
+        queryFn: getUserProfile,
+        staleTime: 1000 * 60 * 10,
+    });
+    useEffect(() => {
+        if (profile) {
+            setProfileData(profile);
+        }
+    }, [profile]);
 
     return (
         <>
@@ -124,15 +146,21 @@ const Navbar = () => {
                         <SheetTitle>
                             <div className="flex items-center space-x-3">
                                 <Avatar>
-                                    <AvatarImage src="/placeholder-avatar.jpg" />
-                                    <AvatarFallback>UN</AvatarFallback>
+                                    <AvatarImage
+                                        src={profileData.avatar ?? ""}
+                                    />
+                                    <AvatarFallback>
+                                        {profileData.firstName.charAt(0) +
+                                            profileData.lastName.charAt(0)}
+                                    </AvatarFallback>
                                 </Avatar>
                                 <div className="flex flex-col">
                                     <span className="font-medium">
-                                        User Name
+                                        {profileData.firstName}
+                                        {profileData.lastName}
                                     </span>
                                     <span className="text-sm text-muted-foreground">
-                                        user@example.com
+                                        {profileData.email}
                                     </span>
                                 </div>
                             </div>

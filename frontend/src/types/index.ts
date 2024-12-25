@@ -47,3 +47,12 @@ export interface IShippingAddress {
     postal_code: string;
     country: string;
 }
+
+export interface IFetchedProfile {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phoneNumber: string;
+    address: string;
+    avatar: string;
+}

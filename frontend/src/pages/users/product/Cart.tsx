@@ -57,6 +57,7 @@ const Cart = () => {
     const { data } = useQuery({
         queryKey: ["cart"],
         queryFn: getUserCartItems,
+        staleTime: 1000 * 60 * 5,
     });
 
     const calculateTotal = useCallback(() => {
