@@ -41,10 +41,10 @@ export const handleUserProfileUpdate = async (data: Partial<IUserProfile>) => {
         fd.append("address", data.address || "");
         fd.append("phoneNumber", data.phoneNumber || "");
         fd.append("image", data.image as File);
-        const response = await axios.post(
+        const response = await axios.put(
             `${import.meta.env.VITE_BACKEND_URL}/${
                 import.meta.env.VITE_USER
-            }/profile/update`,
+            }/profile`,
             fd,
             {
                 headers: {

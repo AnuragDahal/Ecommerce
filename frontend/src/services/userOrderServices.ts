@@ -37,7 +37,7 @@ export const placeUserOrder = async (order: IOrder) => {
                 orderDetails: {
                     items: [...order.items],
                 },
-                shippingAddress: order.shippingAddress ?? "",
+                shippingAddress: { ...order.shippingAddress },
                 paymentMethod: order.paymentMethod ?? "",
             },
             {

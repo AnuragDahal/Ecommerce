@@ -5,7 +5,7 @@ export const updateUserProfileSchema = z.object({
     lastName: z.string().optional(),
     address: z.string().optional(),
     phoneNumber: z.string().optional(),
-    profilePic: z.string().optional(),
+    image: z.string().optional(),
 });
 
 export const addToCartSchema = z.object({

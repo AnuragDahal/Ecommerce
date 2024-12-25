@@ -33,7 +33,7 @@ const DesktopNavigation = () => {
         if (data) {
             setProfile(data);
         }
-    }, []);
+    }, [data]);
 
     const desktopSettings = [
         {
@@ -78,7 +78,7 @@ const DesktopNavigation = () => {
                     {desktopSettings.map((item, index) =>
                         item.label === "Logout" ? (
                             <Link
-                                key={index} 
+                                key={index}
                                 to={item.link}
                                 className="flex items-center space-x-2 p-2 hover:bg-muted w-full hover:rounded-lg"
                                 onClick={() => {
@@ -92,7 +92,7 @@ const DesktopNavigation = () => {
                             </Link>
                         ) : (
                             <Link
-                                key={index} 
+                                key={index}
                                 to={item.link}
                                 className="flex items-center space-x-2 p-2 hover:bg-muted w-full hover:rounded-lg"
                                 onClick={() => setPopoverOpen(false)}

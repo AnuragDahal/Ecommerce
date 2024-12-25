@@ -16,3 +16,18 @@ export const zodValidator =
             return;
         }
     };
+
+export const zodParamsValidator =
+    (schema: z.Schema) => (req: any, res: any, next: any) => {
+        try {
+            schema.parse(req.params);
+            next();
+        } catch (err) {
+            if (err instanceof z.ZodError) {
+                sendBadRequest(res, err.errors[0].message);
+                return;
+            }
+            sendBadRequest(res, "Invalid request params");
+            return;
+        }
+    };

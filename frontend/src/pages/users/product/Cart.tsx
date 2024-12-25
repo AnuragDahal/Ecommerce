@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
-import { useProductServices } from "@/services/useProductCreationService";
+import { useProductServices } from "@/services/useProductServices";
 import {
     clearCart,
     getUserCartItems,
@@ -57,7 +57,6 @@ const Cart = () => {
     const { data } = useQuery({
         queryKey: ["cart"],
         queryFn: getUserCartItems,
-        staleTime: 1000 * 60 * 5,
     });
 
     const calculateTotal = useCallback(() => {

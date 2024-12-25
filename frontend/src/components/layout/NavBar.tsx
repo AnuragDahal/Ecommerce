@@ -115,17 +115,23 @@ const Navbar = () => {
         staleTime: 1000 * 60 * 5,
     });
     const role = roleData?.data?.role;
-
-    const { data: profile } = useQuery({
+    const { data } = useQuery({
         queryKey: ["userProfile"],
         queryFn: getUserProfile,
         staleTime: 1000 * 60 * 10,
     });
     useEffect(() => {
-        if (profile) {
-            setProfileData(profile);
+        if (data) {
+            setProfileData({
+                firstName: data.firstName,
+                lastName: data.lastName,
+                email: data.email,
+                avatar: data.avatar,
+                phoneNumber: data.phoneNumber,
+                address: data.address,
+            });
         }
-    }, [profile]);
+    }, [data]);
 
     return (
         <>
@@ -151,9 +157,7 @@ const Navbar = () => {
                         <SheetTitle>
                             <div className="flex items-center space-x-3">
                                 <Avatar>
-                                    <AvatarImage
-                                        src={profileData.avatar ?? ""}
-                                    />
+                                    <AvatarImage src={profileData?.avatar} />
                                     <AvatarFallback>
                                         {profileData.firstName.charAt(0) +
                                             profileData.lastName.charAt(0)}

@@ -55,20 +55,7 @@ export default function CompletePage() {
     const { data: cartData } = useQuery({
         queryKey: ["cart"],
         queryFn: getUserCartItems,
-        staleTime: 1000 * 60 * 5,
     });
-
-    const newOrder: IOrder = {
-        items:
-            cartData?.data.cart.map((item: any) => ({
-                productId: item.id as string,
-                sellerId: item.seller.id as string,
-                price: item.price as number,
-                quantity: item.quantity as number,
-            })) || [],
-        shippingAddress: shippingAddress,
-        paymentMethod: "stripe",
-    };
 
     const orderMutation = useMutation({
         mutationFn: placeUserOrder,
@@ -101,14 +88,6 @@ export default function CompletePage() {
         onSuccess: (response) => {
             if (response.data.shipping) {
                 setShippingAddress(response.data.shipping.address);
-                newOrder.shippingAddress = shippingAddress;
-
-                if (!isOrderPlaced) {
-                    // Prevent duplicate order placement
-                    console.log("Order req body", newOrder);
-                    orderMutation.mutate(newOrder);
-                    setIsOrderPlaced(true); // Mark as placed
-                }
             }
         },
         onError: (error) => {
@@ -122,7 +101,7 @@ export default function CompletePage() {
     });
 
     useLayoutEffect(() => {
-        if (!stripe || isOrderPlaced) return; // Skip if order already placed
+        if (!stripe || isOrderPlaced) return;
 
         const clientSecret = new URLSearchParams(window.location.search).get(
             "payment_intent_client_secret"
@@ -140,7 +119,29 @@ export default function CompletePage() {
                 paymentIntentMutation.mutate(paymentIntent.id);
             }
         });
-    }, [stripe, isOrderPlaced]); // Dependency on `isOrderPlaced`
+    }, [stripe, isOrderPlaced]);
+
+    useLayoutEffect(() => {
+        if (
+            status === "succeeded" &&
+            !isOrderPlaced &&
+            shippingAddress.city &&
+            cartData?.data?.cart?.length
+        ) {
+            const newOrder: IOrder = {
+                items: cartData.data.cart.map((item: any) => ({
+                    productId: item.id as string,
+                    sellerId: item.seller.id as string,
+                    price: item.price as number,
+                    quantity: item.quantity as number,
+                })),
+                shippingAddress,
+                paymentMethod: "stripe",
+            };
+            setIsOrderPlaced(true);
+            orderMutation.mutate(newOrder);
+        }
+    }, [status, shippingAddress, cartData, isOrderPlaced]);
 
     return (
         <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-screen">

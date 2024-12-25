@@ -14,7 +14,7 @@ import {
 
 const router = Router();
 router.get("/profile", getUserProfile);
-router.post(
+router.put(
     "/profile",
     upload.single("image"),
     zodValidator(updateUserProfileSchema),

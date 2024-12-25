@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
-import { useProductServices } from "@/services/useProductCreationService";
+import { useProductServices } from "@/services/useProductServices";
 import { useMutation } from "@tanstack/react-query";
 import { Loader2, X } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
@@ -83,6 +83,7 @@ export default function CreateProduct() {
             setIsLoading(true);
             e.preventDefault();
             mutation.mutate(ProductData);
+            console.log("ProductData", ProductData);
         },
         [mutation, ProductData]
     );
