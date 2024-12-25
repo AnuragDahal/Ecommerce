@@ -8,10 +8,6 @@ export const updateUserProfileSchema = z.object({
     profilePic: z.string().optional(),
 });
 
-export const getUserProfileSchema = z.object({
-    userId: z.string().nonempty("User ID is required"),
-});
-
 export const addToCartSchema = z.object({
     products: z.array(z.object({
         productId: z.string().nonempty("Product ID is required"),

@@ -17,13 +17,14 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
-
 import { getProducts } from "@/lib/getproduct";
 import { ProductType } from "@/types";
 import { useQuery } from "@tanstack/react-query";
-import { Search } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import Loading from "@/components/reuseable/Loading";
+import NetworkError from "@/components/reuseable/NetworkError";
+import { Search } from "lucide-react";
 
 const Product = () => {
     const [selectedSort, setSelectedSort] = useState("popular");
@@ -35,16 +36,17 @@ const Product = () => {
 
     const category = queryParams.get("category") || "";
 
-    const { status, data, error } = useQuery({
+    const { status, data } = useQuery({
         queryKey: ["products", { category, page, price, limit }],
         queryFn: () => getProducts({ category, page, price, limit }),
     });
 
     if (status === "pending") {
-        return <div>Loading...</div>;
+        return <Loading className="h-[100vh]" />;
     }
+
     if (status === "error") {
-        return <span>Error: {error.message}</span>;
+        return <NetworkError />;
     }
     if (!data.data || data.data.length === 0) {
         return (

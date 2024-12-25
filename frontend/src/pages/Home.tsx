@@ -1,4 +1,6 @@
 //@ts-ignore
+import Loading from "@/components/reuseable/Loading";
+import NetworkError from "@/components/reuseable/NetworkError";
 import ProductCard from "@/components/reuseable/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -8,17 +10,17 @@ import { ArrowRight, CreditCard, ShoppingCart, Truck } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Home = () => {
-    const { status, data, error } = useQuery({
+    const { status, data } = useQuery({
         queryKey: ["products"],
         queryFn: getFeaturedProducts,
     });
 
     if (status === "pending") {
-        return <div>Loading...</div>;
+        return <Loading />;
     }
 
     if (status === "error") {
-        return <span>Error: {error.message}</span>;
+        return <NetworkError />;
     }
     return (
         <>

@@ -21,14 +21,15 @@ import Analytics from "./pages/seller/dashboard/_components/Analytics";
 import Overview from "./pages/seller/dashboard/_components/Overview";
 import Orders from "./pages/seller/dashboard/_components/Orders";
 import ManageProducts from "./pages/seller/dashboard/_components/ManageProducts";
-import SideBar from "./pages/seller/dashboard/_components/SideBar";
+import DashBoard from "./pages/seller/dashboard/DashBoard";
 import ChangePassword from "./pages/users/settings/ChangePassword";
 import ForgetPassword from "./pages/users/auth/ForgetPassword";
 import ResetPassword from "./pages/users/auth/ResetPassword";
 import Cart from "./pages/users/product/Cart";
 import MyOrdersPage from "./pages/users/product/Orders";
 import StripeCheckout from "./pages/users/auth/StripeCheckout";
-import StripeComplete from "./pages/users/auth/StripeComplete"
+import StripeComplete from "./pages/users/auth/StripeComplete";
+import { SidebarProvider } from "./components/ui/sidebar";
 
 const App = () => (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
@@ -151,16 +152,16 @@ const App = () => (
                     </Route>
 
                     {/* Seller Dashboard Nested Routes */}
+
                     <Route path="seller/*" element={<Outlet />}>
                         <Route
-                            path="create-product"
+                            path="dashboard/*"
                             element={
-                                <ProtectedRoute>
-                                    <CreateProduct />
-                                </ProtectedRoute>
+                                <SidebarProvider>
+                                    <DashBoard />
+                                </SidebarProvider>
                             }
-                        />
-                        <Route path="dashboard/*" element={<SideBar />}>
+                        >
                             <Route
                                 path="overview"
                                 element={

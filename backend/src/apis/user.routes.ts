@@ -9,12 +9,11 @@ import upload from "../utils/multer";
 import { zodValidator } from "../middleware/zod";
 import {
     updateUserProfileSchema,
-    getUserProfileSchema,
     createOrderSchema,
 } from "../schema";
 
 const router = Router();
-router.get("/profile", zodValidator(getUserProfileSchema), getUserProfile);
+router.get("/profile", getUserProfile);
 router.post(
     "/profile",
     upload.single("image"),

@@ -16,9 +16,8 @@ import Order from "../models/orders.model";
 import Seller from "../models/seller.model";
 
 export const getUserProfile = async (req: Request, res: Response) => {
-    const userData = req.user;
     try {
-        const user = await User.findById(userData?._id).select(
+        const user = await User.findById(req.user?._id).select(
             "firstName lastName address profilePic email phoneNumber"
         );
         if (!user) {
