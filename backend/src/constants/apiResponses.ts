@@ -33,6 +33,10 @@ export const API_RESPONSES = {
     UPDATE_FAILED: "Falied to update the details",
     ORDER_FAILED: "Failed to place the order",
     ORDER_NOT_FOUND: "No orders found",
+    INVALID_PAYMENT: "Invalid payment",
+    STRIPE_ERROR: "Stripe error",
+    INVALID_PAYMENT_INTENT_ID: "Invalid payment intent id",
+    CART_EMPTY: "Your Cart is empty.Please add items to the cart",
 
     // VALIDATION ERRORS
     INVALID_EMAIL: "Invalid email",
@@ -52,6 +56,7 @@ export const API_RESPONSES = {
     BAD_REQUEST: "Bad request",
     UNAUTHORIZED: "Unauthorized access",
     FORBIDDEN: "Forbidden",
+    METHOD_NOT_ALLOWED: "Method not allowed",
     NOT_FOUND: "Resource not found",
     INTERNAL_SERVER_ERROR: "Internal server error",
     SERVICE_UNAVAILABLE: "Service unavailable",

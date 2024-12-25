@@ -120,6 +120,7 @@ export default {
                 success: {
                     DEFAULT: "hsl(var(--success))",
                 },
+
                 border: "hsl(var(--border))",
                 input: "hsl(var(--input))",
                 ring: "hsl(var(--ring))",
@@ -130,6 +131,21 @@ export default {
                     4: "hsl(var(--chart-4))",
                     5: "hsl(var(--chart-5))",
                 },
+            },
+            fontFamily: {
+                // fonts for body text
+                body: ["Poppins", "sans-serif"],
+                // show fonts for headings and titles
+                display: [
+                    "ui-sans-serif",
+                    "system-ui",
+                    "sans-serif",
+                    "Inter",
+                    "Segoe UI Symbol",
+                    "Apple Color Emoji",
+                    "Segoe UI Emoji",
+                    "Noto Color Emoji",
+                ],
             },
             animation: {
                 "accordion-down": "accordion-down 0.2s ease-out",

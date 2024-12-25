@@ -8,7 +8,8 @@ import {
     handleForgetPassword,
     handlePasswordChange,
     handleGetRole,
-    handlePaymentIntent
+    handlePaymentIntent,
+    handlePaymentRetrieve,
 } from "../controllers/auth.controller";
 import { isAuthenticated } from "../middleware/authenticated";
 
@@ -23,6 +24,7 @@ router.post("/reset-password", handlePasswordReset);
 router.post("/change-password", isAuthenticated, handlePasswordChange);
 router.get("/get-role", handleGetRole);
 router.post("/payment", isAuthenticated, handlePaymentIntent);
+router.post("/payment-intent", isAuthenticated, handlePaymentRetrieve);
 
 // router.post("/resend-verification-email" /* handler */);
 

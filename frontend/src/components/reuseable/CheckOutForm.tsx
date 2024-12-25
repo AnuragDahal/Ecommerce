@@ -31,20 +31,45 @@ export default function CheckoutForm() {
 
         setIsLoading(true);
 
+        // Get the shipping address details from the AddressElement
         const addressElement = elements.getElement(AddressElement);
         const address = await addressElement?.getValue();
+
         if (!address?.complete) {
             setMessage("Please complete your shipping details.");
             setIsLoading(false);
             return;
         }
+
+        // Extract relevant details from the AddressElement
+        const userDetails = address.value; // This contains the entered address details
+        console.log("User Details:", userDetails);
+
+        // Destructure fields you might need
+        const { name, address: shippingAddress, phone } = userDetails;
+
         const { error } = await stripe.confirmPayment({
             elements,
             confirmParams: {
-                // Make sure to change this to your payment completion page
                 return_url: `${window.location.origin}/complete`,
+                payment_method_data: {
+                    billing_details: {
+                        name: name || "N/A", // Fallback if name is not provided
+                        phone: phone || "N/A",
+                        address: shippingAddress || {},
+                    },
+                },
+                shipping: {
+                    name,
+                    phone,
+                    address: {
+                        ...shippingAddress,
+                        line2: "", // Add more fields if needed
+                    },
+                },
             },
         });
+
         if (
             error?.type === "card_error" ||
             error?.type === "validation_error"

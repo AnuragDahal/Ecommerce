@@ -10,12 +10,14 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
 import { CheckCircle2, XCircle, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { placeUserOrder } from "@/services/userOrderServices";
 import { useToast } from "@/hooks/use-toast";
+import { getUserCartItems } from "@/services/useUserServices";
+import { usePaymentIntentService } from "@/services/useAuthService";
+import { IOrder, IShippingAddress, PaymentIntentResponse } from "@/types";
 
 const STATUS_CONTENT_MAP: {
     [key: string]: { iconColor: string; icon: JSX.Element; text: string };
@@ -35,27 +37,40 @@ const STATUS_CONTENT_MAP: {
         icon: <XCircle className="w-12 h-12" />,
         text: "Payment failed",
     },
-    // Add other statuses as needed
 };
-interface ICart {
-    items: {
-        productId: string;
-        sellerId: string;
-        price: number;
-        quantity: number;
-    }[];
-    shippingAddress?: string;
-    paymentMethod?: string;
-}
 
-export default function CompletePage({ cartItems }: { cartItems: ICart }) {
-    // get the cart items from the local    storage
-
+export default function CompletePage() {
     const { toast } = useToast();
     const stripe = useStripe();
     const [status, setStatus] = useState<string | null>(null);
+    const [isOrderPlaced, setIsOrderPlaced] = useState(false); // New flag to track order placement
+    const [shippingAddress, setShippingAddress] = useState<IShippingAddress>({
+        city: "",
+        country: "",
+        line1: "",
+        line2: "",
+        postal_code: "",
+    });
 
-    const mutation = useMutation({
+    const { data: cartData } = useQuery({
+        queryKey: ["cart"],
+        queryFn: getUserCartItems,
+        staleTime: 1000 * 60 * 5,
+    });
+
+    const newOrder: IOrder = {
+        items:
+            cartData?.data.cart.map((item: any) => ({
+                productId: item.id as string,
+                sellerId: item.seller.id as string,
+                price: item.price as number,
+                quantity: item.quantity as number,
+            })) || [],
+        shippingAddress: shippingAddress,
+        paymentMethod: "stripe",
+    };
+
+    const orderMutation = useMutation({
         mutationFn: placeUserOrder,
         mutationKey: ["placeUserOrder"],
         onSuccess: () => {
@@ -66,9 +81,39 @@ export default function CompletePage({ cartItems }: { cartItems: ICart }) {
                 duration: 5000,
             });
         },
-        onError: (error) => {
+        onError: () => {
             toast({
                 title: "Error",
+                description: "Failed to place your order",
+                variant: "destructive",
+                duration: 5000,
+            });
+        },
+    });
+
+    const paymentIntentMutation = useMutation<
+        PaymentIntentResponse,
+        Error,
+        string
+    >({
+        mutationKey: ["paymentIntent"],
+        mutationFn: usePaymentIntentService,
+        onSuccess: (response) => {
+            if (response.data.shipping) {
+                setShippingAddress(response.data.shipping.address);
+                newOrder.shippingAddress = shippingAddress;
+
+                if (!isOrderPlaced) {
+                    // Prevent duplicate order placement
+                    console.log("Order req body", newOrder);
+                    orderMutation.mutate(newOrder);
+                    setIsOrderPlaced(true); // Mark as placed
+                }
+            }
+        },
+        onError: (error) => {
+            toast({
+                title: "Error retrieving payment details",
                 description: error.message,
                 variant: "destructive",
                 duration: 5000,
@@ -77,7 +122,7 @@ export default function CompletePage({ cartItems }: { cartItems: ICart }) {
     });
 
     useLayoutEffect(() => {
-        if (!stripe) return;
+        if (!stripe || isOrderPlaced) return; // Skip if order already placed
 
         const clientSecret = new URLSearchParams(window.location.search).get(
             "payment_intent_client_secret"
@@ -88,19 +133,14 @@ export default function CompletePage({ cartItems }: { cartItems: ICart }) {
         stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
             if (!paymentIntent) return;
 
-            if (paymentIntent.status === "succeeded") {
-                mutation.mutate({
-                    items: [],
-                    shippingAddress: "",
-                    paymentMethod: "",
-                });
-            }
-
             setStatus(paymentIntent.status);
-        });
-    }, [stripe]);
 
-    // Set a fallback for when `status` is not defined or doesn't match a key in `STATUS_CONTENT_MAP`
+            if (paymentIntent.status === "succeeded") {
+                console.log("paymentIntentId", paymentIntent.id);
+                paymentIntentMutation.mutate(paymentIntent.id);
+            }
+        });
+    }, [stripe, isOrderPlaced]); // Dependency on `isOrderPlaced`
 
     return (
         <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-screen">
@@ -109,7 +149,7 @@ export default function CompletePage({ cartItems }: { cartItems: ICart }) {
                     <CardTitle>Order Status</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="flex items-center justify-center">
+                    <div className="flex items-center justify-center text-green-600">
                         {status && STATUS_CONTENT_MAP[status]?.icon}
                     </div>
                     <div className="text-center mt-4">

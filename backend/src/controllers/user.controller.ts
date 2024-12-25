@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import {
+    sendAlreadyExists,
     sendBadRequest,
+    sendForbidden,
     sendInternalServerError,
     sendNotFound,
     sendSuccess,
@@ -75,21 +77,29 @@ export const handleUserProfile = async (req: Request, res: Response) => {
 
 export const createUserOrder = async (req: Request, res: Response) => {
     try {
-        const payload = req.user;
-        const { orderDetails } = req.body;
-        const user = await User.findById(payload?._id);
+        const { orderDetails, shippingAddress } = req.body;
+        const user = await User.findById(req.user?._id);
         if (!user) {
             sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);
             return;
         }
+        if (user.cart.length === 0) {
+            sendBadRequest(res, API_RESPONSES.CART_EMPTY);
+            return;
+        }
+
         const totalAmount = orderDetails.items.reduce(
             (acc: number, item: any) => acc + item.price,
             0
         );
         const newOrder = new Order({
-            userId: payload?._id,
+            userId: req.user?._id,
             items: orderDetails.items,
             totalAmount,
+            shippingDetails: {
+                name: user.firstName + " " + user.lastName,
+                address: { ...shippingAddress },
+            },
             isPaid: true,
         });
         await newOrder.save({ validateBeforeSave: false });
@@ -100,7 +110,7 @@ export const createUserOrder = async (req: Request, res: Response) => {
                     productId: item.productId,
                     quantity: item.quantity,
                     price: item.price,
-                    userId: payload?._id as string,
+                    userId: req.user?._id as string,
                     id: newOrder._id,
                 };
                 seller.orders.push(order);
@@ -108,6 +118,8 @@ export const createUserOrder = async (req: Request, res: Response) => {
             }
         });
         await Promise.all(addToSeller);
+        user.cart = [];
+        await user.save({ validateBeforeSave: false });
         sendSuccess(
             res,
             API_RESPONSES.ORDER_PLACED,
@@ -139,8 +151,8 @@ export const getUserOrders = async (req: Request, res: Response) => {
         const transformedOrders = orders.map((order) => ({
             id: order._id,
             items: order.items.map((item) => ({
-                product: item.productId, // Rename productId to product
-                seller: item.sellerId, // Optionally rename sellerId to seller
+                product: item.productId,
+                seller: item.sellerId,
             })),
             total: order.totalAmount,
             status: order.status,
@@ -149,12 +161,8 @@ export const getUserOrders = async (req: Request, res: Response) => {
                 .slice(0, 19)
                 .replace("T", " "),
         }));
-
         sendSuccess(res, API_RESPONSES.SUCCESS, HTTP_STATUS_CODES.OK, {
             orders: transformedOrders,
-        });
-        sendSuccess(res, API_RESPONSES.SUCCESS, HTTP_STATUS_CODES.OK, {
-            orders,
         });
         return;
     } catch (error) {

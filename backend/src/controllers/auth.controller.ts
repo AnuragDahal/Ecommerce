@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import {
     sendAlreadyExists,
     sendBadRequest,
+    sendForbidden,
     sendInternalServerError,
     sendNotFound,
     sendSuccess,
@@ -20,6 +21,9 @@ import { sendEmail } from "../utils/emailUtils";
 import { forgotPasswordTemplate } from "../constants/emailTemplates/forgetPassword";
 import { passwordChangeTemplate } from "../constants/emailTemplates/passwordChange";
 import { stripe } from "../utils/paymentUtils";
+import { createUserOrder } from "./user.controller";
+import { send } from "process";
+import Stripe from "stripe";
 
 export const handleSignUp = async (req: Request, res: Response) => {
     try {
@@ -419,5 +423,55 @@ export const handlePaymentIntent = async (req: Request, res: Response) => {
             message: JSON.stringify((error as Error).message),
         });
         return;
+    }
+};
+
+export const handlePaymentRetrieve = async (req: Request, res: Response) => {
+    if (req.method !== "POST") {
+        sendForbidden(res, API_RESPONSES.METHOD_NOT_ALLOWED);
+        return;
+    }
+
+    const { paymentIntentId } = req.body;
+
+    // Validate paymentIntentId
+    if (!paymentIntentId || typeof paymentIntentId !== "string") {
+        sendBadRequest(res, API_RESPONSES.INVALID_PAYMENT_INTENT_ID);
+        return;
+    }
+
+    try {
+        const paymentIntent = await stripe.paymentIntents.retrieve(
+            paymentIntentId
+        );
+
+        const responseData = {
+            paymentIntentId: paymentIntent.id,
+            status: paymentIntent.status,
+            amount: paymentIntent.amount,
+            shipping: paymentIntent.shipping,
+        };
+
+        sendSuccess(
+            res,
+            API_RESPONSES.SUCCESS,
+            HTTP_STATUS_CODES.OK,
+            responseData
+        );
+        return;
+    } catch (error) {
+        if (error instanceof Stripe.errors.StripeError) {
+            // Handle specific Stripe errors
+            const message = error.message || API_RESPONSES.STRIPE_ERROR;
+            sendInternalServerError(
+                res,
+                API_RESPONSES.INTERNAL_SERVER_ERROR,
+                message
+            );
+            return;
+        } else {
+            sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
+            return;
+        }
     }
 };

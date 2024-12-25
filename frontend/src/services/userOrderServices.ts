@@ -1,16 +1,7 @@
+import { IOrder } from "@/types";
 import axios from "axios";
 import Cookies from "js-cookie";
 
-interface IOrder {
-    items: {
-        productId: string;
-        sellerId: string;
-        price: number;
-        quantity: number;
-    }[];
-    shippingAddress?: string;
-    paymentMethod?: string;
-}
 export const getUserOrders = async () => {
     try {
         const accessToken = Cookies.get("accessToken");
@@ -43,7 +34,9 @@ export const placeUserOrder = async (order: IOrder) => {
                 import.meta.env.VITE_USER
             }/orders`,
             {
-                orderDetails: order.items,
+                orderDetails: {
+                    items: [...order.items],
+                },
                 shippingAddress: order.shippingAddress ?? "",
                 paymentMethod: order.paymentMethod ?? "",
             },

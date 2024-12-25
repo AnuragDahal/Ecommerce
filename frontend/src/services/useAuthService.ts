@@ -180,3 +180,26 @@ export const useGetRoleService = async () => {
         }
     }
 };
+
+export const usePaymentIntentService = async (paymentIntentId: string) => {
+    try {
+        const response = await axios.post(
+            `${import.meta.env.VITE_BACKEND_URL}/${
+                import.meta.env.VITE_AUTH
+            }/payment-intent`,
+            { paymentIntentId },
+            {
+                headers: {
+                    Authorization: `Bearer ${Cookies.get("accessToken")}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+            throw error.response.data;
+        } else {
+            throw new Error("Network Error");
+        }
+    }
+};

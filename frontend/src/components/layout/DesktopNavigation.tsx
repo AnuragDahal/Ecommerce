@@ -8,10 +8,18 @@ import { LogOut, Package, Settings, ShoppingCart, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import Cookies from "js-cookie";
+import { useQuery } from "@tanstack/react-query";
+import { getUserProfile } from "@/services/useUserServices";
 
 const DesktopNavigation = () => {
     // State to control whether the popover is open
     const [popoverOpen, setPopoverOpen] = useState(false);
+    const { data } = useQuery({
+        queryFn: getUserProfile,
+        queryKey: ["userProfile"],
+        staleTime: 1000 * 60 * 10,
+    });
+
     const desktopSettings = [
         {
             label: "Profile",
@@ -44,7 +52,7 @@ const DesktopNavigation = () => {
             <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
                 <PopoverTrigger onClick={() => setPopoverOpen(!popoverOpen)}>
                     <Avatar className="hidden md:block hover:cursor-pointer">
-                        <AvatarImage src="/placeholder-avatar.jpg" />
+                        <AvatarImage src={`${data.avatar}`} />
                         <AvatarFallback>UN</AvatarFallback>
                     </Avatar>
                 </PopoverTrigger>
