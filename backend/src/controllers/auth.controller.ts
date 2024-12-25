@@ -21,8 +21,7 @@ import { sendEmail } from "../utils/emailUtils";
 import { forgotPasswordTemplate } from "../constants/emailTemplates/forgetPassword";
 import { passwordChangeTemplate } from "../constants/emailTemplates/passwordChange";
 import { stripe } from "../utils/paymentUtils";
-import { createUserOrder } from "./user.controller";
-import { send } from "process";
+
 import Stripe from "stripe";
 
 export const handleSignUp = async (req: Request, res: Response) => {
