@@ -28,11 +28,6 @@ import Stripe from "stripe";
 export const handleSignUp = async (req: Request, res: Response) => {
     try {
         const { firstName, lastName, email, userName, password } = req.body;
-
-        if (!firstName || !lastName || !email || !userName || !password) {
-            sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
-            return;
-        }
         const isUser = await User.findOne({ $or: [{ email }, { userName }] });
         if (isUser) {
             sendAlreadyExists(res, API_RESPONSES.USER_ALREADY_EXISTS);
@@ -78,11 +73,6 @@ export const handleSignUp = async (req: Request, res: Response) => {
 export const handleLogin = async (req: Request, res: Response) => {
     try {
         const { userName, email, password } = req.body;
-
-        if ((!userName && !email) || (userName && email) || !password) {
-            sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
-            return;
-        }
 
         const user = await User.findOne({ $or: [{ email }, { userName }] });
         if (!user) {
@@ -177,10 +167,6 @@ export const handleRefreshToken = async (req: Request, res: Response) => {
 export const handleOtpVerification = async (req: Request, res: Response) => {
     try {
         const { email, otp } = req.body;
-        if (!email || !otp) {
-            sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
-            return;
-        }
         const user = await User.findOne({ email: email });
         if (!user) {
             sendNotFound(res, API_RESPONSES.USER_NOT_FOUND);

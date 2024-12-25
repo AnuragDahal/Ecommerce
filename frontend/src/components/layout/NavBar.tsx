@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Cookies from "js-cookie";
 import { navList } from "@/config/constants";
 import {
@@ -25,33 +25,40 @@ const NavItems = ({
 }: {
     closeMenu: () => void;
     role: string | undefined;
-}) => (
-    <>
-        {navList.map((item, index) => {
-            // Check if the item is "Dashboard" and the role is "user"
-            const isDashboard = item.name === "Dashboard" && role === "user";
-            // Render the dashboard link conditionally
-            if (isDashboard) {
-                return null; // Don't render the Dashboard link for users
-            }
+}) => {
+    const location = useLocation();
 
-            // Render all other links
-            return (
-                <Link
-                    to={item.link}
-                    key={index}
-                    className="flex py-3 px-2 space-x-3 md:p-0 hover:bg-accent rounded-lg"
-                    onClick={closeMenu}
-                >
-                    {item.name}
-                </Link>
-            );
-        })}
-    </>
-);
+    return (
+        <>
+            {navList.map((item, index) => {
+                const isDashboard =
+                    item.name === "Dashboard" && role === "user";
+                if (isDashboard) return null;
+
+                const isActive = location.pathname === item.link;
+
+                return (
+                    <Link
+                        to={item.link}
+                        key={index}
+                        className={`flex py-3 px-2 space-x-3 md:p-0 hover:bg-accent text-[16px] rounded-lg ${
+                            isActive
+                                ? "text-blue-500 text-md font-semibold"
+                                : ""
+                        }`}
+                        onClick={closeMenu}
+                    >
+                        {item.name}
+                    </Link>
+                );
+            })}
+        </>
+    );
+};
 
 // Mobile-only profile section
 const MobileProfileSection = ({ closeMenu }: { closeMenu: () => void }) => {
+    const location = useLocation();
     const profileMenuItems = [
         { name: "My Profile", icon: User, link: "/profile" },
         { name: "My Orders", icon: ShoppingBag, link: "/orders" },
@@ -62,33 +69,31 @@ const MobileProfileSection = ({ closeMenu }: { closeMenu: () => void }) => {
 
     return (
         <div className="flex flex-col space-y-1">
-            {profileMenuItems.map((item, index) =>
-                item.name === "Logout" ? (
+            {profileMenuItems.map((item, index) => {
+                const isActive = location.pathname === item.link;
+
+                return (
                     <Link
                         to={item.link}
                         key={index}
-                        className="flex items-center px-2 py-3 space-x-3 rounded-md hover:bg-accent transition-colors"
+                        className={`flex items-center px-2 py-3 space-x-3 rounded-md transition-colors ${
+                            isActive
+                                ? "text-blue-500 font-semibold"
+                                : "hover:bg-accent"
+                        }`}
                         onClick={() => {
-                            Cookies.remove("accessToken");
-                            Cookies.remove("refreshToken");
+                            if (item.name === "Logout") {
+                                Cookies.remove("accessToken");
+                                Cookies.remove("refreshToken");
+                            }
                             closeMenu();
                         }}
                     >
                         <item.icon className="h-4 w-4" />
                         <span>{item.name}</span>
                     </Link>
-                ) : (
-                    <Link
-                        to={item.link}
-                        key={index}
-                        className="flex items-center px-2 py-3 space-x-3 rounded-md hover:bg-accent transition-colors"
-                        onClick={closeMenu}
-                    >
-                        <item.icon className="h-4 w-4" />
-                        <span>{item.name}</span>
-                    </Link>
-                )
-            )}
+                );
+            })}
         </div>
     );
 };

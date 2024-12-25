@@ -6,11 +6,22 @@ import {
     handleUserProfile,
 } from "../controllers/user.controller";
 import upload from "../utils/multer";
+import { zodValidator } from "../middleware/zod";
+import {
+    updateUserProfileSchema,
+    getUserProfileSchema,
+    createOrderSchema,
+} from "../schema";
 
 const router = Router();
-router.get("/profile", getUserProfile);
-router.post("/profile", upload.single("image"), handleUserProfile);
-router.post("/orders", createUserOrder);
+router.get("/profile", zodValidator(getUserProfileSchema), getUserProfile);
+router.post(
+    "/profile",
+    upload.single("image"),
+    zodValidator(updateUserProfileSchema),
+    handleUserProfile
+);
+router.post("/orders", zodValidator(createOrderSchema), createUserOrder);
 router.get("/orders", getUserOrders);
 
 export default router;
