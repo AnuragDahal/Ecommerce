@@ -231,10 +231,11 @@ export default function ProfileCard() {
             <CardFooter className="flex justify-end">
                 {isEditing ? (
                     <div className="space-x-2">
-                        <Button variant="outline" onClick={handleCancel}>
+                        <Button variant={"destructive"} onClick={handleCancel}>
                             Cancel
                         </Button>
                         <Button
+                            variant={"auth"}
                             type="submit"
                             onClick={handleSubmit}
                             disabled={!hasChanges}
@@ -243,7 +244,7 @@ export default function ProfileCard() {
                         </Button>
                     </div>
                 ) : (
-                    <Button onClick={() => setIsEditing(true)}>
+                    <Button variant={"auth"} onClick={() => setIsEditing(true)}>
                         Edit Profile
                     </Button>
                 )}

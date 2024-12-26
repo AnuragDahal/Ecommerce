@@ -38,8 +38,6 @@ const UpgradeAccount = () => {
             });
         },
         onError: (data) => {
-            console.log(businessLogo);
-            console.log(AccountData);
             toast({
                 title: "Account upgrade failed!",
                 description: data.message,
@@ -137,7 +135,8 @@ const UpgradeAccount = () => {
                         </div>
                         <Button
                             type="submit"
-                            className="w-full py-2 rounded-md"
+                            variant={"auth"}
+                            // className="w-full py-2 rounded-md bg-purple-deep hover:bg-purple-deep/80 dark:text-white text-white"
                         >
                             Upgrade
                         </Button>

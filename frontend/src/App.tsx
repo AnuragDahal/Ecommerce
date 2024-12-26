@@ -30,6 +30,7 @@ import MyOrdersPage from "./pages/users/product/Orders";
 import StripeCheckout from "./pages/users/auth/StripeCheckout";
 import StripeComplete from "./pages/users/auth/StripeComplete";
 import { SidebarProvider } from "./components/ui/sidebar";
+import Settings from "./pages/users/settings/Settings";
 
 const App = () => (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
@@ -131,23 +132,21 @@ const App = () => (
                     />
                     <Route path="*" element={<NotFound />} />
 
-                    {/* Settings Nested Routes */}
-                    <Route path="settings/*" element={<Outlet />}>
-                        <Route
-                            path="upgrade-account"
-                            element={
-                                <ProtectedRoute>
-                                    <UpgradeAccount />
-                                </ProtectedRoute>
-                            }
-                        />
+                    <Route
+                        path="settings"
+                        element={
+                            <ProtectedRoute>
+                                <Settings />
+                            </ProtectedRoute>
+                        }
+                    >
                         <Route
                             path="change-password"
-                            element={
-                                <ProtectedRoute>
-                                    <ChangePassword />
-                                </ProtectedRoute>
-                            }
+                            element={<ChangePassword />}
+                        />
+                        <Route
+                            path="upgrade-account"
+                            element={<UpgradeAccount />}
                         />
                     </Route>
 

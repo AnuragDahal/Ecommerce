@@ -115,7 +115,6 @@ export default function CompletePage() {
             setStatus(paymentIntent.status);
 
             if (paymentIntent.status === "succeeded") {
-                console.log("paymentIntentId", paymentIntent.id);
                 paymentIntentMutation.mutate(paymentIntent.id);
             }
         });

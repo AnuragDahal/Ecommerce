@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -25,6 +25,7 @@ export default function SignUp() {
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const { signUpMutation } = useAuth();
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const navigate = useNavigate();
     const signUpData = {
         firstName,
@@ -149,7 +150,7 @@ export default function SignUp() {
                                     className="bg-gray-700/50 border-gray-600 text-white placeholder-gray-400"
                                 />
                             </div>
-                            <div className="space-y-2">
+                            <div className="space-y-2 relative">
                                 <Label
                                     htmlFor="password"
                                     className="text-white"
@@ -163,14 +164,33 @@ export default function SignUp() {
                                         setPassword(e.target.value)
                                     }
                                     placeholder="Create a password"
-                                    type="password"
+                                    type={
+                                        isPasswordVisible ? "text" : "password"
+                                    }
                                     required
                                     className="bg-gray-700/50 border-gray-600 text-white placeholder-gray-400"
                                 />
+                                {isPasswordVisible ? (
+                                    <Eye
+                                        onClick={() =>
+                                            setIsPasswordVisible(false)
+                                        }
+                                        className="absolute right-3 top-8"
+                                    />
+                                ) : (
+                                    <EyeOff
+                                        onClick={() =>
+                                            setIsPasswordVisible(true)
+                                        }
+                                        className="absolute right-3 top-8"
+                                    />
+                                )}
                             </div>
                             <Button
+                                className="w-full"
+                                variant={"auth"}
                                 type="submit"
-                                className="w-full bg-purple-600 hover:bg-purple-700 text-white text-lg py-6"
+                                // className="w-full bg-purple-600 hover:bg-purple-700 text-white text-lg py-6"
                                 disabled={isLoading}
                             >
                                 {isLoading ? (
@@ -187,12 +207,12 @@ export default function SignUp() {
                     <CardFooter>
                         <p className="text-sm text-gray-400 text-center w-full">
                             Already have an account?{" "}
-                            <a
-                                href="#"
+                            <Link
                                 className="text-purple-400 hover:text-purple-300 underline underline-offset-4"
+                                to="/login"
                             >
-                                <Link to="/login">Sign In</Link>
-                            </a>
+                                Sign In
+                            </Link>
                         </p>
                     </CardFooter>
                 </Card>

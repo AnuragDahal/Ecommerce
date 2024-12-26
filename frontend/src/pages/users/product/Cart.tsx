@@ -182,9 +182,8 @@ const Cart = () => {
                         <h2 className="text-xl font-semibold">Cart Items</h2>
                         {cartItems.length > 0 && (
                             <Button
-                                variant="outline"
+                                variant="destructive"
                                 onClick={() => clearAllCart.mutate()}
-                                className="text-red-600 border-red-600 hover:bg-red-600 hover:text-white"
                             >
                                 Clear Cart
                             </Button>
@@ -253,7 +252,7 @@ const Cart = () => {
                                             </Button>
                                         </div>
                                         <Button
-                                            variant="ghost"
+                                            variant="destructive"
                                             size="icon"
                                             className="ml-4"
                                             onClick={() =>
@@ -283,6 +282,7 @@ const Cart = () => {
                         </CardContent>
                         <CardFooter>
                             <Button
+                                variant="auth"
                                 onClick={handleCheckout}
                                 disabled={cartItems.length === 0}
                                 className="w-full"

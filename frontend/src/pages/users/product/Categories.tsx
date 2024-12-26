@@ -37,6 +37,7 @@ const Categories = () => {
                                 </h2>
                                 <div className="flex justify-center">
                                     <Button
+                                        variant={"cta"}
                                         className="md:w-full"
                                         onClick={() =>
                                             navigate(

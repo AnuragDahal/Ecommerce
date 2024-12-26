@@ -87,6 +87,42 @@ export default {
                 sm: "calc(var(--radius) - 4px)",
             },
             colors: {
+                blush: {
+                    pink: "#FED7D7",
+                },
+                deep: {
+                    slate: "#1A202C",
+                },
+                teal: {
+                    rich: "#1B4D89",
+                    soft: "#63B3ED",
+                },
+                coral: {
+                    1: " #FF6B6B",
+                },
+                purple: {
+                    deep: "#7C3AED",
+                    light: "#EDE9FE",
+                },
+                blue: {
+                    primary: "#2563EB",
+                    hover: "#",
+                },
+                black: {
+                    headings: "#0F172A",
+                },
+                gray: {
+                    primary: "#1E293B",
+                },
+                green: {
+                    success: "#10B981",
+                    mint: "#48BB78",
+                },
+                error: {
+                    red: "#EF4444",
+                    sunset: "#FC8181",
+                },
+
                 background: "hsl(var(--background))",
                 foreground: "hsl(var(--foreground))",
                 card: {

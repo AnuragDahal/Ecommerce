@@ -82,16 +82,19 @@ const ResetPassword = () => {
         mutation.mutate(updatedInput);
     };
     return (
-        <div>
+        <div className="bg-gradient-to-br from-gray-700 via-slate-900 to-gray-500">
             <form onSubmit={handleSubmit}>
-                <div className="container space-y-3 h-screen flex items-center justify-center w-full">
-                    <Card className="max-w-[43rem] shadow-lg backdrop-blur-md">
+                <div className="space-y-3 h-screen flex flex-col justify-center w-full px-16 py-24 max-w-3xl mx-auto gap-4">
+                    <h2 className="text-white font-bold text-2xl md:text-4xl tracking-wide">
+                        Reset Password
+                    </h2>
+                    <Card className="bg-gray-800/40 backdrop-blur-md border-gray-700 text-white space-y-3">
                         <CardHeader>
                             <CardTitle title="Forget Password">
                                 Enter your email to reset your password
                             </CardTitle>
                         </CardHeader>
-                        <CardContent className="space-y-3">
+                        <CardContent className="space-y-5">
                             <div className="space-y-2">
                                 <Label htmlFor="otp">Otp</Label>
                                 <Input
@@ -180,11 +183,14 @@ const ResetPassword = () => {
                         <CardFooter className="btn">
                             <div className="w-full flex justify-center">
                                 <Button
-                                    className={
-                                        isLoading
-                                            ? "bg-accent-foreground text-muted-foreground"
-                                            : ""
-                                    }
+                                    variant={"auth"}
+                                    className={`w-full
+                                        ${
+                                            isLoading
+                                                ? "bg-accent-foreground text-muted-foreground"
+                                                : ""
+                                        }
+                                    `}
                                     type="submit"
                                 >
                                     {isLoading ? (

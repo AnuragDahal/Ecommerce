@@ -40,7 +40,6 @@ export const handleSellerUserCreation = async (req: Request, res: Response) => {
     }
     try {
         const { storeName, businessEmail, paymentDetails, address } = req.body;
-        console.log(req.body);
         let contact;
         if (typeof req.body.contact === "string") {
             contact = JSON.parse(req.body.contact);

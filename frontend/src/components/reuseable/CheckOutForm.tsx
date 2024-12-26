@@ -42,7 +42,6 @@ export default function CheckoutForm() {
 
         // Extract relevant details from the AddressElement
         const userDetails = address.value; // This contains the entered address details
-        console.log("User Details:", userDetails);
 
         // Destructure fields you might need
         const { name, address: shippingAddress, phone } = userDetails;

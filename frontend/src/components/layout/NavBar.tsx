@@ -63,6 +63,7 @@ const MobileProfileSection = ({ closeMenu }: { closeMenu: () => void }) => {
         { name: "My Profile", icon: User, link: "/profile" },
         { name: "My Orders", icon: ShoppingBag, link: "/orders" },
         { name: "Wishlist", icon: Heart, link: "/wishlist" },
+        {name: "My Cart", icon: ShoppingBag, link: "/cart"},
         { name: "Settings", icon: Settings, link: "/settings" },
         { name: "Logout", icon: LogOut, link: "/login" },
     ];

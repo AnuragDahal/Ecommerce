@@ -125,7 +125,7 @@ export default function MyOrdersPage() {
                                             <DialogContent className="sm:max-w-[425px]">
                                                 <DialogHeader>
                                                     <DialogTitle>
-                                                        Order Details -{" "}
+                                                        Order Details
                                                         {order.id}
                                                     </DialogTitle>
                                                 </DialogHeader>

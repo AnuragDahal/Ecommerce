@@ -34,7 +34,6 @@ const ChangePassword = () => {
         },
         onError: (data) => {
             setIsLoading(false);
-            console.log(input);
             toast({
                 title: "Password change failed!",
                 description: data.message,
@@ -63,7 +62,6 @@ const ChangePassword = () => {
         }
         setIsLoading(true);
         const { confirmPassword, ...passwordData } = input;
-        console.log(input); 
         mutation.mutate(passwordData);
     };
 
@@ -118,6 +116,7 @@ const ChangePassword = () => {
                             />
                         </div>
                         <Button
+                            variant={"auth"}
                             type="submit"
                             className="w-full py-2 rounded-md"
                             disabled={isLoading}

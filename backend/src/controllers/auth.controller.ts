@@ -64,7 +64,6 @@ export const handleSignUp = async (req: Request, res: Response) => {
         return;
     } catch (error) {
         sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);
-        console.log("Signup error:");
         return;
     }
 };
@@ -89,7 +88,7 @@ export const handleLogin = async (req: Request, res: Response) => {
             await generateAccessAndRefreshToken(user._id);
 
         if (!accessToken && !refreshToken) {
-            console.log("Failed to generate access and refresh token");
+
             sendInternalServerError(
                 res,
                 API_RESPONSES.FAILED_TO_GENERATE_TOKEN

@@ -83,7 +83,6 @@ export default function CreateProduct() {
             setIsLoading(true);
             e.preventDefault();
             mutation.mutate(ProductData);
-            console.log("ProductData", ProductData);
         },
         [mutation, ProductData]
     );
@@ -285,8 +284,8 @@ export default function CreateProduct() {
                                             alt={`preview-${index}`}
                                             className="h-24 w-full object-cover rounded-lg shadow-md"
                                         />
-                                        <button
-                                            type="button"
+                                        <Button
+                                            variant={"destructive"}
                                             onClick={() =>
                                                 handleDeleteImage(index)
                                             }
@@ -294,13 +293,14 @@ export default function CreateProduct() {
                                             aria-label="Delete image"
                                         >
                                             <X className="h-4 w-4" />
-                                        </button>
+                                        </Button>
                                     </div>
                                 ))}
                             </div>
                         )}
                         <div className="flex justify-center">
                             <Button
+                                variant={"auth"}
                                 type="submit"
                                 disabled={isLoading || !isFormValid}
                                 className={`w-full sm:w-auto ${

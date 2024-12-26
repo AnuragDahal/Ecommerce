@@ -4,7 +4,6 @@ import Cookies from "js-cookie";
 interface IProductFilter {
     category: string;
     limit?: number;
-    page: number;
     price: string;
 }
 
@@ -40,8 +39,6 @@ export const getProducts = async (data: IProductFilter) => {
             {
                 params: {
                     category: data.category,
-                    limit: data.limit ? data.limit : 1,
-                    page: data.page ? data.page : 1,
                     price: data.price ? data.price : "low",
                 },
                 headers: {

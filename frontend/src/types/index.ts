@@ -4,6 +4,11 @@ export interface ProductType {
     description: string;
     price: number;
     images: string[];
+    category?: string;
+    seller?: {
+        storeName: string;
+        businessEmail: string;
+    };
 }
 
 export interface ICart {
