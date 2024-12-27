@@ -1,5 +1,6 @@
 import mongoose, { Types } from "mongoose";
 import { SellerDetails } from "../types/user";
+import { productParams } from "../schema";
 export interface IProduct extends mongoose.Document {
     name: string;
     description: string;
@@ -81,6 +82,7 @@ const ProductSchema = new mongoose.Schema(
         timestamps: true,
     }
 );
+ProductSchema.index({ name: "text", category: "text" });
 
 const Product = mongoose.model<IProduct>("Product", ProductSchema);
 export default Product;

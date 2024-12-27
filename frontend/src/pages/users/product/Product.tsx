@@ -1,13 +1,12 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useLocation } from "react-router-dom";
 import { Search } from "lucide-react";
-
 import ProductCard from "@/components/reuseable/ProductCard";
 import Loading from "@/components/reuseable/Loading";
 import NetworkError from "@/components/reuseable/NetworkError";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { debounce } from "@/lib/utils";
 import {
     Select,
     SelectContent,
@@ -25,25 +24,56 @@ import {
 } from "@/components/ui/pagination";
 import { getProducts } from "@/lib/getproduct";
 import { ProductType } from "@/types";
-
+import { useCallback, useState } from "react";
 const Product = () => {
-    const [selectedSort, setSelectedSort] = useState("popular");
+    const [selectedSort, setSelectedSort] = useState("low");
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState("");
+    const [searchInput, setSearchInput] = useState("");
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
-    const limit = 4;
-
+    const limit = parseInt(queryParams.get("limit") || "8");
     const category = queryParams.get("category") || "";
 
+    // Derive price and latest directly from selectedSort
+    const getQueryParams = (sort: string) => {
+        switch (sort) {
+            case "high":
+                return { latest: false, price: "high" };
+            case "low":
+                return { latest: false, price: "low" };
+            default:
+                return { latest: false, price: "low" };
+        }
+    };
+
+    const debouncedSearch = useCallback(
+        debounce((value: string) => {
+            setSearchTerm(value);
+        }, 500),
+        []
+    );
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setSearchInput(value);
+        debouncedSearch(value);
+    };
+
+    const { latest, price } = getQueryParams(selectedSort);
+
     const { status, data } = useQuery({
-        queryKey: ["products", { category, limit, searchTerm }],
+        queryKey: [
+            "products",
+            { category, limit, page, price, latest, searchTerm },
+        ],
         queryFn: () =>
             getProducts({
+                latest,
                 category,
-                price: "low-high",
+                price,
                 limit,
-                // search: searchTerm,
+                page,
+                search: searchTerm,
             }),
     });
 
@@ -55,7 +85,7 @@ const Product = () => {
         return <NetworkError />;
     }
 
-    if (!data.data || data.data.length === 0) {
+    if (!data.products || data.products.length === 0) {
         return (
             <div className="container mx-auto px-4 py-12 md:py-24 lg:py-32">
                 <div className="text-center">
@@ -73,8 +103,9 @@ const Product = () => {
             </div>
         );
     }
-
-    const totalPages = Math.ceil(data.data.length / limit);
+    const totalPages = Math.ceil(data.total / limit);
+    console.log(totalPages);
+    console.log(data);
     return (
         <section className="w-full py-12 md:py-24 lg:py-32">
             <div className="container mx-auto px-4">
@@ -90,8 +121,8 @@ const Product = () => {
                                 className="pl-8"
                                 placeholder="Search products..."
                                 type="search"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
+                                value={searchInput}
+                                onChange={handleSearchChange}
                             />
                         </div>
                     </div>
@@ -104,12 +135,10 @@ const Product = () => {
                                 <SelectValue placeholder="Sort by" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="popular">Popular</SelectItem>
-                                <SelectItem value="newest">Newest</SelectItem>
-                                <SelectItem value="price-high-low">
+                                <SelectItem value="high">
                                     Price: High to Low
                                 </SelectItem>
-                                <SelectItem value="price-low-high">
+                                <SelectItem value="low">
                                     Price: Low to High
                                 </SelectItem>
                             </SelectContent>
@@ -118,15 +147,18 @@ const Product = () => {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 place-items-center">
-                    {data.data.map((product: ProductType, index: number) => (
-                        <ProductCard
-                            key={product.id}
-                            number={index}
-                            message={product}
-                        />
-                    ))}
+                    {data.products.map(
+                        (product: ProductType, index: number) => (
+                            <div className="hover:scale-105 transform transition-all duration-300">
+                                <ProductCard
+                                    key={product.id}
+                                    number={index}
+                                    message={product}
+                                />
+                            </div>
+                        )
+                    )}
                 </div>
-
                 <div className="flex justify-center mt-8">
                     <Pagination>
                         <PaginationContent>

@@ -10,7 +10,7 @@ import { useMutation } from "@tanstack/react-query";
 import { addtoCart } from "@/services/useUserServices";
 
 // Debounce utility function
-function debounce(func: (...args: any[]) => void, delay: number) {
+export function debounce(func: (...args: any[]) => void, delay: number) {
     let timer: NodeJS.Timeout;
     return (...args: any[]) => {
         clearTimeout(timer);

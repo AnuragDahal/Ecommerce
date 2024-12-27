@@ -196,28 +196,52 @@ export const handleDeleteProduct = async (
     }
 };
 
-// Get product details
-
 export const handleAllProductsRetrieval = async (
     req: Request,
     res: Response
 ): Promise<void> => {
     try {
-        const limit = parseInt(req.query.limit as string) || 10;
-        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string);
+        const search = req.query.search as string;
+        const page = parseInt(req.query.page as string);
         const skip = (page - 1) * limit;
         const category = req.query.category as string;
         const price = req.query.price as string;
-        const products = await Product.find(category ? { category } : {})
+        const latest = req.query.latest as string;
+
+        let query: any = {};
+        if (search) {
+            query = {
+                $text: { $search: search }, // Performs a text search
+            };
+        }
+        if (category) {
+            query.category = category;
+        }
+
+        const sortOptions: any = {};
+        if (price) {
+            if (price === "high") {
+                sortOptions.price = -1;
+            } else if (price === "low") {
+                sortOptions.price = 1;
+            }
+        }
+        if (latest === "true") {
+            sortOptions.createdAt = -1;
+        }
+        const products = await Product.find(query)
             .populate({
                 path: "sellerId",
                 model: "Seller",
                 select: ["_id", "storeName", "businessEmail"],
             })
-            .sort({ price: price === "high" ? -1 : 1 })
+            .sort(sortOptions)
             .skip(skip)
             .limit(limit)
             .lean();
+
+        const totalProducts = await Product.countDocuments(query);
 
         if (!products) {
             sendNotFound(res, API_RESPONSES.NOT_FOUND);
@@ -239,12 +263,11 @@ export const handleAllProductsRetrieval = async (
                 },
             };
         });
-        sendSuccess(
-            res,
-            API_RESPONSES.SUCCESS,
-            HTTP_STATUS_CODES.OK,
-            formattedProducts
-        );
+
+        sendSuccess(res, API_RESPONSES.SUCCESS, HTTP_STATUS_CODES.OK, {
+            products: formattedProducts,
+            total: totalProducts,
+        });
         return;
     } catch (error) {
         sendInternalServerError(res, API_RESPONSES.INTERNAL_SERVER_ERROR);

@@ -38,7 +38,7 @@ const Categories = () => {
                                         className="md:w-full"
                                         onClick={() =>
                                             navigate(
-                                                `/products?category=${category.name}`
+                                                `/products?category=${category.name}&Z&limit=3`
                                             )
                                         }
                                     >

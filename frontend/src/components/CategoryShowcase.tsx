@@ -1,24 +1,26 @@
+import { Link } from "react-router-dom";
+
 const CategoryShowCase = () => {
     const categories = [
         {
             name: "Men's Fashion",
-            image: "/logo.jpeg",
-            link: "/category/mens",
+            image: "/mensfashion.jpg",
+            link: "/products?category=Clothes",
         },
         {
             name: "Women's Fashion",
-            image: "/api/placeholder/300/400",
+            image: "/women.jpg",
             link: "/category/womens",
         },
         {
             name: "Accessories",
-            image: "/api/placeholder/300/400",
-            link: "/category/accessories",
+            image: "/accessories.jpg",
+            link: "/products?category=Accessories",
         },
         {
             name: "Footwear",
-            image: "/logo.jpeg",
-            link: "/category/footwear",
+            image: "/footwear.jpg",
+            link: "/products?category=Shoes",
         },
     ];
 
@@ -30,8 +32,8 @@ const CategoryShowCase = () => {
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                     {categories.map((category, index) => (
-                        <a
-                            href={category.link}
+                        <Link
+                            to={category.link}
                             key={index}
                             className="group relative overflow-hidden rounded-lg transition-transform hover:scale-105"
                         >
@@ -40,12 +42,12 @@ const CategoryShowCase = () => {
                                 alt={category.name}
                                 className="w-full h-64 object-cover"
                             />
-                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                                <h3 className="text-white text-xl font-medium">
+                            <div className="inset-0 bg-black/40 flex items-center justify-center">
+                                <h3 className="text-xl font-medium">
                                     {category.name}
                                 </h3>
                             </div>
-                        </a>
+                        </Link>
                     ))}
                 </div>
             </div>

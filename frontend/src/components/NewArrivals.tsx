@@ -6,9 +6,8 @@ import { ProductType } from "@/types";
 
 const NewArrivals = ({ products }: { products: Array<ProductType> }) => {
     const [currentPage, setCurrentPage] = useState(0);
-    const productsPerPage = 4;
+    const productsPerPage = 6;
     const totalPages = Math.ceil(products.length / productsPerPage);
-
     const nextPage = () => setCurrentPage((prev) => (prev + 1) % totalPages);
     const prevPage = () =>
         setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages);
