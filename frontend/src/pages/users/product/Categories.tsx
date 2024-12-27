@@ -1,17 +1,14 @@
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";;
+import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 
 const Categories = () => {
     const categories = [
         { name: "Electronics", icon: "💻" },
-        { name: "Clothing", icon: "👕" },
-        { name: "Home & Garden", icon: "🏡" },
-        { name: "Sports & Outdoors", icon: "⚽" },
-        { name: "Beauty & Personal Care", icon: "💄" },
-        { name: "Books", icon: "📚" },
-        { name: "Toys & Games", icon: "🎮" },
-        { name: "Automotive", icon: "🚗" },
+        { name: "Accessories", icon: "🎧" },
+        { name: "Clothes", icon: "👕" },
+        { name: "Beauty", icon: "💄" },
+        { name: "Shoes", icon: "👟" },
     ];
 
     const navigate = useNavigate();

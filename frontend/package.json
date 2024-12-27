@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-accordion": "^1.2.1",
     "@radix-ui/react-alert-dialog": "^1.1.4",
     "@radix-ui/react-avatar": "^1.1.1",
@@ -17,9 +18,10 @@
     "@radix-ui/react-dialog": "^1.1.4",
     "@radix-ui/react-dropdown-menu": "^2.1.2",
     "@radix-ui/react-icons": "^1.3.0",
-    "@radix-ui/react-label": "^2.1.0",
-    "@radix-ui/react-popover": "^1.1.2",
+    "@radix-ui/react-label": "^2.1.1",
+    "@radix-ui/react-popover": "^1.1.4",
     "@radix-ui/react-radio-group": "^1.2.1",
+    "@radix-ui/react-scroll-area": "^1.2.2",
     "@radix-ui/react-select": "^2.1.2",
     "@radix-ui/react-separator": "^1.1.1",
     "@radix-ui/react-slider": "^1.2.2",
@@ -36,6 +38,7 @@
     "axios": "^1.7.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cmdk": "^1.0.0",
     "date-fns": "^4.1.0",
     "framer-motion": "^11.11.1",
     "imagekitio-react": "^4.2.0",
@@ -45,14 +48,18 @@
     "next": "^15.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-dropzone": "^14.3.5",
+    "react-hook-form": "^7.54.2",
     "react-router-dom": "^6.26.2",
     "rechart": "^0.0.1",
     "recharts": "^2.15.0",
+    "sonner": "^1.7.1",
     "tailwind-merge": "^2.5.4",
     "tailwind-scrollbar-hide": "^1.1.7",
     "tailwind-typography": "^0.1.0",
     "tailwindcss-animate": "^1.0.7",
-    "tailwindcss-typography": "^3.1.0"
+    "tailwindcss-typography": "^3.1.0",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",

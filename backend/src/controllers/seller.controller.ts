@@ -31,40 +31,30 @@ import { API_RESPONSES } from "../constants/apiResponses";
 import User from "../models/user.model";
 import { HTTP_STATUS_CODES } from "../constants/statusCodes";
 
-// }
+
 export const handleSellerUserCreation = async (req: Request, res: Response) => {
-    const payload = getPayloadDataFromHeader(req, res);
-    if (!payload) {
-        sendUnauthorized(res, API_RESPONSES.UNAUTHORIZED);
-        return;
-    }
     try {
-        const { storeName, businessEmail, paymentDetails, address } = req.body;
-        let contact;
-        if (typeof req.body.contact === "string") {
-            contact = JSON.parse(req.body.contact);
-        } else {
-            contact = req.body.contact;
-        }
-        const userId = payload._id;
-        const user = await User.findById(userId);
+        const { storeName, businessEmail, paymentDetails, address, contact } =
+            req.body;
+
+        const user = await User.findById(req.user?._id);
         if (!user) {
             sendNotFound(res, API_RESPONSES.NOT_FOUND);
             return;
         }
-        const isSeller = await Seller.findOne({ userId: userId });
+        const isSeller = await Seller.findOne({ userId: req.user?._id });
         if (isSeller) {
             sendAlreadyExists(res, API_RESPONSES.SELLER_ALREADY_EXISTS);
             return;
         }
 
         const sellerDetails = {
-            userId,
+            userId: req.user?._id,
             businessEmail,
             storeName,
             paymentDetails,
             contact,
-            storeAddress: address,
+            address,
         };
 
         const seller = new Seller(sellerDetails);

@@ -39,7 +39,6 @@ export const handleCreateProduct = async (
             sendBadRequest(res, API_RESPONSES.IMAGE_UPLOAD_FAILED);
             return;
         }
-
         const { name, price, description, totalQuantity, category } =
             multerReq.body;
         if (!name || !price || !description || !totalQuantity || !category) {

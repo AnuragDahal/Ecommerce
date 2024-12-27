@@ -206,6 +206,7 @@ export default function ProductDetailCard({
                         </div>
                         <div className="flex-1">
                             <Button
+                                variant={"cta"}
                                 size="lg"
                                 className="w-full mt-8"
                                 onClick={handleAddToCart}

@@ -25,7 +25,7 @@ const HeroCarousel = ({ products }: { products: ProductType[] }) => {
     };
 
     return (
-        <div className="relative w-full bg-gray-50 flex justify-center py-4 lg:py-8">
+        <div className="relative w-full flex justify-center py-4 lg:py-8">
             <div className="relative w-full max-w-6xl overflow-hidden">
                 {/* More contained height */}
                 <div className="h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh]">

@@ -2,9 +2,9 @@ import axios from "axios";
 import Cookies from "js-cookie";
 interface IProductData {
     name: string;
-    price: number;
+    price: string;
     description: string;
-    totalQuantity: number;
+    totalQuantity: string;
     category: string;
     images: File[];
 }

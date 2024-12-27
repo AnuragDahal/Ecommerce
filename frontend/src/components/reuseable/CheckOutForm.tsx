@@ -52,7 +52,7 @@ export default function CheckoutForm() {
                 return_url: `${window.location.origin}/complete`,
                 payment_method_data: {
                     billing_details: {
-                        name: name || "N/A", // Fallback if name is not provided
+                        name: name || "N/A",
                         phone: phone || "N/A",
                         address: shippingAddress || {},
                     },

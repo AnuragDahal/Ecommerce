@@ -49,10 +49,23 @@ const sellerSchema = new Schema(
             type: String,
             required: true,
         },
-        storeAddress: {
-            type: String,
-            required: true,
-        },
+        address: [
+            {
+                _id: false,
+                street: {
+                    type: String,
+                    required: true,
+                },
+                city: {
+                    type: String,
+                    required: true,
+                },
+                country: {
+                    type: String,
+                    required: true,
+                },
+            },
+        ],
         userId: {
             type: Schema.Types.ObjectId,
             ref: "User",
@@ -71,6 +84,7 @@ const sellerSchema = new Schema(
         },
         paymentDetails: [
             {
+                _id: false,
                 bankAccountNumber: {
                     type: String,
                     required: true,
