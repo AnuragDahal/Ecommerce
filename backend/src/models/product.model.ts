@@ -1,22 +1,5 @@
-import mongoose, { Types } from "mongoose";
-import { SellerDetails } from "../types/user";
-import { productParams } from "../schema";
-export interface IProduct extends mongoose.Document {
-    name: string;
-    description: string;
-    price: number;
-    imageUrl: Array<string>;
-    category: string;
-    totalQuantity: number;
-    countInStock: number;
-    totalItemsSold: number;
-    isOutOfStock: boolean;
-    createdAt: Date;
-    updatedAt: Date;
-    discount: number;
-    reviews: Array<string>;
-    sellerId: Types.ObjectId | SellerDetails;
-}
+import mongoose from "mongoose";
+import { IProduct } from "../types";
 
 const ProductSchema = new mongoose.Schema(
     {
@@ -82,7 +65,7 @@ const ProductSchema = new mongoose.Schema(
         timestamps: true,
     }
 );
-ProductSchema.index({ name: "text", category: "text" });
+ProductSchema.index({name: "text", category: "text"});
 
 const Product = mongoose.model<IProduct>("Product", ProductSchema);
 export default Product;

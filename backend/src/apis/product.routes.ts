@@ -20,7 +20,7 @@ import {
     removeFromCartSchema,
     manageCartQuantitySchema,
     productParams,
-} from "../schema";
+} from "../zod";
 
 const router = Router();
 

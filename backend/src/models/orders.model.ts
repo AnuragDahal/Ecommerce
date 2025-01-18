@@ -1,38 +1,5 @@
-import mongoose, { Schema } from "mongoose";
-
-type EnumStatus = {
-    pending: string;
-    delivered: string;
-    cancelled: string;
-    processing: string;
-    shipped: string;
-};
-
-interface IOrder extends mongoose.Document {
-    userId: mongoose.Types.ObjectId;
-    items: Array<{
-        sellerId: mongoose.Types.ObjectId;
-        productId: mongoose.Types.ObjectId;
-        quantity: number;
-        price: number; // Price for the single product
-    }>;
-    totalAmount: number;
-    isPaid: boolean;
-    status: EnumStatus;
-    shippingDetails: {
-        name: string;
-        address: {
-            line1: string;
-            city: string;
-            state: string;
-            postal_code: string;
-            country: string;
-        };
-    };
-    deliveryCharges: number;
-    createdAt: Date;
-    updatedAt: Date;
-}
+import mongoose, {Schema} from "mongoose";
+import {IOrder} from "../types";
 
 const orderSchema = new mongoose.Schema(
     {
@@ -118,8 +85,8 @@ orderSchema.methods.getSalesBySeller = function () {
         {
             $group: {
                 _id: "$items.sellerId",
-                totalSales: { $sum: "$items.price" },
-                orderCount: { $sum: 1 },
+                totalSales: {$sum: "$items.price"},
+                orderCount: {$sum: 1},
             },
         },
     ]);

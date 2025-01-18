@@ -1,35 +1,6 @@
-// firstName string
-// lastName string
-// userName string unique
-// address string
-// email string unique
-// isEmailVerified boolean//default false
-// role Enum["user","seller","admin"]//default user
-// password string
-// avatar string //cloudinary url
-// refreshToken string
-// createdAt Date
-// updateAt Date
-
-import { Document, Types } from "mongoose";
-
-type EnumRole = "user" | "seller" | "admin";
-
-export interface ProductDetails {
-    _id: string;
-    name: string;
-    price: number;
-    description: string;
-    totalQuantity: number;
-    category: string;
-    imageUrl: string[];
-}
-
-export interface SellerDetails {
-    _id: string;
-    storeName: string;
-    businessEmail: string;
-}
+import {Document, Types} from "mongoose";
+import {Role} from "../enums";
+import {ICart} from ".";
 
 export interface IUser extends Document {
     _id: Types.ObjectId;
@@ -40,14 +11,9 @@ export interface IUser extends Document {
     address?: string;
     phoneNumber: string;
     isEmailVerified?: boolean;
-    cart: Array<{
-        productId: Types.ObjectId | ProductDetails;
-        price: number;
-        quantity: number;
-        sellerId: Types.ObjectId | SellerDetails;
-    }>;
+    cart: Array<ICart>;
     orders: Array<Types.ObjectId>;
-    role: EnumRole;
+    role: Role;
     password: string;
     avatar: string;
     profilePic: string;

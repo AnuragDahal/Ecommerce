@@ -23,7 +23,7 @@ import {
     changePasswordSchema,
     paymentIntentSchema,
     paymentRetrieveSchema,
-} from "../schema";
+} from "../zod";
 
 const router = Router();
 

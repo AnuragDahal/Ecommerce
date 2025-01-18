@@ -1,4 +1,4 @@
-import { Router } from "express";
+import {Router} from "express";
 import {
     createUserOrder,
     getUserOrders,
@@ -6,11 +6,8 @@ import {
     handleUserProfile,
 } from "../controllers/user.controller";
 import upload from "../utils/multer";
-import { zodValidator } from "../middleware/zod";
-import {
-    updateUserProfileSchema,
-    createOrderSchema,
-} from "../schema";
+import {zodValidator} from "../middleware/zod";
+import {updateUserProfileSchema, createOrderSchema} from "../zod";
 
 const router = Router();
 router.get("/profile", getUserProfile);

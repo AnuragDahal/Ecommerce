@@ -1,43 +1,5 @@
-import mongoose, { Types } from "mongoose";
-import { Document, Schema } from "mongoose";
-// To be included in future versions
-// Use Cases for Aggregation Pipelines
-// Total Number of Products per Seller: Calculate the total number of products each seller has.
-// Average Rating of Products per Seller: Calculate the average rating of products for each seller.
-// Top Sellers by Sales: Identify the top sellers based on sales data.
-// Sellers by Category: Group sellers by their product categories.
-
-interface ISellerOrder {
-    productId: string;
-    quantity: number;
-    price: number;
-    userId: string;
-}
-interface ISeller extends Document {
-    name: string;
-    userId: Schema.Types.ObjectId;
-    email: string;
-    storeName: string;
-    categoryOfProduct: string;
-    imageUrl: string;
-    products: Array<Types.ObjectId>;
-    orders: Array<ISellerOrder>;
-    storeAddress: string;
-    paymentDetails: Array<{
-        bankAccountNumber: string;
-    }>;
-
-    contact: Array<{
-        phone: string;
-        email: string;
-    }>;
-    socialMedia: Array<{
-        platform: string;
-        url: string;
-    }>;
-    createdAt: Date;
-    updatedAt: Date;
-}
+import mongoose, {Schema} from "mongoose";
+import {ISeller} from "../types";
 
 const sellerSchema = new Schema(
     {
@@ -125,7 +87,7 @@ const sellerSchema = new Schema(
             default: Date.now,
         },
     },
-    { timestamps: true }
+    {timestamps: true}
 );
 
 const Seller = mongoose.model<ISeller>("Seller", sellerSchema);

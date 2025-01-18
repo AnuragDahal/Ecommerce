@@ -5,7 +5,7 @@ import {
 } from "../controllers/seller.controller";
 import upload from "../utils/multer";
 import { zodValidator } from "../middleware/zod";
-import { createSellerSchema } from "../schema";
+import { createSellerSchema } from "../zod";
 
 const router = Router();
 
