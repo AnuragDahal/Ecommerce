@@ -1,18 +1,25 @@
-import { Request, Response } from "express";
-import { API_RESPONSES } from "../constants/apiResponses";
-import Product, { IProduct } from "../models/product.model";
+import {Request, Response} from "express";
+import {API_RESPONSES} from "../constants/apiResponses";
 import {
     sendBadRequest,
     sendInternalServerError,
     sendNotFound,
     sendSuccess,
 } from "../utils/statusUtils";
-import { deletePreviousImages, uploadMultipleFiles } from "../utils/imageKit";
-import { HTTP_STATUS_CODES } from "../constants/statusCodes";
+import {deletePreviousImages, uploadMultipleFiles} from "../utils/imageKit";
+import {HTTP_STATUS_CODES} from "../constants/statusCodes";
 import Seller from "../models/seller.model";
 import User from "../models/user.model";
-import { ProductDetails, SellerDetails } from "../types/user";
-import { Types } from "mongoose";
+
+import {Types} from "mongoose";
+import Product from "../models/product.model";
+import {
+    ICart,
+    ICartProduct,
+    IProduct,
+    ProductDetails,
+    SellerDetails,
+} from "../types";
 
 export interface MulterRequest extends Request {
     files?: Express.Multer.File[];
@@ -30,7 +37,7 @@ export const handleCreateProduct = async (
             sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
             return;
         }
-        const seller = await Seller.findOne({ userId: payload._id });
+        const seller = await Seller.findOne({userId: payload._id});
         if (!seller) {
             sendNotFound(res, API_RESPONSES.NOT_FOUND);
             return;
@@ -39,7 +46,7 @@ export const handleCreateProduct = async (
             sendBadRequest(res, API_RESPONSES.IMAGE_UPLOAD_FAILED);
             return;
         }
-        const { name, price, description, totalQuantity, category } =
+        const {name, price, description, totalQuantity, category} =
             multerReq.body;
         if (!name || !price || !description || !totalQuantity || !category) {
             sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
@@ -62,9 +69,9 @@ export const handleCreateProduct = async (
         );
         product.imageUrl = result;
 
-        await product.save({ validateBeforeSave: false });
+        await product.save({validateBeforeSave: false});
         seller.products.push(product._id as any);
-        await seller.save({ validateBeforeSave: false });
+        await seller.save({validateBeforeSave: false});
 
         sendSuccess(
             res,
@@ -135,8 +142,8 @@ export const handleUpdateProduct = async (
 
         const updatedProduct = await Product.findByIdAndUpdate(
             productId,
-            { $set: updateData },
-            { new: true } // This option returns the updated document
+            {$set: updateData},
+            {new: true} // This option returns the updated document
         );
 
         if (!updatedProduct) {
@@ -212,7 +219,7 @@ export const handleAllProductsRetrieval = async (
         let query: any = {};
         if (search) {
             query = {
-                $text: { $search: search }, // Performs a text search
+                $text: {$search: search},
             };
         }
         if (category) {
@@ -280,7 +287,7 @@ export const handleProductRetrieval = async (
     res: Response
 ): Promise<void> => {
     try {
-        const { productId } = req.params;
+        const {productId} = req.params;
         if (!productId) {
             sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
             return;
@@ -314,19 +321,13 @@ export const handleProductRetrieval = async (
     }
 };
 
-interface CartProduct {
-    productId: string;
-    quantity: number;
-    price: number;
-    sellerId: string;
-}
 // Cart related functions
 export const handleAddToCart = async (
     req: Request,
     res: Response
 ): Promise<void> => {
     try {
-        const { products } = req.body;
+        const {products} = req.body;
 
         // Validate request payload
         if (!products || !Array.isArray(products)) {
@@ -347,7 +348,7 @@ export const handleAddToCart = async (
         }
 
         // Process each product in the request payload
-        products.forEach((product: CartProduct) => {
+        products.forEach((product: ICartProduct) => {
             // Convert string IDs to ObjectId for comparison
             const productObjectId = new Types.ObjectId(product.productId);
             const sellerObjectId = new Types.ObjectId(product.sellerId);
@@ -379,7 +380,7 @@ export const handleAddToCart = async (
         });
 
         // Save user with updated cart
-        await user.save({ validateBeforeSave: false });
+        await user.save({validateBeforeSave: false});
         sendSuccess(res, API_RESPONSES.ADDED_TO_CART, HTTP_STATUS_CODES.OK);
         return;
     } catch (error) {
@@ -394,7 +395,7 @@ export const handleRemoveFromCart = async (
     res: Response
 ): Promise<void> => {
     try {
-        const { productId } = req.params;
+        const {productId} = req.params;
 
         if (!productId) {
             sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
@@ -409,7 +410,7 @@ export const handleRemoveFromCart = async (
         user.cart = user.cart.filter(
             (item) => item.productId.toString() !== productId
         );
-        await user.save({ validateBeforeSave: false });
+        await user.save({validateBeforeSave: false});
         sendSuccess(res, API_RESPONSES.SUCCESS, HTTP_STATUS_CODES.DELETED, {
             message: "Product removed from cart",
         });
@@ -433,7 +434,7 @@ export const handleClearCart = async (
             return;
         }
         user.cart = [];
-        await user.save({ validateBeforeSave: false });
+        await user.save({validateBeforeSave: false});
         sendSuccess(res, API_RESPONSES.SUCCESS, HTTP_STATUS_CODES.OK);
         return;
     } catch (error) {
@@ -497,8 +498,8 @@ export const manageCartQuantity = async (
     res: Response
 ): Promise<void> => {
     try {
-        const { productId } = req.params;
-        const { quantity } = req.query;
+        const {productId} = req.params;
+        const {quantity} = req.query;
         if (!productId || !quantity) {
             sendBadRequest(res, API_RESPONSES.MISSING_REQUIRED_FIELDS);
             return;
@@ -516,7 +517,7 @@ export const manageCartQuantity = async (
             return;
         }
         cartItem.quantity = Number(quantity);
-        await user.save({ validateBeforeSave: false });
+        await user.save({validateBeforeSave: false});
         sendSuccess(res, API_RESPONSES.SUCCESS, HTTP_STATUS_CODES.OK);
         return;
     } catch (error) {

@@ -34,3 +34,10 @@ export interface ICart {
     quantity: number;
     sellerId: Types.ObjectId | SellerDetails;
 }
+
+export interface ICartProduct {
+    productId: string;
+    price: number;
+    quantity: number;
+    sellerId: string;
+}
