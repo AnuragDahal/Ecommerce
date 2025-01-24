@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { ProductType } from "@/types";
+import {useState, useEffect} from "react";
+import {ChevronLeft, ChevronRight} from "lucide-react";
+import {Button} from "@/components/ui/button";
+import {Link} from "react-router-dom";
+import {ProductType} from "@/types";
 
-const HeroCarousel = ({ products }: { products: ProductType[] }) => {
+const HeroCarousel = ({products}: {products: ProductType[]}) => {
     const [currentIndex, setCurrentIndex] = useState(0);
 
     useEffect(() => {
@@ -27,11 +27,10 @@ const HeroCarousel = ({ products }: { products: ProductType[] }) => {
     return (
         <div className="relative w-full flex justify-center py-4 lg:py-8">
             <div className="relative w-full max-w-6xl overflow-hidden">
-                {/* More contained height */}
                 <div className="h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh]">
                     {products.map((product: ProductType, index: number) => (
                         <div
-                            key={product.id}
+                            key={index}
                             className={`absolute top-0 left-0 w-full h-full transition-opacity duration-1000 ${
                                 index === currentIndex
                                     ? "opacity-100"
@@ -46,7 +45,7 @@ const HeroCarousel = ({ products }: { products: ProductType[] }) => {
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent rounded-lg" />
 
-                                <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
                                     <div className="text-center px-4 sm:px-6 md:px-8 max-w-3xl mx-auto">
                                         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 text-white drop-shadow-lg">
                                             {product.title}
@@ -59,7 +58,7 @@ const HeroCarousel = ({ products }: { products: ProductType[] }) => {
                                             <Button
                                                 size="lg"
                                                 variant="cta"
-                                                className="text-base px-6 py-2 font-semibold hover:scale-105 transition-transform"
+                                                className="pointer-events-auto text-base px-6 py-2 font-semibold hover:scale-105 transition-transform"
                                             >
                                                 Shop Now
                                             </Button>
@@ -71,7 +70,6 @@ const HeroCarousel = ({ products }: { products: ProductType[] }) => {
                     ))}
                 </div>
 
-                {/* Navigation dots */}
                 <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
                     {products.map((_, index) => (
                         <button
