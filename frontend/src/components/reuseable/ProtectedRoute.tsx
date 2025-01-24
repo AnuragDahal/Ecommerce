@@ -1,37 +1,65 @@
-// src/components/ProtectedRoute.tsx
-import { useEffect } from "react";
-import { useAuthContext } from "@/context/authcontext";
-import { useNavigate } from "react-router-dom";
+import {useEffect, useState} from "react";
+import {useAuthContext} from "@/context/authcontext";
+import {useNavigate, useLocation} from "react-router-dom";
 import React from "react";
 
 interface ProtectedRouteProps {
     children: React.ReactNode;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-    const { isAuthenticated, getUserRole } = useAuthContext();
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({children}) => {
+    const {isAuthenticated, getUserRole} = useAuthContext();
     const navigate = useNavigate();
-    const path = "/seller";
+    const location = useLocation();
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const checkAuthentication = async () => {
-            if (!isAuthenticated) {
-                navigate("/login");
+        const checkAccess = async () => {
+            // Only check authentication for protected routes
+            const protectedRoutes = [
+                "/complete",
+                "/checkout",
+                "/cart",
+                "/profile",
+                "/orders",
+                "/seller",
+            ];
+            const isProtectedRoute = protectedRoutes.some((route) =>
+                location.pathname.startsWith(route)
+            );
+
+            if (isProtectedRoute && !isAuthenticated) {
+                navigate("/login", {replace: true, state: {from: location}});
+                return;
             }
-            const role = await getUserRole();
-            if (role !== "seller" && location.pathname.includes(path)) {
-                navigate("/");
+
+            if (isProtectedRoute) {
+                try {
+                    const role = await getUserRole();
+                    if (
+                        location.pathname.includes("/seller") &&
+                        role !== "seller"
+                    ) {
+                        navigate("/", {replace: true});
+                    }
+                } catch (error) {
+                    navigate("/login", {replace: true});
+                } finally {
+                    setIsLoading(false);
+                }
+            } else {
+                setIsLoading(false);
             }
         };
-        checkAuthentication();
-    }, [isAuthenticated, navigate, getUserRole]);
 
-    // If the user is authenticated, render the children (protected content)
-    if (!isAuthenticated) {
-        return null; // or you could return a loading spinner if desired
+        checkAccess();
+    }, [isAuthenticated, navigate, getUserRole, location]);
+
+    if (isLoading) {
+        return <div>Loading...</div>;
     }
 
-    return <>{children}</>; // Render the protected content
+    return <>{children}</>;
 };
 
 export default ProtectedRoute;

@@ -1,13 +1,15 @@
-import { useState, useCallback } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Minus, Plus } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
-import { useMutation } from "@tanstack/react-query";
-import { addtoCart } from "@/services/useUserServices";
+import {useState, useCallback} from "react";
+import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
+import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import {Minus, Plus} from "lucide-react";
+import {toast} from "@/hooks/use-toast";
+import {useMutation} from "@tanstack/react-query";
+import {addtoCart} from "@/services/useUserServices";
+import {useAuthContext} from "@/context/authcontext";
+import {useNavigate} from "react-router-dom";
 
 // Debounce utility function
 export function debounce(func: (...args: any[]) => void, delay: number) {
@@ -51,6 +53,8 @@ export default function ProductDetailCard({
     images,
     category,
 }: ProductProps) {
+    const {isAuthenticated} = useAuthContext();
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [selectedColor, setSelectedColor] = useState<string>(
         colors ? colors[0].name : ""
@@ -93,6 +97,10 @@ export default function ProductDetailCard({
     });
 
     const handleAddToCart = () => {
+        if (!isAuthenticated) {
+            navigate("/login");
+            return;
+        }
         setLoading(!loading);
         mutation.mutate({
             products: [

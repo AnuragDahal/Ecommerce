@@ -7,8 +7,8 @@ import React, {
 } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { useGetRoleService } from "@/services/useAuthService";
+import {useNavigate} from "react-router-dom";
+import {useGetRoleService} from "@/services/useAuthService";
 
 interface AuthContextProps {
     isAuthenticated: boolean;
@@ -16,6 +16,7 @@ interface AuthContextProps {
     login: (accessToken: string, refreshToken: string) => void;
     logout: () => void;
     getUserRole: () => Promise<string | undefined>;
+    loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -40,9 +41,7 @@ const removeExpiredTokens = () => {
     return false;
 };
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({
-    children,
-}) => {
+export const AuthProvider: React.FC<{children: ReactNode}> = ({children}) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [token, setToken] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
@@ -61,9 +60,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
                         refreshToken,
                     }
                 );
-                const { accessToken } = response.data.data;
+                const {accessToken} = response.data.data;
 
-                Cookies.set("accessToken", accessToken, { expires: 10 });
+                Cookies.set("accessToken", accessToken, {expires: 10});
                 setToken(accessToken);
                 setIsAuthenticated(true);
                 return true;
@@ -127,8 +126,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
     const login = (accessToken: string, refreshToken: string) => {
         if (!isTokenExpired(accessToken)) {
-            Cookies.set("accessToken", accessToken, { expires: 10 });
-            Cookies.set("refreshToken", refreshToken, { expires: 10 });
+            Cookies.set("accessToken", accessToken, {expires: 10});
+            Cookies.set("refreshToken", refreshToken, {expires: 10});
             setToken(accessToken);
             setIsAuthenticated(true);
             navigate("/");
@@ -153,7 +152,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         Cookies.remove("refreshToken");
         setToken(null);
         setIsAuthenticated(false);
-        navigate("/login");
+        const publicRoutes = [
+            "/login",
+            "/sign-up",
+            "/verify-email",
+            "/products/:id",
+            "/",
+            "/products",
+            "/about",
+            "/categories",
+            "/contact",
+        ];
+        if (
+            !publicRoutes.some((route) => location.pathname.startsWith(route))
+        ) {
+            navigate("/login");
+        }
     };
 
     if (loading) {
@@ -164,13 +178,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         <AuthContext.Provider
             value={{
                 isAuthenticated,
-                token,
-                logout,
                 login,
+                logout,
+                loading,
+                token,
                 getUserRole,
             }}
         >
-            {children}
+            {loading ? <div>Loading...</div> : children}{" "}
+            {/* Show loading until authentication is determined */}
         </AuthContext.Provider>
     );
 };

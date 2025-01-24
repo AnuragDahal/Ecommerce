@@ -1,18 +1,23 @@
+import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, Package, Settings, ShoppingCart, User } from "lucide-react";
-import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+    LogIn,
+    LogOut,
+    Package,
+    Settings,
+    ShoppingCart,
+    User,
+} from "lucide-react";
+import {Link} from "react-router-dom";
+import {useEffect, useState} from "react";
 import Cookies from "js-cookie";
-import { useQuery } from "@tanstack/react-query";
-import { getUserProfile } from "@/services/useUserServices";
-import { IFetchedProfile } from "@/types";
+import {useQuery} from "@tanstack/react-query";
+import {getUserProfile} from "@/services/useUserServices";
+import {IFetchedProfile} from "@/types";
+import {useAuthContext} from "@/context/authcontext";
 
 const DesktopNavigation = () => {
+    const {isAuthenticated} = useAuthContext();
     // State to control whether the popover is open
     const [popoverOpen, setPopoverOpen] = useState(false);
     const [profile, setProfile] = useState<IFetchedProfile>({
@@ -24,7 +29,7 @@ const DesktopNavigation = () => {
         avatar: "",
     });
 
-    const { data } = useQuery({
+    const {data} = useQuery({
         queryFn: getUserProfile,
         queryKey: ["userProfile"],
         staleTime: 1000 * 60 * 10,
@@ -35,33 +40,41 @@ const DesktopNavigation = () => {
         }
     }, [data]);
 
-    const desktopSettings = [
-        {
-            label: "Profile",
-            icon: <User />,
-            link: "/profile",
-        },
-        {
-            label: "Settings",
-            icon: <Settings />,
-            link: "/settings",
-        },
-        {
-            label: "My Orders",
-            icon: <Package />,
-            link: "/orders",
-        },
-        {
-            label: "My Cart",
-            icon: <ShoppingCart />,
-            link: "/cart",
-        },
-        {
-            label: "Logout",
-            icon: <LogOut />,
-            link: "/login",
-        },
-    ];
+    const desktopSettings = isAuthenticated
+        ? [
+              {
+                  label: "Profile",
+                  icon: <User />,
+                  link: "/profile",
+              },
+              {
+                  label: "Settings",
+                  icon: <Settings />,
+                  link: "/settings",
+              },
+              {
+                  label: "My Orders",
+                  icon: <Package />,
+                  link: "/orders",
+              },
+              {
+                  label: "My Cart",
+                  icon: <ShoppingCart />,
+                  link: "/cart",
+              },
+              {
+                  label: "Logout",
+                  icon: <LogOut />,
+                  link: "/login",
+              },
+          ]
+        : [
+              {
+                  label: "Login",
+                  icon: <LogIn />,
+                  link: "/login",
+              },
+          ];
     return (
         <div>
             <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>

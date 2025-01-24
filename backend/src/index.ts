@@ -28,7 +28,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRouter);
-app.use("/api/products", isAuthenticated, productRouter);
+app.use("/api/products", productRouter);
 app.use("/api/seller", isAuthenticated, sellerRouter);
 app.use("/api/user", isAuthenticated, userRouter);
 

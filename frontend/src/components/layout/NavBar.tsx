@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import {useEffect, useState} from "react";
+import {Link, useLocation} from "react-router-dom";
 import Cookies from "js-cookie";
-import { navList } from "@/config/constants";
+import {navList} from "@/config/constants";
 import {
     Sheet,
     SheetContent,
@@ -9,22 +9,33 @@ import {
     SheetTitle,
     SheetTrigger,
 } from "@/components/ui/sheet";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import { Menu, LogOut, ShoppingBag, Heart, User, Settings } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { useGetRoleService } from "@/services/useAuthService";
-import { getUserProfile } from "@/services/useUserServices";
-import { IFetchedProfile } from "@/types";
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
+import {Separator} from "@/components/ui/separator";
+import {Button} from "@/components/ui/button";
+import {
+    Menu,
+    LogIn,
+    LogOut,
+    ShoppingBag,
+    Heart,
+    User,
+    Settings,
+} from "lucide-react";
+import {useQuery} from "@tanstack/react-query";
+import {useGetRoleService} from "@/services/useAuthService";
+import {getUserProfile} from "@/services/useUserServices";
+import {IFetchedProfile} from "@/types";
+import {useAuthContext} from "@/context/authcontext";
 
 // NavItems for both desktop and mobile
 const NavItems = ({
     closeMenu,
     role,
+    isAuthenticated,
 }: {
     closeMenu: () => void;
     role: string | undefined;
+    isAuthenticated: boolean;
 }) => {
     const location = useLocation();
 
@@ -32,7 +43,8 @@ const NavItems = ({
         <>
             {navList.map((item, index) => {
                 const isDashboard =
-                    item.name === "Dashboard" && role === "user";
+                    item.name === "Dashboard" &&
+                    (!isAuthenticated || role !== "seller");
                 if (isDashboard) return null;
 
                 const isActive = location.pathname === item.link;
@@ -57,16 +69,18 @@ const NavItems = ({
 };
 
 // Mobile-only profile section
-const MobileProfileSection = ({ closeMenu }: { closeMenu: () => void }) => {
+const MobileProfileSection = ({closeMenu}: {closeMenu: () => void}) => {
+    const {isAuthenticated} = useAuthContext();
     const location = useLocation();
-    const profileMenuItems = [
-        { name: "My Profile", icon: User, link: "/profile" },
-        { name: "My Orders", icon: ShoppingBag, link: "/orders" },
-        { name: "Wishlist", icon: Heart, link: "/wishlist" },
-        {name: "My Cart", icon: ShoppingBag, link: "/cart"},
-        { name: "Settings", icon: Settings, link: "/settings" },
-        { name: "Logout", icon: LogOut, link: "/login" },
-    ];
+    const profileMenuItems = isAuthenticated
+        ? [
+              {name: "My Profile", icon: User, link: "/profile"},
+              {name: "My Orders", icon: ShoppingBag, link: "/orders"},
+              {name: "My Cart", icon: ShoppingBag, link: "/cart"},
+              {name: "Settings", icon: Settings, link: "/settings"},
+              {name: "Logout", icon: LogOut, link: "/login"},
+          ]
+        : [{name: "Login", icon: LogIn, link: "/login"}];
 
     return (
         <div className="flex flex-col space-y-1">
@@ -100,6 +114,7 @@ const MobileProfileSection = ({ closeMenu }: { closeMenu: () => void }) => {
 };
 
 const Navbar = () => {
+    const {isAuthenticated} = useAuthContext();
     const [isOpen, setIsOpen] = useState(false);
     const toggleMenu = () => setIsOpen(!isOpen);
     const [profileData, setProfileData] = useState<IFetchedProfile>({
@@ -110,17 +125,19 @@ const Navbar = () => {
         phoneNumber: "",
         address: "",
     });
-    const { data: roleData } = useQuery({
+    const {data: roleData} = useQuery({
         queryKey: ["user"],
         queryFn: useGetRoleService,
         staleTime: 1000 * 60 * 5,
     });
     const role = roleData?.data?.role;
-    const { data } = useQuery({
+    const {data} = useQuery({
         queryKey: ["userProfile"],
         queryFn: getUserProfile,
         staleTime: 1000 * 60 * 10,
+        enabled: isAuthenticated,
     });
+
     useEffect(() => {
         if (data) {
             setProfileData({
@@ -138,7 +155,11 @@ const Navbar = () => {
         <>
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-                <NavItems closeMenu={() => {}} role={role} />
+                <NavItems
+                    closeMenu={() => {}}
+                    role={role}
+                    isAuthenticated={isAuthenticated}
+                />
             </nav>
 
             {/* Mobile Menu */}
@@ -150,39 +171,50 @@ const Navbar = () => {
                         className="md:hidden"
                         onClick={toggleMenu}
                     >
-                        <Menu className="h-5 w-5" />
+                        <Menu className="h-6 w-6" />
                     </Button>
                 </SheetTrigger>
-                <SheetContent side="left" className="w-72">
-                    <SheetHeader className="mb-4">
-                        <SheetTitle>
-                            <div className="flex items-center space-x-3">
-                                <Avatar>
-                                    <AvatarImage src={profileData?.avatar} />
-                                    <AvatarFallback>
-                                        {profileData.firstName.charAt(0) +
-                                            profileData.lastName.charAt(0)}
-                                    </AvatarFallback>
-                                </Avatar>
-                                <div className="flex flex-col">
-                                    <span className="font-medium">
-                                        {profileData.firstName}
-                                        {profileData.lastName}
-                                    </span>
-                                    <span className="text-sm text-muted-foreground">
-                                        {profileData.email}
-                                    </span>
+                <SheetContent
+                    side="left"
+                    className={`w-72 transition-all duration-300 ease-in-out ${
+                        isOpen
+                            ? "translate-x-0 opacity-100"
+                            : "-translate-x-full opacity-0"
+                    }`}
+                >
+                    {isAuthenticated ? (
+                        <SheetHeader className="mb-4">
+                            <SheetTitle>
+                                <div className="flex items-center space-x-3">
+                                    <Avatar>
+                                        <AvatarImage
+                                            src={profileData?.avatar}
+                                        />
+                                        <AvatarFallback>
+                                            {profileData.firstName.charAt(0) +
+                                                profileData.lastName.charAt(0)}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div className="flex flex-col">
+                                        <span className="font-medium">
+                                            {profileData.firstName}
+                                            {profileData.lastName}
+                                        </span>
+                                        <span className="text-sm text-muted-foreground">
+                                            {profileData.email}
+                                        </span>
+                                    </div>
                                 </div>
-                            </div>
-                        </SheetTitle>
-                    </SheetHeader>
+                            </SheetTitle>
+                        </SheetHeader>
+                    ) : null}
 
                     {/* Mobile Navigation Layout */}
                     <div className="flex flex-col space-y-6">
                         {/* Profile Section */}
                         <div>
                             <h3 className="px-2 mb-2 text-sm font-semibold text-muted-foreground">
-                                Profile
+                                {isAuthenticated ? "Profile" : "Account"}
                             </h3>
                             <MobileProfileSection
                                 closeMenu={() => setIsOpen(false)}
@@ -196,10 +228,11 @@ const Navbar = () => {
                             <h3 className="px-2 mb-2 text-sm font-semibold text-muted-foreground">
                                 Menu
                             </h3>
-                            <div className="flex flex-col space-y-1 space-x-3">
+                            <div className="pl-3 flex flex-col space-y-3">
                                 <NavItems
                                     closeMenu={() => setIsOpen(false)}
                                     role={role}
+                                    isAuthenticated={isAuthenticated}
                                 />
                             </div>
                         </div>

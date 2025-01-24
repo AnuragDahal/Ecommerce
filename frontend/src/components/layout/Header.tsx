@@ -1,6 +1,6 @@
-import { Link } from "react-router-dom";
-import { ShoppingCart } from "lucide-react";
-import { ModeToggle } from "@/components/themes/mode-toggle";
+import {Link} from "react-router-dom";
+import {ShoppingCart} from "lucide-react";
+import {ModeToggle} from "@/components/themes/mode-toggle";
 
 import Navbar from "@/components/layout/NavBar";
 
@@ -8,7 +8,7 @@ import DesktopNavigation from "./DesktopNavigation";
 
 const Header = () => {
     return (
-        <header className="sticky top-0 z-50 w-full border-b backdrop-blur-md">
+        <header className="sticky top-0 z-50 w-full border-b backdrop-blur-md bg-card">
             <div className="container mx-auto px-4 h-14 flex items-center justify-between">
                 <div className="flex items-center">
                     <Link to="/" className="flex items-center space-x-2">

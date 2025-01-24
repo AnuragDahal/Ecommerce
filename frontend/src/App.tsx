@@ -1,4 +1,4 @@
-import { Outlet, Route, Routes } from "react-router-dom";
+import {Outlet, Route, Routes} from "react-router-dom";
 import Product from "@/pages/users/product/Product";
 import NotFound from "@/pages/NotFound";
 import SignUp from "@/pages/users/auth/SignUp";
@@ -8,10 +8,10 @@ import Categories from "@/pages/users/product/Categories";
 import Contact from "@/pages/static/Contact";
 import Home from "@/pages/Home";
 import Layout from "@/components/layout/Layout";
-import { Toaster } from "@/components/ui/toaster";
+import {Toaster} from "@/components/ui/toaster";
 import ProtectedRoute from "@/components/reuseable/ProtectedRoute";
-import { AuthProvider } from "@/context/authcontext";
-import { ThemeProvider } from "@/components/themes/theme-provider";
+import {AuthProvider} from "@/context/authcontext";
+import {ThemeProvider} from "@/components/themes/theme-provider";
 import EmailVerification from "./pages/users/auth/EmailVerification";
 import SingleProduct from "./pages/users/product/SingleProduct";
 import UpgradeAccount from "./pages/users/settings/UpgradeAccount";
@@ -29,14 +29,12 @@ import Cart from "./pages/users/product/Cart";
 import MyOrdersPage from "./pages/users/product/Orders";
 import StripeCheckout from "./pages/users/auth/StripeCheckout";
 import StripeComplete from "./pages/users/auth/StripeComplete";
-import { SidebarProvider } from "./components/ui/sidebar";
+import {SidebarProvider} from "./components/ui/sidebar";
 import Settings from "./pages/users/settings/Settings";
 
-const App = () => (
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+const App = () => {
+    return (
         <AuthProvider>
-            <Toaster />
-
             <Routes>
                 {/* Auth Routes */}
                 <Route path="/login" element={<Login />} />
@@ -46,18 +44,16 @@ const App = () => (
                 <Route path="/reset-password" element={<ResetPassword />} />
 
                 {/* Main App Layout with Nested Routes */}
+
                 <Route path="/*" element={<Layout />}>
                     <Route index element={<Home />} />
-
+                    <Route path="products" element={<Product />} />
+                    <Route path="about" element={<About />} />
+                    <Route path="categories" element={<Categories />} />
+                    <Route path="contact" element={<Contact />} />
+                    <Route path="products/:id" element={<SingleProduct />} />
                     {/* Protected Routes */}
-                    <Route
-                        path="products"
-                        element={
-                            <ProtectedRoute>
-                                <Product />
-                            </ProtectedRoute>
-                        }
-                    />
+
                     <Route
                         path="complete"
                         element={
@@ -90,38 +86,7 @@ const App = () => (
                             </ProtectedRoute>
                         }
                     />
-                    <Route
-                        path="about"
-                        element={
-                            <ProtectedRoute>
-                                <About />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="categories"
-                        element={
-                            <ProtectedRoute>
-                                <Categories />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="contact"
-                        element={
-                            <ProtectedRoute>
-                                <Contact />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="products/:id"
-                        element={
-                            <ProtectedRoute>
-                                <SingleProduct />
-                            </ProtectedRoute>
-                        }
-                    />
+
                     <Route
                         path="profile"
                         element={
@@ -206,7 +171,7 @@ const App = () => (
                 </Route>
             </Routes>
         </AuthProvider>
-    </ThemeProvider>
-);
+    );
+};
 
 export default App;
