@@ -163,7 +163,11 @@ const Navbar = () => {
                         className="md:hidden"
                         onClick={toggleMenu}
                     >
-                        <Menu className="h-6 w-6" />
+                        {isOpen ? (
+                            <Menu className="hidden" />
+                        ) : (
+                            <Menu className="h-6 w-6" />
+                        )}
                     </Button>
                 </SheetTrigger>
                 <SheetContent
