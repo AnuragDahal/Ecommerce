@@ -1,8 +1,8 @@
 import React from "react";
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import {useState} from "react";
+import {motion} from "framer-motion";
+import {Eye, EyeOff, Loader2} from "lucide-react";
+import {Button} from "@/components/ui/button";
 import {
     Card,
     CardContent,
@@ -10,21 +10,21 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@/hooks/use-toast";
-import { Link, useNavigate } from "react-router-dom";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
+import {useAuth} from "@/hooks/useAuth";
+import {useToast} from "@/hooks/use-toast";
+import {Link, useNavigate} from "react-router-dom";
 
 export default function SignUp() {
-    const { toast } = useToast();
+    const {toast} = useToast();
     const [isLoading, setIsLoading] = useState(false);
     const [firstName, setFirstName] = useState<string>("");
     const [lastName, setLastName] = useState<string>("");
     const [userName, setUserName] = useState<string>("");
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
-    const { signUpMutation } = useAuth();
+    const {signUpMutation} = useAuth();
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const navigate = useNavigate();
     const signUpData = {
@@ -34,8 +34,58 @@ export default function SignUp() {
         email,
         password,
     };
+    const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
+    const validatePassword = (password: string) => {
+        const errors: string[] = [];
+
+        // Length check
+        if (password.length < 8 || password.length > 16) {
+            errors.push("Password must be 8-16 characters long");
+        }
+
+        // Special character check
+        if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+            errors.push("Must include at least one special character");
+        }
+
+        // Uppercase check
+        if (!/[A-Z]/.test(password)) {
+            errors.push("Must include at least one capital letter");
+        }
+
+        // Numeric check
+        if (!/[0-9]/.test(password)) {
+            errors.push("Must include at least one numeric digit");
+        }
+
+        return errors;
+    };
+    const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newPassword = e.target.value;
+        setPassword(newPassword);
+
+        // Validate password as user types
+        const validationErrors = validatePassword(newPassword);
+        setPasswordErrors(validationErrors);
+    };
+
     const handleSignUp = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        setPasswordErrors([]);
+
+        // Validate password
+        const passwordValidationErrors = validatePassword(password);
+
+        // If there are validation errors, show them one by one
+        if (passwordValidationErrors.length > 0) {
+            // Show first error
+            toast({
+                title: "Password Validation Error",
+                description: passwordValidationErrors[0],
+                variant: "destructive",
+            });
+            return;
+        }
         setIsLoading(true);
         signUpMutation.mutate(signUpData, {
             onSuccess: () => {
@@ -67,9 +117,9 @@ export default function SignUp() {
                 <div className="absolute bottom-1/3 left-1/2 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
             </div>
             <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
+                initial={{opacity: 0, y: 20}}
+                animate={{opacity: 1, y: 0}}
+                transition={{duration: 0.5}}
                 className="w-full max-w-2xl px-4 sm:px-0"
             >
                 <Card className="bg-gray-800/40 backdrop-blur-md border-gray-700">
@@ -160,9 +210,7 @@ export default function SignUp() {
                                 <Input
                                     id="password"
                                     value={password}
-                                    onChange={(e) =>
-                                        setPassword(e.target.value)
-                                    }
+                                    onChange={handlePasswordChange}
                                     placeholder="Create a password"
                                     type={
                                         isPasswordVisible ? "text" : "password"
@@ -170,6 +218,12 @@ export default function SignUp() {
                                     required
                                     className="bg-gray-700/50 border-gray-600 text-white placeholder-gray-400"
                                 />
+                                {passwordErrors.length > 0 && (
+                                    <div className="text-red-500 text-sm">
+                                        {passwordErrors[0]}
+                                    </div>
+                                )}
+
                                 {isPasswordVisible ? (
                                     <Eye
                                         onClick={() =>
