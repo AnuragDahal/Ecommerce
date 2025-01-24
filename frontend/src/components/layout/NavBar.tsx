@@ -1,7 +1,6 @@
-import {useEffect, useState} from "react";
-import {Link, useLocation} from "react-router-dom";
-import Cookies from "js-cookie";
-import {navList} from "@/config/constants";
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
+import {Button} from "@/components/ui/button";
+import {Separator} from "@/components/ui/separator";
 import {
     Sheet,
     SheetContent,
@@ -9,23 +8,16 @@ import {
     SheetTitle,
     SheetTrigger,
 } from "@/components/ui/sheet";
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
-import {Separator} from "@/components/ui/separator";
-import {Button} from "@/components/ui/button";
-import {
-    Menu,
-    LogIn,
-    LogOut,
-    ShoppingBag,
-    Heart,
-    User,
-    Settings,
-} from "lucide-react";
-import {useQuery} from "@tanstack/react-query";
+import {navList} from "@/config/constants";
+import {useAuthContext} from "@/context/authcontext";
 import {useGetRoleService} from "@/services/useAuthService";
 import {getUserProfile} from "@/services/useUserServices";
 import {IFetchedProfile} from "@/types";
-import {useAuthContext} from "@/context/authcontext";
+import {useQuery} from "@tanstack/react-query";
+import Cookies from "js-cookie";
+import {LogIn, LogOut, Menu, Settings, ShoppingBag, User} from "lucide-react";
+import {useEffect, useState} from "react";
+import {Link, useLocation} from "react-router-dom";
 
 // NavItems for both desktop and mobile
 const NavItems = ({
