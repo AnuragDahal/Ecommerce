@@ -53,6 +53,18 @@ export interface IShippingAddress {
     country: string;
 }
 
+export interface User {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  userName: string;
+  role: 'user' | 'seller' | 'admin';
+  avatar?: string;
+  address?: string;
+  phoneNumber?: string;
+}
+
 export interface IFetchedProfile {
     firstName: string;
     lastName: string;
@@ -60,4 +72,45 @@ export interface IFetchedProfile {
     phoneNumber: string;
     address: string;
     avatar: string;
+}
+
+export interface Product {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    images: string[];
+    category: string;
+    totalQuantity: number;
+    sellerId: string;
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+export interface ProductFilters {
+    category: string;
+    price: string;
+    search: string;
+    page: number;
+    limit: number;
+}
+
+export interface CreateProductDTO {
+    name: string;
+    price: number;
+    description: string;
+    totalQuantity: number;
+    category: string;
+    images: File[];
+}
+
+export interface CartItem extends Product {
+    quantity: number;
+}
+
+export interface Toast {
+    id: string;
+    title: string;
+    description?: string;
+    variant?: 'default' | 'destructive' | 'success';
 }
