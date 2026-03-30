@@ -5,7 +5,7 @@ import NetworkError from "@/components/reuseable/NetworkError";
 import HeroCarousel from "@/components/HeroCarousel";
 import CategoryShowcase from "@/components/CategoryShowcase";
 import NewArrivals from "@/components/NewArrivals";
-// import PromoBanner from "@/components/PromoBanner";
+import PromoBanner from "@/components/PromoBanner";
 
 const Home = () => {
     const { status, data: products } = useQuery({
@@ -31,9 +31,10 @@ const Home = () => {
             <div className="w-full ">
                 <CategoryShowcase />
             </div>
-            {/* <PromoBanner /> */}
+            <PromoBanner />
         </div>
     );
 };
+
 
 export default Home;
